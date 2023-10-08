@@ -11,6 +11,9 @@ function Evento({ id, nombre, fecha, hora, ubicacion, invitados, onEliminar }) {
     const [nombreInvalido, setNombrelInvaido] = useState(false);
     const [DNIInvalido, setDNIInvalido] = useState(false);
     const [showInvitados, setShowInvitados] = useState(false);
+    const [showConfirmacionEliminar, setShowConfirmacionEliminar] =
+        useState(false);
+    const [indexInvitadoEliminar, setIndexInvitadoEliminar] = useState(null);
 
     const validarDNI = (DNI) => {
         // Validar DNI
@@ -68,8 +71,15 @@ function Evento({ id, nombre, fecha, hora, ubicacion, invitados, onEliminar }) {
     };
 
     const handleEliminarInvitado = async (index) => {
+        setIndexInvitadoEliminar(index);
+        setShowInvitados(false);
+        setShowConfirmacionEliminar(true);
+    };
+
+    const handleConfirmarEliminarInvitado = async () => {
+        if (indexInvitadoEliminar === null) return;
         const nuevosInvitados = [...invitadosArray];
-        nuevosInvitados.splice(index, 1);
+        nuevosInvitados.splice(indexInvitadoEliminar, 1);
         try {
             const res = await updateDoc(doc(db, "Eventos", id), {
                 invitados: [...nuevosInvitados],
@@ -80,6 +90,9 @@ function Evento({ id, nombre, fecha, hora, ubicacion, invitados, onEliminar }) {
         } catch (e) {
             console.error("Error adding document: ", e);
         }
+        setIndexInvitadoEliminar(null);
+        setShowConfirmacionEliminar(false);
+        setShowInvitados(true);
     };
 
     const listaInvitados = () => {
@@ -89,7 +102,7 @@ function Evento({ id, nombre, fecha, hora, ubicacion, invitados, onEliminar }) {
                     {invitadosArray.map((invitado, index) => {
                         return (
                             <ListGroup.Item key={index}>
-                                <div className="d-flex justify-content-between align-items-center">
+                                <div className="d-flex flex-column flex-md-row gap-2 justify-content-between ">
                                     <div>
                                         <span className="fw-bold d-block mt-1">
                                             Nombre:{" "}
@@ -112,15 +125,17 @@ function Evento({ id, nombre, fecha, hora, ubicacion, invitados, onEliminar }) {
                                     </div>
 
                                     {/* Botón de eliminación a la derecha */}
-                                    <button
-                                        className="btn btn-danger" // Estilo de botón de eliminación
-                                        onClick={() =>
-                                            handleEliminarInvitado(index)
-                                        } // Manejador para eliminar el evento por índice
-                                    >
-                                        {" "}
-                                        Eliminar
-                                    </button>
+                                    <div className="d-grid my-auto d-md-inline gap-2">
+                                        <button
+                                            className="my-2 btn btn-danger" // Estilo de botón de eliminación
+                                            onClick={() =>
+                                                handleEliminarInvitado(index)
+                                            } // Manejador para eliminar el evento por índice
+                                        >
+                                            {" "}
+                                            Eliminar
+                                        </button>
+                                    </div>
                                 </div>
                             </ListGroup.Item>
                         );
@@ -137,8 +152,8 @@ function Evento({ id, nombre, fecha, hora, ubicacion, invitados, onEliminar }) {
 
     return (
         <>
-            <li className="mb-4 list-group-item border border-2 rounded col-8 mx-auto">
-                <div className="d-flex justify-content-between align-items-center">
+            <li className="mb-4 list-group-item border border-2 rounded col-12 col-lg-8 mx-auto">
+                <div className="d-flex flex-column py-2 flex-md-row gap-3 justify-content-between align-items-center">
                     <div>
                         <h5 className="fw-bold">{nombre}</h5>
                         <span className="fw-bold d-block mt-1">
@@ -152,7 +167,7 @@ function Evento({ id, nombre, fecha, hora, ubicacion, invitados, onEliminar }) {
                             <span className="fw-light">{ubicacion}</span>
                         </span>
                     </div>
-                    <div className="d-flex gap-3">
+                    <div className="d-flex flex-column pb-3 pb-md-0 flex-md-row gap-3">
                         {/* Botón de ver invitados a la derecha */}
                         <button
                             className="btn btn-primary" // Estilo de botón primario
@@ -166,7 +181,7 @@ function Evento({ id, nombre, fecha, hora, ubicacion, invitados, onEliminar }) {
 
                         {/* Botón de eliminación a la derecha */}
                         <button
-                            className="btn btn-danger" // Estilo de botón de eliminación
+                            className="btn btn-block btn-danger" // Estilo de botón de eliminación
                             onClick={onEliminar} // Manejador para eliminar el evento por índice
                         >
                             {" "}
@@ -175,8 +190,9 @@ function Evento({ id, nombre, fecha, hora, ubicacion, invitados, onEliminar }) {
                     </div>
                 </div>
             </li>
-            {/* Modal de confirmación de eliminación de evento */}
+            {/* Modal de listado de invitados */}
             <Modal
+                className="pt-2 px-2 pt-md-0 px-md-0"
                 show={showInvitados}
                 onHide={() => {
                     setNombrelInvaido(false);
@@ -244,17 +260,53 @@ function Evento({ id, nombre, fecha, hora, ubicacion, invitados, onEliminar }) {
                                     Introduzca un email válido
                                 </Form.Control.Feedback>
                             </Form.Group>
-
-                            <Form.Group as={Col} md="12" controlId="formEmail">
-                                <Button type="submit" variant="primary">
+                            <div className="d-grid gap-2">
+                                <Button
+                                    className="btn btn-block"
+                                    type="submit"
+                                    variant="primary"
+                                >
                                     Añadir
                                 </Button>
-                            </Form.Group>
+                            </div>
                         </Row>
                     </Form>
                     <hr className="hr" />
                     {listaInvitados()}
                 </Modal.Body>
+            </Modal>
+
+            {/* Modal de confirmación de eliminacion de invitado de  */}
+            <Modal
+                show={showConfirmacionEliminar}
+                onHide={() => {
+                    setShowConfirmacionEliminar(false);
+                }}
+                centered
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirmar eliminación</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    ¿Estás seguro de que quieres eliminar este invitado?
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button
+                        variant="secondary"
+                        onClick={() => {
+                            setShowConfirmacionEliminar(false);
+                            setShowInvitados(true);
+                        }}
+                    >
+                        Cancelar
+                    </Button>
+                    <Button
+                        variant="danger"
+                        onClick={handleConfirmarEliminarInvitado}
+                    >
+                        Eliminar
+                    </Button>
+                </Modal.Footer>
             </Modal>
         </>
     );

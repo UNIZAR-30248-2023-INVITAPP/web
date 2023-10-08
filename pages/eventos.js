@@ -162,9 +162,9 @@ function EventosPage() {
             <Layout>
                 {/* Contenido de la página */}
                 <div className="container mt-4">
-                    <div className="mx-5">
-                        <div className="d-flex justify-content-between">
-                            <h1>Mis Eventos</h1>
+                    <div className="mx-4 mx-md-5">
+                        <div className="d-flex flex-column flex-md-row justify-content-between">
+                            <h1 className="fw-bold text-center">Mis Eventos</h1>
                             <button
                                 className="btn btn-dark m-2"
                                 onClick={handleShow}
@@ -172,12 +172,6 @@ function EventosPage() {
                                 Crear Evento
                             </button>
                         </div>
-                        <button
-                            className="btn btn-dark m-2"
-                            onClick={fetchEventos}
-                        >
-                            Fetch eventos
-                        </button>
 
                         {/* Modal de crear evento */}
                         <Modal show={showModal} onHide={handleClose} centered>
@@ -322,7 +316,7 @@ function EventosPage() {
                             </Modal.Footer>
                         </Modal>
 
-                        <div className="p-5 rounded bg-light">
+                        <div className="p-3 p-md-5 mt-3 rounded bg-light">
                             {/* Carrusel de eventos */}
                             <ul className="list-group">
                                 {eventos.map((evento, index) => (
