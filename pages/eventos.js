@@ -4,6 +4,7 @@ import Evento from "../components/evento";
 import { Modal, Button } from "react-bootstrap";
 import {
     doc,
+    updateDoc,
     deleteDoc,
     collection,
     addDoc,
@@ -12,9 +13,11 @@ import {
 import db from "../firebase";
 
 function EventosPage() {
-    const [showModal, setShowModal] = useState(false);
+    const [showModalCrear, setShowModalCrear] = useState(false);
+    const [showModalModificar, setShowModalModificar] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [eventToDeleteIndex, setEventToDeleteIndex] = useState(null);
+    const [eventToUpdateIndex, setEventToUpdateIndex] = useState(null);
     const [eventos, setEventos] = useState([]); // Estado para almacenar los eventos
     const [error, setError] = useState(null);
     const [errorFecha, setErrorFecha] = useState(null);
@@ -27,6 +30,8 @@ function EventosPage() {
         invitados: [],
         id: "",
     });
+
+    const [eventoCambiar, setEventoCambiar] = useState({});
 
     const fetchEventos = async () => {
         const eventosFirebase = await getDocs(collection(db, "Eventos"));
@@ -43,7 +48,7 @@ function EventosPage() {
                     evento._document.data.value.mapValue.fields.ubicacion
                         .stringValue,
                 invitados:
-                    evento._document.data.value.mapValue.fields.invitados.arrayValue.values.map(
+                    evento._document.data.value.mapValue.fields.invitados.arrayValue.values?.map(
                         (invitado) => {
                             return {
                                 nombre: invitado.mapValue.fields.nombre
@@ -94,9 +99,9 @@ function EventosPage() {
         return añoIngresado >= añoActual; // Verifica si el año es futuro o igual al actual
     };
 
-    const handleShow = () => setShowModal(true);
-    const handleClose = () => {
-        setShowModal(false);
+    const handleShow = () => setShowModalCrear(true);
+    const handleCloseCrear = () => {
+        setShowModalCrear(false);
         // Limpiamos los campos del formulario cuando se cierra el modal
         setNuevoEvento({
             nombre: "",
@@ -145,12 +150,53 @@ function EventosPage() {
             };
             // Agregar el nuevo evento al estado de eventos
             setEventos([...eventos, nuevoEventoConId]);
-            handleClose(); // Cerrar el modal después de guardar
+            handleCloseCrear(); // Cerrar el modal después de guardar
             setError(null);
         } catch (e) {
             console.error("Error adding document: ", e);
             return;
         }
+    };
+
+    const handleModificarEvento = async (e) => {
+        e.preventDefault();
+        // Validación de datos antes de agregarlos
+        if (
+            eventoCambiar.nombre.trim() === "" ||
+            eventoCambiar.fecha === "" ||
+            eventoCambiar.hora === "" ||
+            eventoCambiar.ubicacion.trim() === ""
+        ) {
+            // Mostrar un mensaje de error si algún campo está vacío
+            setError("Todos los campos son obligatorios");
+            return;
+        }
+
+        if (!validarFecha(eventoCambiar.fecha)) {
+            setErrorFecha(
+                "La fecha del evento tiene que ser posterior a la fecha actual"
+            );
+            setError("");
+            return;
+        }
+        //Guardar datos en Firestore
+        try {
+            const res = await updateDoc(doc(db, "Eventos", eventoCambiar.id), {
+                nombre: eventoCambiar.nombre,
+                fecha: eventoCambiar.fecha,
+                hora: eventoCambiar.hora,
+                ubicacion: eventoCambiar.ubicacion,
+            });
+            // Agregar el cambio de  evento al estado de eventos
+            await fetchEventos();
+            setShowModalModificar(false); // Cerrar el modal después de guardar
+            setEventToUpdateIndex(null);
+            setError(null);
+        } catch (e) {
+            console.error("Error adding document: ", e);
+            return;
+        }
+        console.log(eventoCambiar);
     };
 
     useEffect(() => {
@@ -174,7 +220,11 @@ function EventosPage() {
                         </div>
 
                         {/* Modal de crear evento */}
-                        <Modal show={showModal} onHide={handleClose} centered>
+                        <Modal
+                            show={showModalCrear}
+                            onHide={handleCloseCrear}
+                            centered
+                        >
                             <Modal.Header closeButton>
                                 <Modal.Title>Crear un nuevo evento</Modal.Title>
                             </Modal.Header>
@@ -285,7 +335,125 @@ function EventosPage() {
                                 </form>
                             </Modal.Body>
                         </Modal>
-                        {/* Modal de crear evento */}
+
+                        {/* Modal de modificar evento */}
+                        <Modal
+                            show={showModalModificar}
+                            onHide={() => {
+                                setShowModalModificar(false);
+                            }}
+                            centered
+                        >
+                            <Modal.Header closeButton>
+                                <Modal.Title>Modificar un evento</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <form>
+                                    <div className="mb-3">
+                                        <label
+                                            htmlFor="nombre"
+                                            className="form-label fw-bold"
+                                        >
+                                            Nombre del evento
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            id="nombre"
+                                            value={eventoCambiar.nombre}
+                                            placeholder="Ingrese el nombre del evento"
+                                            onChange={(e) =>
+                                                setEventoCambiar({
+                                                    ...eventoCambiar,
+                                                    nombre: e.target.value,
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                    <div className="mb-3">
+                                        <label
+                                            htmlFor="fecha"
+                                            className="form-label fw-bold"
+                                        >
+                                            Fecha
+                                        </label>
+                                        <input
+                                            type="date"
+                                            className="form-control"
+                                            id="fecha"
+                                            value={eventoCambiar.fecha}
+                                            onChange={(e) =>
+                                                setEventoCambiar({
+                                                    ...eventoCambiar,
+                                                    fecha: e.target.value,
+                                                })
+                                            }
+                                        />
+                                        {errorFecha && (
+                                            <p className="text-center text-danger">
+                                                {errorFecha}
+                                            </p>
+                                        )}{" "}
+                                        {/* Mostrar mensaje de error */}
+                                    </div>
+                                    <div className="mb-3">
+                                        <label
+                                            htmlFor="hora"
+                                            className="form-label fw-bold"
+                                        >
+                                            Hora
+                                        </label>
+                                        <input
+                                            type="time"
+                                            className="form-control"
+                                            id="hora"
+                                            value={eventoCambiar.hora}
+                                            onChange={(e) =>
+                                                setEventoCambiar({
+                                                    ...eventoCambiar,
+                                                    hora: e.target.value,
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                    <div className="mb-3">
+                                        <label
+                                            htmlFor="ubicacion"
+                                            className="form-label fw-bold"
+                                        >
+                                            Ubicación
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            id="ubicacion"
+                                            placeholder="Ingrese la ubicación del evento"
+                                            value={eventoCambiar.ubicacion}
+                                            onChange={(e) =>
+                                                setEventoCambiar({
+                                                    ...eventoCambiar,
+                                                    ubicacion: e.target.value,
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                    <div className="text-center">
+                                        {error && (
+                                            <p className="text-danger">
+                                                {error}
+                                            </p>
+                                        )}{" "}
+                                        {/* Mostrar mensaje de error */}
+                                        <button
+                                            className="btn btn-dark w-100"
+                                            onClick={handleModificarEvento}
+                                        >
+                                            Modificar evento
+                                        </button>
+                                    </div>
+                                </form>
+                            </Modal.Body>
+                        </Modal>
 
                         {/* Modal de confirmación de eliminación de evento */}
                         <Modal
@@ -323,6 +491,17 @@ function EventosPage() {
                                     <Evento
                                         key={index}
                                         {...evento}
+                                        onCambio={() => {
+                                            setEventToUpdateIndex(index);
+                                            setEventoCambiar({
+                                                id: evento.id,
+                                                nombre: evento.nombre,
+                                                fecha: evento.fecha,
+                                                hora: evento.hora,
+                                                ubicacion: evento.ubicacion,
+                                            });
+                                            setShowModalModificar(true);
+                                        }}
                                         onEliminar={() =>
                                             handleEliminarEvento(index)
                                         }

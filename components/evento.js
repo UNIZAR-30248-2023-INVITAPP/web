@@ -5,7 +5,16 @@ import { Modal, ListGroup, Form, Button, Row, Col } from "react-bootstrap";
 import db from "../firebase";
 import { doc, updateDoc } from "firebase/firestore";
 
-function Evento({ id, nombre, fecha, hora, ubicacion, invitados, onEliminar }) {
+function Evento({
+    id,
+    nombre,
+    fecha,
+    hora,
+    ubicacion,
+    invitados,
+    onEliminar,
+    onCambio,
+}) {
     const [invitadosArray, setInvitados] = useState(invitados);
     const [emailInvalido, setEmailInvaido] = useState(false);
     const [nombreInvalido, setNombrelInvaido] = useState(false);
@@ -96,7 +105,7 @@ function Evento({ id, nombre, fecha, hora, ubicacion, invitados, onEliminar }) {
     };
 
     const listaInvitados = () => {
-        if (invitadosArray.length > 0) {
+        if (invitadosArray?.length > 0) {
             return (
                 <ListGroup>
                     {invitadosArray.map((invitado, index) => {
@@ -177,6 +186,15 @@ function Evento({ id, nombre, fecha, hora, ubicacion, invitados, onEliminar }) {
                         >
                             {" "}
                             Ver invitados
+                        </button>
+
+                        {/* Botón de editar a la derecha */}
+                        <button
+                            className="btn btn-block btn-warning" // Estilo de botón de eliminación
+                            onClick={onCambio} // Manejador para eliminar el evento por índice
+                        >
+                            {" "}
+                            Editar
                         </button>
 
                         {/* Botón de eliminación a la derecha */}
