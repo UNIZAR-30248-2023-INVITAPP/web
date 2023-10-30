@@ -13,15 +13,21 @@ import {
 import db from "../firebase";
 
 function EventosPage() {
-    const [showModalCrear, setShowModalCrear] = useState(false);
-    const [showModalModificar, setShowModalModificar] = useState(false);
-    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    // Modal que aparece al crear un evento
+    const [showModalCrear, setShowModalCrear] = useState(false); 
+    // Modal para modificar un determinado evento
+    const [showModalModificar, setShowModalModificar] = useState(false); 
+    // Modal de confirmación a la hora de borrar un evento
+    const [showConfirmModal, setShowConfirmModal] = useState(false); 
     const [eventToDeleteIndex, setEventToDeleteIndex] = useState(null);
     const [eventToUpdateIndex, setEventToUpdateIndex] = useState(null);
-    const [eventos, setEventos] = useState([]); // Estado para almacenar los eventos
+    // Estado para almacenar el conjunto de los eventos
+    const [eventos, setEventos] = useState([]); 
+    // Para mostrar el mensaje de error a la hora de crear el evento
     const [error, setError] = useState(null);
     const [errorFecha, setErrorFecha] = useState(null);
 
+    // State para crear un nuevo evento
     const [nuevoEvento, setNuevoEvento] = useState({
         nombre: "",
         fecha: "",
@@ -33,6 +39,9 @@ function EventosPage() {
 
     const [eventoCambiar, setEventoCambiar] = useState({});
 
+    // Esta función se encarga de recuperar eventos desde una base de datos Firebase,
+    // formatear los datos obtenidos y almacenarlos en un arreglo de eventos.
+    // Luego, ordena el arreglo de eventos por nombre y actualiza el estado con los eventos obtenidos.
     const fetchEventos = async () => {
         const eventosFirebase = await getDocs(collection(db, "Eventos"));
         const eventosArray = eventosFirebase.docs.map((evento, index) => {
@@ -61,11 +70,12 @@ function EventosPage() {
                     ),
             };
         });
-        eventosArray.reverse();
+        
+        eventosArray.sort((a, b) => a.nombre.localeCompare(b.nombre));
         setEventos(eventosArray);
+        console.log(eventosArray)
     };
 
-    // Función que guarda los datos del evento en Firestore y añade el evento a la lista de eventos
     const confirmarEliminacion = async () => {
         if (eventToDeleteIndex !== null) {
             const id = eventos[eventToDeleteIndex].id;
@@ -78,11 +88,13 @@ function EventosPage() {
         setShowConfirmModal(false); // Cierra el modal de confirmación
     };
 
+    // Almacena en el estado el índice del evento a borrar y muestra el modal de confirmación
     const handleEliminarEvento = (index) => {
         setEventToDeleteIndex(index);
         setShowConfirmModal(true);
     };
 
+    // Función que se utiliza para verificar si la fecha introducida es posterior a la actual
     const validarFecha = (fecha) => {
         const regexFecha = /^\d{4}-\d{2}-\d{2}$/; // Formato YYYY-MM-DD
 
@@ -100,6 +112,9 @@ function EventosPage() {
     };
 
     const handleShow = () => setShowModalCrear(true);
+    
+    // Función para cerrar el modal de crear evento.
+    // Se cierra el modal y se limpian los campos corresponientes a un nuevo evento
     const handleCloseCrear = () => {
         setShowModalCrear(false);
         // Limpiamos los campos del formulario cuando se cierra el modal
@@ -112,9 +127,23 @@ function EventosPage() {
         });
     };
 
+    // Funcion que se ejecuta al crear evento en el modal de "crear evento"
     const handleCrearEvento = async (e) => {
         e.preventDefault();
-        // Validación de datos antes de agregarlos
+
+        // Se tiene que mantener que ningún evento tenga mismo nombre, fecha y ubicación
+        const eventoExistente = eventos.find((evento) =>
+            evento.nombre === nuevoEvento.nombre &&
+            evento.fecha === nuevoEvento.fecha &&
+            evento.ubicacion === nuevoEvento.ubicacion
+        );
+
+        if(eventoExistente){
+            setError("Ya existe un evento con esas propiedades")
+            return
+        }
+
+        // Comprobar que ningún evento se crea con campos vacíos
         if (
             nuevoEvento.nombre.trim() === "" ||
             nuevoEvento.fecha === "" ||
@@ -134,7 +163,7 @@ function EventosPage() {
             return;
         }
 
-        //Guardar datos en Firestore
+        // Almacenar los datos en Cloud Firestore
         try {
             const docRef = await addDoc(collection(db, "Eventos"), {
                 nombre: nuevoEvento.nombre,
@@ -221,6 +250,7 @@ function EventosPage() {
 
                         {/* Modal de crear evento */}
                         <Modal
+                            id="modalCrear"
                             show={showModalCrear}
                             onHide={handleCloseCrear}
                             centered
@@ -326,6 +356,7 @@ function EventosPage() {
                                         )}{" "}
                                         {/* Mostrar mensaje de error */}
                                         <button
+                                            id="boton-crear-evento"
                                             className="btn btn-dark w-100"
                                             onClick={handleCrearEvento}
                                         >
