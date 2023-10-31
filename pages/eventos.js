@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 import db from "../firebase";
 
+// Componente que se corresponde con la página que se muestra de inicio, donde aparece la lista de los eventos
 function EventosPage() {
     // Modal que aparece al crear un evento
     const [showModalCrear, setShowModalCrear] = useState(false); 
@@ -72,8 +73,18 @@ function EventosPage() {
         });
         
         eventosArray.sort((a, b) => a.nombre.localeCompare(b.nombre));
-        setEventos(eventosArray);
-        console.log(eventosArray)
+
+        // Cambia el formato de la fecha para que se vea en el DOM de manera más legible
+        const eventosFechaDate = eventosArray.map((evento) => {
+            const eventoCopia = { ...evento };
+            const fechaDate = new Date(evento.fecha);
+            // Formatear la fecha en un formato legible
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            eventoCopia.fecha = fechaDate.toLocaleDateString('es-ES', options);
+            return eventoCopia;
+        })
+        setEventos(eventosFechaDate);
+        
     };
 
     const confirmarEliminacion = async () => {
@@ -94,23 +105,9 @@ function EventosPage() {
         setShowConfirmModal(true);
     };
 
-    // Función que se utiliza para verificar si la fecha introducida es posterior a la actual
-    const validarFecha = (fecha) => {
-        const regexFecha = /^\d{4}-\d{2}-\d{2}$/; // Formato YYYY-MM-DD
+    
 
-        if (!regexFecha.test(fecha)) {
-            setErrorFecha("Formato de fecha incorrecto");
-            return;
-        }
-
-        const partesFecha = fecha.split("-");
-        const añoIngresado = parseInt(partesFecha[0]);
-        const getYear = () => new Date().getFullYear();
-        const añoActual = getYear();
-
-        return añoIngresado >= añoActual; // Verifica si el año es futuro o igual al actual
-    };
-
+    // Muestra el modal de crear evento
     const handleShow = () => setShowModalCrear(true);
     
     // Función para cerrar el modal de crear evento.
@@ -127,21 +124,59 @@ function EventosPage() {
         });
     };
 
+    // Función que se utiliza para verificar si la fecha introducida es posterior a la actual
+    const validarFecha = (fecha) => {
+        const regexFecha = /^\d{4}-\d{2}-\d{2}$/; // Formato YYYY-MM-DD
+
+        if (!regexFecha.test(fecha)) {
+            setErrorFecha("Formato de fecha incorrecto");
+            return;
+        }
+
+        const partesFecha = fecha.split("-");
+        const añoIngresado = parseInt(partesFecha[0]);
+        const mesIngresado = parseInt(partesFecha[1]);
+        const diaIngresado = parseInt(partesFecha[2]);
+
+        const getYear = () => new Date().getFullYear();
+        const getMonth = () => new Date().getMonth() + 1; // Mes actual (0-11) -> (1-12)
+        const getDay = () => new Date().getDate(); // Día actual del mes
+
+        const añoActual = getYear();
+        const mesActual = getMonth();
+        const diaActual = getDay();
+
+        if (añoIngresado > añoActual) {
+            return true; // El año ingresado es futuro
+        } else if (añoIngresado === añoActual) {
+            // El año es igual, verifica el mes
+            if (mesIngresado > mesActual) {
+                return true; // El mes ingresado es futuro
+            } else if (mesIngresado === mesActual) {
+                // El mes es igual, verifica el día
+                if( diaIngresado === diaActual){
+                    setErrorFecha('No se pueden reservar eventos en el día actual, debe reservarlos como mínimo el día siguiente')
+                    return false
+                } else if (diaIngresado > diaActual) {
+                    return true
+                } else {
+                    setErrorFecha("La fecha del evento tiene que ser posterior a la fecha actual")
+                    return false
+                }
+            } else {
+                setErrorFecha('La fecha del evento tiene que ser posterior a la fecha actual')
+                return false
+            }
+        } else {
+            setErrorFecha('La fecha del evento tiene que ser posterior a la fecha actual')
+            return false
+        }
+    };
+
+
     // Funcion que se ejecuta al crear evento en el modal de "crear evento"
     const handleCrearEvento = async (e) => {
         e.preventDefault();
-
-        // Se tiene que mantener que ningún evento tenga mismo nombre, fecha y ubicación
-        const eventoExistente = eventos.find((evento) =>
-            evento.nombre === nuevoEvento.nombre &&
-            evento.fecha === nuevoEvento.fecha &&
-            evento.ubicacion === nuevoEvento.ubicacion
-        );
-
-        if(eventoExistente){
-            setError("Ya existe un evento con esas propiedades")
-            return
-        }
 
         // Comprobar que ningún evento se crea con campos vacíos
         if (
@@ -154,14 +189,30 @@ function EventosPage() {
             setError("Todos los campos son obligatorios");
             return;
         }
-
+        // Validar el formato de la fecha
         if (!validarFecha(nuevoEvento.fecha)) {
-            setErrorFecha(
-                "La fecha del evento tiene que ser posterior a la fecha actual"
-            );
             setError("");
             return;
         }
+
+        // ----------------------------
+        
+        // Se tiene que mantener que ningún evento tenga mismo nombre, fecha y ubicación
+        const fechaAux = nuevoEvento.fecha
+        const fechaDate = new Date(fechaAux)
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const fechaFormateada = fechaDate.toLocaleDateString('es-ES', options);
+    
+        const eventoExistente = eventos.find((evento) =>
+            evento.nombre === nuevoEvento.nombre &&
+            evento.fecha === fechaFormateada &&
+            evento.ubicacion === nuevoEvento.ubicacion
+        );
+        if(eventoExistente){
+            setError("Ya existe un evento con esas propiedades")
+            return
+        }
+        
 
         // Almacenar los datos en Cloud Firestore
         try {
@@ -173,6 +224,11 @@ function EventosPage() {
                 invitados: nuevoEvento.invitados,
             });
             console.log("Document written with ID: ", docRef.id);
+
+            const fechaDate = new Date(nuevoEvento.fecha)
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const fechaFormateada = fechaDate.toLocaleDateString('es-ES', options);
+            nuevoEvento.fecha = fechaFormateada
             const nuevoEventoConId = {
                 ...nuevoEvento,
                 id: docRef.id, // Almacena el ID del documento recién creado
@@ -187,6 +243,9 @@ function EventosPage() {
         }
     };
 
+
+
+    // Funcion que se encarga de modificar un determinado evento y comprueba los diferentes campos del formulario
     const handleModificarEvento = async (e) => {
         e.preventDefault();
         // Validación de datos antes de agregarlos
@@ -228,6 +287,8 @@ function EventosPage() {
         console.log(eventoCambiar);
     };
 
+    // El hook useEffect se utiliza para hacer la peticion a Cloud Firestore y mostrar
+    // los datos de los eventos cuando se realiza la renderización del componente
     useEffect(() => {
         fetchEventos();
     }, []);
