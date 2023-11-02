@@ -87,6 +87,8 @@ function EventosPage() {
         
     };
 
+
+    // Función para eliminar definitivamente el evento cuando aparece el modal de confirmación
     const confirmarEliminacion = async () => {
         if (eventToDeleteIndex !== null) {
             const id = eventos[eventToDeleteIndex].id;
@@ -122,6 +124,7 @@ function EventosPage() {
             ubicacion: "",
             invitados: [],
         });
+        setError("")
     };
 
     // Función que se utiliza para verificar si la fecha introducida es posterior a la actual
@@ -308,6 +311,37 @@ function EventosPage() {
                                 Crear Evento
                             </button>
                         </div>
+                        
+                        {/* Modal de confirmación de eliminación de evento */}
+                        <Modal
+                            id='modalConfirmar'
+                            show={showConfirmModal}
+                            onHide={() => setShowConfirmModal(false)}
+                            centered
+                            
+                        >
+                            <Modal.Header closeButton>
+                                <Modal.Title>Confirmar eliminación</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                ¿Estás seguro de que quieres eliminar este
+                                evento?
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <Button
+                                    variant="secondary"
+                                    onClick={() => setShowConfirmModal(false)}
+                                >
+                                    Cancelar
+                                </Button>
+                                <Button
+                                    variant="danger"
+                                    onClick={confirmarEliminacion}
+                                >
+                                    Eliminar
+                                </Button>
+                            </Modal.Footer>
+                        </Modal>
 
                         {/* Modal de crear evento */}
                         <Modal
@@ -547,35 +581,10 @@ function EventosPage() {
                             </Modal.Body>
                         </Modal>
 
-                        {/* Modal de confirmación de eliminación de evento */}
-                        <Modal
-                            show={showConfirmModal}
-                            onHide={() => setShowConfirmModal(false)}
-                            centered
-                        >
-                            <Modal.Header closeButton>
-                                <Modal.Title>Confirmar eliminación</Modal.Title>
-                            </Modal.Header>
-                            <Modal.Body>
-                                ¿Estás seguro de que quieres eliminar este
-                                evento?
-                            </Modal.Body>
-                            <Modal.Footer>
-                                <Button
-                                    variant="secondary"
-                                    onClick={() => setShowConfirmModal(false)}
-                                >
-                                    Cancelar
-                                </Button>
-                                <Button
-                                    variant="danger"
-                                    onClick={confirmarEliminacion}
-                                >
-                                    Eliminar
-                                </Button>
-                            </Modal.Footer>
-                        </Modal>
+                        
+                        
 
+                        {/* Carrusel donde aparecen todos los eventos */}
                         <div className="p-3 p-md-5 mt-3 rounded bg-light">
                             {/* Carrusel de eventos */}
                             <ul className="list-group">
