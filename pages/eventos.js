@@ -264,11 +264,25 @@ function EventosPage() {
         }
 
         if (!validarFecha(eventoCambiar.fecha)) {
-            setErrorFecha(
-                "La fecha del evento tiene que ser posterior a la fecha actual"
-            );
             setError("");
             return;
+        }
+
+        // Se tiene que mantener que ningún evento tenga mismo nombre, fecha y ubicación
+        const fechaAux = eventoCambiar.fecha
+        const fechaDate = new Date(fechaAux)
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const fechaFormateada = fechaDate.toLocaleDateString('es-ES', options);
+    
+        // Comprobar que no existe un evento con esas propiedades
+        const eventoExistente = eventos.find((evento) =>
+            evento.nombre === eventoCambiar.nombre &&
+            evento.fecha === fechaFormateada &&
+            evento.ubicacion === eventoCambiar.ubicacion
+        );
+        if(eventoExistente){
+            setError("Ya existe un evento con esas propiedades")
+            return
         }
         //Guardar datos en Firestore
         try {
@@ -282,6 +296,7 @@ function EventosPage() {
             await fetchEventos();
             setShowModalModificar(false); // Cerrar el modal después de guardar
             setEventToUpdateIndex(null);
+            setErrorFecha(null)
             setError(null);
         } catch (e) {
             console.error("Error adding document: ", e);
@@ -311,6 +326,128 @@ function EventosPage() {
                                 Crear Evento
                             </button>
                         </div>
+
+                        {/* Modal de modificar evento */}
+                        <Modal
+                            id='modalModificar'
+                            show={showModalModificar}
+                            onHide={() => {
+                                setShowModalModificar(false);
+                                setErrorFecha("")
+                                setError(null)
+                            }}
+                            centered
+                        >
+                            <Modal.Header closeButton>
+                                <Modal.Title>Modificar un evento</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <form>
+                                    <div className="mb-3">
+                                        <label
+                                            htmlFor="nombre"
+                                            className="form-label fw-bold"
+                                        >
+                                            Nombre del evento
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            id="nombre"
+                                            value={eventoCambiar.nombre}
+                                            placeholder="Ingrese el nombre del evento"
+                                            onChange={(e) =>
+                                                setEventoCambiar({
+                                                    ...eventoCambiar,
+                                                    nombre: e.target.value,
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                    <div className="mb-3">
+                                        <label
+                                            htmlFor="fecha"
+                                            className="form-label fw-bold"
+                                        >
+                                            Fecha
+                                        </label>
+                                        <input
+                                            type="date"
+                                            className="form-control"
+                                            id="fecha"
+                                            value={eventoCambiar.fecha}
+                                            onChange={(e) =>
+                                                setEventoCambiar({
+                                                    ...eventoCambiar,
+                                                    fecha: e.target.value,
+                                                })
+                                            }
+                                        />
+                                        {errorFecha && (
+                                            <p className="text-center text-danger">
+                                                {errorFecha}
+                                            </p>
+                                        )}{" "}
+                                        {/* Mostrar mensaje de error */}
+                                    </div>
+                                    <div className="mb-3">
+                                        <label
+                                            htmlFor="hora"
+                                            className="form-label fw-bold"
+                                        >
+                                            Hora
+                                        </label>
+                                        <input
+                                            type="time"
+                                            className="form-control"
+                                            id="hora"
+                                            value={eventoCambiar.hora}
+                                            onChange={(e) =>
+                                                setEventoCambiar({
+                                                    ...eventoCambiar,
+                                                    hora: e.target.value,
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                    <div className="mb-3">
+                                        <label
+                                            htmlFor="ubicacion"
+                                            className="form-label fw-bold"
+                                        >
+                                            Ubicación
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            id="ubicacion"
+                                            placeholder="Ingrese la ubicación del evento"
+                                            value={eventoCambiar.ubicacion}
+                                            onChange={(e) =>
+                                                setEventoCambiar({
+                                                    ...eventoCambiar,
+                                                    ubicacion: e.target.value,
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                    <div className="text-center">
+                                        {error && (
+                                            <p className="text-danger">
+                                                {error}
+                                            </p>
+                                        )}{" "}
+                                        {/* Mostrar mensaje de error */}
+                                        <button
+                                            className="btn btn-dark w-100"
+                                            onClick={handleModificarEvento}
+                                        >
+                                            Modificar evento
+                                        </button>
+                                    </div>
+                                </form>
+                            </Modal.Body>
+                        </Modal>
                         
                         {/* Modal de confirmación de eliminación de evento */}
                         <Modal
@@ -462,124 +599,7 @@ function EventosPage() {
                             </Modal.Body>
                         </Modal>
 
-                        {/* Modal de modificar evento */}
-                        <Modal
-                            show={showModalModificar}
-                            onHide={() => {
-                                setShowModalModificar(false);
-                            }}
-                            centered
-                        >
-                            <Modal.Header closeButton>
-                                <Modal.Title>Modificar un evento</Modal.Title>
-                            </Modal.Header>
-                            <Modal.Body>
-                                <form>
-                                    <div className="mb-3">
-                                        <label
-                                            htmlFor="nombre"
-                                            className="form-label fw-bold"
-                                        >
-                                            Nombre del evento
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="nombre"
-                                            value={eventoCambiar.nombre}
-                                            placeholder="Ingrese el nombre del evento"
-                                            onChange={(e) =>
-                                                setEventoCambiar({
-                                                    ...eventoCambiar,
-                                                    nombre: e.target.value,
-                                                })
-                                            }
-                                        />
-                                    </div>
-                                    <div className="mb-3">
-                                        <label
-                                            htmlFor="fecha"
-                                            className="form-label fw-bold"
-                                        >
-                                            Fecha
-                                        </label>
-                                        <input
-                                            type="date"
-                                            className="form-control"
-                                            id="fecha"
-                                            value={eventoCambiar.fecha}
-                                            onChange={(e) =>
-                                                setEventoCambiar({
-                                                    ...eventoCambiar,
-                                                    fecha: e.target.value,
-                                                })
-                                            }
-                                        />
-                                        {errorFecha && (
-                                            <p className="text-center text-danger">
-                                                {errorFecha}
-                                            </p>
-                                        )}{" "}
-                                        {/* Mostrar mensaje de error */}
-                                    </div>
-                                    <div className="mb-3">
-                                        <label
-                                            htmlFor="hora"
-                                            className="form-label fw-bold"
-                                        >
-                                            Hora
-                                        </label>
-                                        <input
-                                            type="time"
-                                            className="form-control"
-                                            id="hora"
-                                            value={eventoCambiar.hora}
-                                            onChange={(e) =>
-                                                setEventoCambiar({
-                                                    ...eventoCambiar,
-                                                    hora: e.target.value,
-                                                })
-                                            }
-                                        />
-                                    </div>
-                                    <div className="mb-3">
-                                        <label
-                                            htmlFor="ubicacion"
-                                            className="form-label fw-bold"
-                                        >
-                                            Ubicación
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="ubicacion"
-                                            placeholder="Ingrese la ubicación del evento"
-                                            value={eventoCambiar.ubicacion}
-                                            onChange={(e) =>
-                                                setEventoCambiar({
-                                                    ...eventoCambiar,
-                                                    ubicacion: e.target.value,
-                                                })
-                                            }
-                                        />
-                                    </div>
-                                    <div className="text-center">
-                                        {error && (
-                                            <p className="text-danger">
-                                                {error}
-                                            </p>
-                                        )}{" "}
-                                        {/* Mostrar mensaje de error */}
-                                        <button
-                                            className="btn btn-dark w-100"
-                                            onClick={handleModificarEvento}
-                                        >
-                                            Modificar evento
-                                        </button>
-                                    </div>
-                                </form>
-                            </Modal.Body>
-                        </Modal>
+                        
 
                         
                         
@@ -598,7 +618,7 @@ function EventosPage() {
                                                 id: evento.id,
                                                 nombre: evento.nombre,
                                                 fecha: evento.fecha,
-                                                hora: evento.hora,
+                                                hora: "",
                                                 ubicacion: evento.ubicacion,
                                             });
                                             setShowModalModificar(true);
