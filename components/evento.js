@@ -268,6 +268,7 @@ function Evento({
 
             {/* Modal de confirmación de eliminacion de invitado */}
             <Modal
+                id="modalConfirmarEliminacion"
                 show={showConfirmacionEliminar}
                 onHide={() => {
                     setShowConfirmacionEliminar(false);

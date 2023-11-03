@@ -1,4 +1,4 @@
-import { anadirEventoPrueba, eliminarEvento } from "./aux-funciones";
+import { anadirEventoPrueba, eliminarEvento } from "../aux-funciones";
 
 describe("Añadir un invitado", () => {
     var docReference;
