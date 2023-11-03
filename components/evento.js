@@ -48,6 +48,8 @@ function Evento({
         // Valido el dni
         if (validarDNI(DNI) === true) {
             console.log({ nombre, DNI, email });
+        } else {
+            return;
         }
         // Añado el invitado a firebase
         try {

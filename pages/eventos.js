@@ -15,15 +15,15 @@ import db from "../firebase";
 // Componente que se corresponde con la página que se muestra de inicio, donde aparece la lista de los eventos
 function EventosPage() {
     // Modal que aparece al crear un evento
-    const [showModalCrear, setShowModalCrear] = useState(false); 
+    const [showModalCrear, setShowModalCrear] = useState(false);
     // Modal para modificar un determinado evento
-    const [showModalModificar, setShowModalModificar] = useState(false); 
+    const [showModalModificar, setShowModalModificar] = useState(false);
     // Modal de confirmación a la hora de borrar un evento
-    const [showConfirmModal, setShowConfirmModal] = useState(false); 
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [eventToDeleteIndex, setEventToDeleteIndex] = useState(null);
     const [eventToUpdateIndex, setEventToUpdateIndex] = useState(null);
     // Estado para almacenar el conjunto de los eventos
-    const [eventos, setEventos] = useState([]); 
+    const [eventos, setEventos] = useState([]);
     // Para mostrar el mensaje de error a la hora de crear el evento
     const [error, setError] = useState(null);
     const [errorFecha, setErrorFecha] = useState(null);
@@ -45,6 +45,7 @@ function EventosPage() {
     // Luego, ordena el arreglo de eventos por nombre y actualiza el estado con los eventos obtenidos.
     const fetchEventos = async () => {
         const eventosFirebase = await getDocs(collection(db, "Eventos"));
+        console.log(eventosFirebase);
         const eventosArray = eventosFirebase.docs.map((evento, index) => {
             return {
                 id: evento.id,
@@ -68,10 +69,10 @@ function EventosPage() {
                                     .stringValue,
                             };
                         }
-                    ),
+                    ) ?? [],
             };
         });
-        
+
         eventosArray.sort((a, b) => a.nombre.localeCompare(b.nombre));
 
         // Cambia el formato de la fecha para que se vea en el DOM de manera más legible
@@ -79,14 +80,12 @@ function EventosPage() {
             const eventoCopia = { ...evento };
             const fechaDate = new Date(evento.fecha);
             // Formatear la fecha en un formato legible
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            eventoCopia.fecha = fechaDate.toLocaleDateString('es-ES', options);
+            const options = { year: "numeric", month: "long", day: "numeric" };
+            eventoCopia.fecha = fechaDate.toLocaleDateString("es-ES", options);
             return eventoCopia;
-        })
+        });
         setEventos(eventosFechaDate);
-        
     };
-
 
     // Función para eliminar definitivamente el evento cuando aparece el modal de confirmación
     const confirmarEliminacion = async () => {
@@ -107,11 +106,9 @@ function EventosPage() {
         setShowConfirmModal(true);
     };
 
-    
-
     // Muestra el modal de crear evento
     const handleShow = () => setShowModalCrear(true);
-    
+
     // Función para cerrar el modal de crear evento.
     // Se cierra el modal y se limpian los campos corresponientes a un nuevo evento
     const handleCloseCrear = () => {
@@ -124,7 +121,7 @@ function EventosPage() {
             ubicacion: "",
             invitados: [],
         });
-        setError("")
+        setError("");
     };
 
     // Función que se utiliza para verificar si la fecha introducida es posterior a la actual
@@ -157,25 +154,32 @@ function EventosPage() {
                 return true; // El mes ingresado es futuro
             } else if (mesIngresado === mesActual) {
                 // El mes es igual, verifica el día
-                if( diaIngresado === diaActual){
-                    setErrorFecha('No se pueden reservar eventos en el día actual, debe reservarlos como mínimo el día siguiente')
-                    return false
+                if (diaIngresado === diaActual) {
+                    setErrorFecha(
+                        "No se pueden reservar eventos en el día actual, debe reservarlos como mínimo el día siguiente"
+                    );
+                    return false;
                 } else if (diaIngresado > diaActual) {
-                    return true
+                    return true;
                 } else {
-                    setErrorFecha("La fecha del evento tiene que ser posterior a la fecha actual")
-                    return false
+                    setErrorFecha(
+                        "La fecha del evento tiene que ser posterior a la fecha actual"
+                    );
+                    return false;
                 }
             } else {
-                setErrorFecha('La fecha del evento tiene que ser posterior a la fecha actual')
-                return false
+                setErrorFecha(
+                    "La fecha del evento tiene que ser posterior a la fecha actual"
+                );
+                return false;
             }
         } else {
-            setErrorFecha('La fecha del evento tiene que ser posterior a la fecha actual')
-            return false
+            setErrorFecha(
+                "La fecha del evento tiene que ser posterior a la fecha actual"
+            );
+            return false;
         }
     };
-
 
     // Funcion que se ejecuta al crear evento en el modal de "crear evento"
     const handleCrearEvento = async (e) => {
@@ -199,23 +203,23 @@ function EventosPage() {
         }
 
         // ----------------------------
-        
+
         // Se tiene que mantener que ningún evento tenga mismo nombre, fecha y ubicación
-        const fechaAux = nuevoEvento.fecha
-        const fechaDate = new Date(fechaAux)
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        const fechaFormateada = fechaDate.toLocaleDateString('es-ES', options);
-    
-        const eventoExistente = eventos.find((evento) =>
-            evento.nombre === nuevoEvento.nombre &&
-            evento.fecha === fechaFormateada &&
-            evento.ubicacion === nuevoEvento.ubicacion
+        const fechaAux = nuevoEvento.fecha;
+        const fechaDate = new Date(fechaAux);
+        const options = { year: "numeric", month: "long", day: "numeric" };
+        const fechaFormateada = fechaDate.toLocaleDateString("es-ES", options);
+
+        const eventoExistente = eventos.find(
+            (evento) =>
+                evento.nombre === nuevoEvento.nombre &&
+                evento.fecha === fechaFormateada &&
+                evento.ubicacion === nuevoEvento.ubicacion
         );
-        if(eventoExistente){
-            setError("Ya existe un evento con esas propiedades")
-            return
+        if (eventoExistente) {
+            setError("Ya existe un evento con esas propiedades");
+            return;
         }
-        
 
         // Almacenar los datos en Cloud Firestore
         try {
@@ -228,10 +232,13 @@ function EventosPage() {
             });
             console.log("Document written with ID: ", docRef.id);
 
-            const fechaDate = new Date(nuevoEvento.fecha)
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            const fechaFormateada = fechaDate.toLocaleDateString('es-ES', options);
-            nuevoEvento.fecha = fechaFormateada
+            const fechaDate = new Date(nuevoEvento.fecha);
+            const options = { year: "numeric", month: "long", day: "numeric" };
+            const fechaFormateada = fechaDate.toLocaleDateString(
+                "es-ES",
+                options
+            );
+            nuevoEvento.fecha = fechaFormateada;
             const nuevoEventoConId = {
                 ...nuevoEvento,
                 id: docRef.id, // Almacena el ID del documento recién creado
@@ -245,8 +252,6 @@ function EventosPage() {
             return;
         }
     };
-
-
 
     // Funcion que se encarga de modificar un determinado evento y comprueba los diferentes campos del formulario
     const handleModificarEvento = async (e) => {
@@ -311,14 +316,13 @@ function EventosPage() {
                                 Crear Evento
                             </button>
                         </div>
-                        
+
                         {/* Modal de confirmación de eliminación de evento */}
                         <Modal
-                            id='modalConfirmar'
+                            id="modalConfirmar"
                             show={showConfirmModal}
                             onHide={() => setShowConfirmModal(false)}
                             centered
-                            
                         >
                             <Modal.Header closeButton>
                                 <Modal.Title>Confirmar eliminación</Modal.Title>
@@ -580,9 +584,6 @@ function EventosPage() {
                                 </form>
                             </Modal.Body>
                         </Modal>
-
-                        
-                        
 
                         {/* Carrusel donde aparecen todos los eventos */}
                         <div className="p-3 p-md-5 mt-3 rounded bg-light">
