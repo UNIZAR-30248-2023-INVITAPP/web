@@ -1,7 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-
+import { getAuth } from "firebase/auth";
+import { useRouter } from "next/navigation";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -15,7 +16,8 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig)
-// Inicializar Firestore y exportar la instancia
+// Información acerca del usuario que está autenticado en la aplicación
+export const auth = getAuth(app);
 
 const db = getFirestore(app);
 
