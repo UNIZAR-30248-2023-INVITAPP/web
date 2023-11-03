@@ -1,6 +1,6 @@
 // Evento.js
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Modal, ListGroup, Form, Button, Row, Col } from "react-bootstrap";
 import db from "../firebase";
 import { doc, updateDoc } from "firebase/firestore";
@@ -24,19 +24,27 @@ function Evento({
         useState(false);
     const [indexInvitadoEliminar, setIndexInvitadoEliminar] = useState(null);
 
+    // Funcion que dado un DNI, devuelve true si es valido
+    // y false si no
+    // Se entiende que un DNI es valido si tiene una estructura:
+    // DDDDDDDDL si es NIF - o - LDDDDDDDL si es NIE
+    // donde D es un digito y L una letra
     const validarDNI = (DNI) => {
         // Validar DNI
         var nifRexp = /^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKET]$/i;
         var nieRexp = /^[XYZ][0-9]{7}[TRWAGMYFPDXBNJZSQVHLCKET]$/i;
         DNI = DNI.toUpperCase();
         if (!nifRexp.test(DNI) && !nieRexp.test(DNI)) {
-            setDNIInvalido(true);
             return false;
         }
 
         return true;
     };
 
+    // Funcion que maneja el evento submit del formulario de añadir invitado
+    // Comprueba que los campos no esten vacios, que el DNI sea valido
+    // En caso satisfactorio añade el invitado a Firebase
+    // En caso contrario muestra el mensaje de error correspondiente
     const handleSubmitAnadirInvitado = async (event) => {
         setNombrelInvaido(false);
         setDNIInvalido(false);
@@ -48,6 +56,9 @@ function Evento({
         // Valido el dni
         if (validarDNI(DNI) === true) {
             console.log({ nombre, DNI, email });
+        } else {
+            setDNIInvalido(true);
+            return;
         }
         // Añado el invitado a firebase
         try {
@@ -79,12 +90,17 @@ function Evento({
         }
     };
 
+    // Funcion que maneja el evento del boton Eliminar de un invitado
+    // Lanza un modal para confirmar la eliminacion del invitado
     const handleEliminarInvitado = async (index) => {
         setIndexInvitadoEliminar(index);
         setShowInvitados(false);
         setShowConfirmacionEliminar(true);
     };
 
+    // Funcion que maneja el evento del boton Confirmar del modal de
+    // confirmacion de eliminacion de invitado
+    // Actualiza la lista de invitados y actualiza los invitados en Firebase
     const handleConfirmarEliminarInvitado = async () => {
         if (indexInvitadoEliminar === null) return;
         const nuevosInvitados = [...invitadosArray];
@@ -104,6 +120,9 @@ function Evento({
         setShowInvitados(true);
     };
 
+    // Componente visual de la lista de invitados
+    // Si la longitud del array de invitados es 0 muestra un mensaje
+    // En caso contrario muestra para cada invitado su informacion y un boton de eliminar
     const listaInvitados = () => {
         if (invitadosArray?.length > 0) {
             return (
@@ -161,53 +180,6 @@ function Evento({
 
     return (
         <>
-            <li className="mb-4 list-group-item border border-2 rounded col-12 col-lg-8 mx-auto">
-                <div className="d-flex flex-column py-2 flex-md-row gap-3 justify-content-between align-items-center">
-                    <div>
-                        <h5 className="fw-bold">{nombre}</h5>
-                        <span className="fw-bold d-block mt-1">
-                            Fecha: <span className="fw-light">{fecha}</span>
-                        </span>
-                        <span className="fw-bold d-block mt-1">
-                            Hora: <span className="fw-light">{hora}</span>
-                        </span>
-                        <span className="fw-bold d-block mt-1">
-                            Ubicación:{" "}
-                            <span className="fw-light">{ubicacion}</span>
-                        </span>
-                    </div>
-                    <div className="d-flex flex-column pb-3 pb-md-0 flex-md-row gap-3">
-                        {/* Botón de ver invitados a la derecha */}
-                        <button
-                            className="btn btn-primary" // Estilo de botón primario
-                            onClick={() => {
-                                setShowInvitados(true);
-                            }}
-                        >
-                            {" "}
-                            Ver invitados
-                        </button>
-
-                        {/* Botón de editar a la derecha */}
-                        <button
-                            className="btn btn-block btn-warning" // Estilo de botón de eliminación
-                            onClick={onCambio} // Manejador para eliminar el evento por índice
-                        >
-                            {" "}
-                            Editar
-                        </button>
-
-                        {/* Botón de eliminación a la derecha */}
-                        <button
-                            className="btn btn-block btn-danger" // Estilo de botón de eliminación
-                            onClick={onEliminar} // Manejador para eliminar el evento por índice
-                        >
-                            {" "}
-                            Borrar
-                        </button>
-                    </div>
-                </div>
-            </li>
             {/* Modal de listado de invitados */}
             <Modal
                 className="pt-2 px-2 pt-md-0 px-md-0"
@@ -294,7 +266,7 @@ function Evento({
                 </Modal.Body>
             </Modal>
 
-            {/* Modal de confirmación de eliminacion de invitado de  */}
+            {/* Modal de confirmación de eliminacion de invitado */}
             <Modal
                 show={showConfirmacionEliminar}
                 onHide={() => {
@@ -326,6 +298,54 @@ function Evento({
                     </Button>
                 </Modal.Footer>
             </Modal>
+
+            <li className="mb-4 list-group-item border border-2 rounded col-12 col-lg-8 mx-auto">
+                <div className="d-flex flex-column py-2 flex-md-row gap-3 justify-content-between align-items-center">
+                    <div>
+                        <h5 className="fw-bold">{nombre}</h5>
+                        <span className="fw-bold d-block mt-1">
+                            Fecha: <span className="fw-light">{fecha}</span>
+                        </span>
+                        <span className="fw-bold d-block mt-1">
+                            Hora: <span className="fw-light">{hora}</span>
+                        </span>
+                        <span className="fw-bold d-block mt-1">
+                            Ubicación:{" "}
+                            <span className="fw-light">{ubicacion}</span>
+                        </span>
+                    </div>
+                    <div className="d-flex flex-column pb-3 pb-md-0 flex-md-row gap-3">
+                        {/* Botón de ver invitados a la derecha */}
+                        <button
+                            className="btn btn-primary" // Estilo de botón primario
+                            onClick={() => {
+                                setShowInvitados(true);
+                            }}
+                        >
+                            {" "}
+                            Ver invitados
+                        </button>
+
+                        {/* Botón de editar a la derecha */}
+                        <button
+                            className="btn btn-block btn-warning" // Estilo de botón de eliminación
+                            onClick={onCambio} // Manejador para eliminar el evento por índice
+                        >
+                            {" "}
+                            Editar
+                        </button>
+
+                        {/* Botón de eliminación a la derecha */}
+                        <button
+                            className="btn btn-block btn-danger" // Estilo de botón de eliminación
+                            onClick={onEliminar} // Manejador para eliminar el evento por índice
+                        >
+                            {" "}
+                            Borrar
+                        </button>
+                    </div>
+                </div>
+            </li>
         </>
     );
 }
