@@ -28,6 +28,8 @@ function EventosPage() {
     const [error, setError] = useState(null);
     const [errorFecha, setErrorFecha] = useState(null);
 
+    const [filtrarEvento, setFiltrarEvento] = useState(false)
+
     // State para crear un nuevo evento
     const [nuevoEvento, setNuevoEvento] = useState({
         nombre: "",
@@ -323,9 +325,12 @@ function EventosPage() {
                 <div className="container mt-4">
                     <div className="mx-4 mx-md-5">
                         <div className="d-flex flex-column flex-md-row justify-content-between">
-                            <h1 className="fw-bold text-center">Mis Eventos</h1>
+                            <h1 className="fw-bold text-center m-2">Mis Eventos</h1>
+                            <form class="d-flex mx-5 p-2 flex-grow-1 text-center" role="search">
+                                <input onFocus={() => setFiltrarEvento(true)} onBlur={() => setFiltrarEvento(false)}  class="form-control border-2" type="search" placeholder="Busque un evento..." aria-label="Search" />
+                            </form>
                             <button
-                                className="btn btn-dark m-2"
+                                className="btn btn-dark my-2"
                                 onClick={handleShow}
                             >
                                 Crear Evento
@@ -612,7 +617,7 @@ function EventosPage() {
                         <div className="p-3 p-md-5 mt-3 rounded bg-light">
                             {/* Carrusel de eventos */}
                             <ul className="list-group">
-                                {eventos.map((evento, index) => (
+                                {!filtrarEvento &&  eventos.map((evento, index) => (
                                     <Evento
                                         key={index}
                                         {...evento}
