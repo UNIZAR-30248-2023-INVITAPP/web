@@ -28,7 +28,7 @@ function EventosPage() {
     const [error, setError] = useState(null);
     const [errorFecha, setErrorFecha] = useState(null);
 
-    const [filtrarEvento, setFiltrarEvento] = useState(false)
+    const [busqueda, setBusqueda] = useState("");
 
     // State para crear un nuevo evento
     const [nuevoEvento, setNuevoEvento] = useState({
@@ -276,20 +276,21 @@ function EventosPage() {
         }
 
         // Se tiene que mantener que ningún evento tenga mismo nombre, fecha y ubicación
-        const fechaAux = eventoCambiar.fecha
-        const fechaDate = new Date(fechaAux)
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        const fechaFormateada = fechaDate.toLocaleDateString('es-ES', options);
-    
+        const fechaAux = eventoCambiar.fecha;
+        const fechaDate = new Date(fechaAux);
+        const options = { year: "numeric", month: "long", day: "numeric" };
+        const fechaFormateada = fechaDate.toLocaleDateString("es-ES", options);
+
         // Comprobar que no existe un evento con esas propiedades
-        const eventoExistente = eventos.find((evento) =>
-            evento.nombre === eventoCambiar.nombre &&
-            evento.fecha === fechaFormateada &&
-            evento.ubicacion === eventoCambiar.ubicacion
+        const eventoExistente = eventos.find(
+            (evento) =>
+                evento.nombre === eventoCambiar.nombre &&
+                evento.fecha === fechaFormateada &&
+                evento.ubicacion === eventoCambiar.ubicacion
         );
-        if(eventoExistente){
-            setError("Ya existe un evento con esas propiedades")
-            return
+        if (eventoExistente) {
+            setError("Ya existe un evento con esas propiedades");
+            return;
         }
         //Guardar datos en Firestore
         try {
@@ -303,7 +304,7 @@ function EventosPage() {
             await fetchEventos();
             setShowModalModificar(false); // Cerrar el modal después de guardar
             setEventToUpdateIndex(null);
-            setErrorFecha(null)
+            setErrorFecha(null);
             setError(null);
         } catch (e) {
             console.error("Error adding document: ", e);
@@ -325,9 +326,23 @@ function EventosPage() {
                 <div className="container mt-4">
                     <div className="mx-4 mx-md-5">
                         <div className="d-flex flex-column flex-md-row justify-content-between">
-                            <h1 className="fw-bold text-center m-2">Mis Eventos</h1>
-                            <form class="d-flex mx-5 p-2 flex-grow-1 text-center" role="search">
-                                <input onFocus={() => setFiltrarEvento(true)} onBlur={() => setFiltrarEvento(false)}  class="form-control border-2" type="search" placeholder="Busque un evento..." aria-label="Search" />
+                            <h1 className="fw-bold text-center m-2">
+                                Mis Eventos
+                            </h1>
+                            <form
+                                className="d-flex mx-5 p-2 flex-grow-1 text-center"
+                                role="search"
+                            >
+                                <input
+                                    value={busqueda}
+                                    onChange={(e) =>
+                                        setBusqueda(e.target.value)
+                                    }
+                                    className="form-control border-2"
+                                    type="search"
+                                    placeholder="Busque un evento..."
+                                    aria-label="Search"
+                                />
                             </form>
                             <button
                                 className="btn btn-dark my-2"
@@ -339,12 +354,12 @@ function EventosPage() {
 
                         {/* Modal de modificar evento */}
                         <Modal
-                            id='modalModificar'
+                            id="modalModificar"
                             show={showModalModificar}
                             onHide={() => {
                                 setShowModalModificar(false);
-                                setErrorFecha("")
-                                setError(null)
+                                setErrorFecha("");
+                                setError(null);
                             }}
                             centered
                         >
@@ -458,7 +473,7 @@ function EventosPage() {
                                 </form>
                             </Modal.Body>
                         </Modal>
-                        
+
                         {/* Modal de confirmación de eliminación de evento */}
                         <Modal
                             id="modalConfirmar"
@@ -608,35 +623,41 @@ function EventosPage() {
                             </Modal.Body>
                         </Modal>
 
-                        
-
-                        
-                        
-
                         {/* Carrusel donde aparecen todos los eventos */}
                         <div className="p-3 p-md-5 mt-3 rounded bg-light">
                             {/* Carrusel de eventos */}
                             <ul className="list-group">
-                                {!filtrarEvento &&  eventos.map((evento, index) => (
-                                    <Evento
-                                        key={index}
-                                        {...evento}
-                                        onCambio={() => {
-                                            setEventToUpdateIndex(index);
-                                            setEventoCambiar({
-                                                id: evento.id,
-                                                nombre: evento.nombre,
-                                                fecha: evento.fecha,
-                                                hora: "",
-                                                ubicacion: evento.ubicacion,
-                                            });
-                                            setShowModalModificar(true);
-                                        }}
-                                        onEliminar={() =>
-                                            handleEliminarEvento(index)
-                                        }
-                                    />
-                                ))}
+                                {eventos
+                                    .filter((evento) =>
+                                        evento.nombre
+                                            .trim()
+                                            .toLowerCase()
+                                            .includes(
+                                                busqueda
+                                                    .trim()
+                                                    .toLocaleLowerCase()
+                                            )
+                                    )
+                                    .map((evento, index) => (
+                                        <Evento
+                                            key={index}
+                                            {...evento}
+                                            onCambio={() => {
+                                                setEventToUpdateIndex(index);
+                                                setEventoCambiar({
+                                                    id: evento.id,
+                                                    nombre: evento.nombre,
+                                                    fecha: evento.fecha,
+                                                    hora: "",
+                                                    ubicacion: evento.ubicacion,
+                                                });
+                                                setShowModalModificar(true);
+                                            }}
+                                            onEliminar={() =>
+                                                handleEliminarEvento(index)
+                                            }
+                                        />
+                                    ))}
                             </ul>
                         </div>
                     </div>
