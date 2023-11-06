@@ -19,6 +19,7 @@ function Evento({
     const [emailInvalido, setEmailInvaido] = useState(false);
     const [nombreInvalido, setNombrelInvaido] = useState(false);
     const [DNIInvalido, setDNIInvalido] = useState(false);
+    const [invitadoExistente, setInvitadoExistente] = useState(false);
     const [showInvitados, setShowInvitados] = useState(false);
     const [showConfirmacionEliminar, setShowConfirmacionEliminar] =
         useState(false);
@@ -60,6 +61,11 @@ function Evento({
             setDNIInvalido(true);
             return;
         }
+        // Compruebo si existe un invitado con ese DNI
+        if (invitadosArray.find((i) => i.DNI === DNI) != undefined) {
+            setInvitadoExistente(true);
+            return;
+        }
         // Añado el invitado a firebase
         try {
             const res = await updateDoc(doc(db, "Eventos", id), {
@@ -67,8 +73,8 @@ function Evento({
                     ...invitados,
                     {
                         nombre: nombre,
-                        email: DNI,
-                        DNI: email,
+                        email: email,
+                        DNI: DNI,
                     },
                 ],
             });
@@ -77,14 +83,15 @@ function Evento({
                 ...invitadosArray,
                 {
                     nombre: nombre,
-                    email: DNI,
-                    DNI: email,
+                    email: email,
+                    DNI: DNI,
                 },
             ]);
             //
             event.target.formNombre.value = null;
             event.target.formDNI.value = null;
             event.target.formEmail.value = null;
+            setInvitadoExistente(false);
         } catch (e) {
             console.error("Error adding document: ", e);
         }
@@ -250,6 +257,11 @@ function Evento({
                                     Introduzca un email válido
                                 </Form.Control.Feedback>
                             </Form.Group>
+                            {invitadoExistente && (
+                                <p className="text-center text-danger">
+                                    Ya existe un invitado con ese DNI
+                                </p>
+                            )}
                             <div className="d-grid gap-2">
                                 <Button
                                     className="btn btn-block"
