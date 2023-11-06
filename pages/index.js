@@ -4,7 +4,6 @@ import Link from "next/link";
 
 import { Inter } from "next/font/google";
 import Login from "@/components/login.js";
-import Signup from "@/components/signup";
 import { getAuth } from "firebase/auth";
 import { useRouter } from "next/router";
 import { auth } from "@/firebase";
