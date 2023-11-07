@@ -10,11 +10,6 @@ describe("Añadir un invitado con campo invalido", () => {
         );
         cy.wait(500);
 
-<<<<<<< HEAD
-    beforeEach(async () => {
-        docReference = await anadirEventoPrueba('Test - Añadir invitado');
-=======
->>>>>>> fa3a9d4b4f1549dc7e6e7525a86268c09fd93167
         cy.visit("http://localhost:3000/eventos");
     });
 
