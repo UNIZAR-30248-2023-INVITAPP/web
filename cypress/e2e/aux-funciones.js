@@ -1,7 +1,7 @@
 import { doc, collection, deleteDoc, addDoc } from "firebase/firestore";
 import db from "../../firebase";
 
-export const anadirEventoPrueba = async () => {
+export const anadirEventoPrueba = async (titulo) => {
     const fechaUnDiaDespues = new Date();
     fechaUnDiaDespues.setDate(fechaUnDiaDespues.getDate() + 1);
 
@@ -13,7 +13,7 @@ export const anadirEventoPrueba = async () => {
         "0"
     )}`;
     var docReference = await addDoc(collection(db, "Eventos"), {
-        nombre: "Test - Añadir un invitado",
+        nombre: titulo,
         fecha: fechaUnDiaDespuesFormateada,
         hora: "00:00",
         ubicacion: "Ubicacion de prueba",

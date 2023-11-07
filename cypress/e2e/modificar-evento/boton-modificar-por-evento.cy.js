@@ -8,12 +8,11 @@ describe('Comprobar que aparece un boton de modificar evento en cada evento', ()
         cy.get('h1').should('have.text', 'Mis Eventos')
     })
 
-    it('Prueba 2: Comprobar que cada evento tiene un botón de eliminar', () => {
+    it('Prueba 2: Comprobar que cada evento tiene un botón de modificar', () => {
         // Obtén todos los elementos <li> que representan eventos
         cy.get('li.list-group-item').each((evento) => {
           // Verifica que dentro de cada evento hay un botón de eliminar
           cy.wrap(evento).find('button.btn-warning').should('exist');
         });
       });
-
 })

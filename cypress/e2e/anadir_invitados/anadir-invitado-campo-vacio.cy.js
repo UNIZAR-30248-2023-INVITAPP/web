@@ -4,7 +4,7 @@ describe("Añadir un invitado con campo vacio", () => {
     var docReference;
 
     beforeEach(async () => {
-        docReference = await anadirEventoPrueba();
+        docReference = await anadirEventoPrueba('Test- Añadir invitado');
         cy.visit("http://localhost:3000/eventos");
     });
 

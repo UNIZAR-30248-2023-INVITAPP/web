@@ -1,6 +1,7 @@
-describe('Crear evento con una fecha anterior a la actual', () => {
-    beforeEach(() => {
-      cy.visit('http://localhost:3000/eventos')
+
+describe('Crear evento campos vacíos', () => {
+    beforeEach(() => {    
+        cy.visit('http://localhost:3000/eventos')
     })
   
   

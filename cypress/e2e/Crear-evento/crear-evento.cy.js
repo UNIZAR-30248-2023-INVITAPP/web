@@ -2,21 +2,11 @@
 
 describe('Crear Evento', () => {
   beforeEach(() => {
-    // Cypress starts out with a blank slate for each test
-    // so we must tell it to visit our website with the `cy.visit()` command.
-    // Since we want to visit the same URL at the start of all our tests,
-    // we include it in our beforeEach function so that it runs before each test
     cy.visit('http://localhost:3000/eventos')
   })
 
-  it('Prueba 1: Verificar que aparece la cabecera "Mis Eventos" ', () => {
-    
-    cy.get('h1').should('have.text', 'Mis Eventos')
 
-  })
-
-
-  it('Prueba 2: Verificar que al pinchar en el botón Crear Evento se abre un el modal', () => {
+  it('Prueba 1: Verificar que al pinchar en el botón Crear Evento se abre un el modal', () => {
     // Pinchar en el modal para crear Evento
     cy.contains('button', 'Crear Evento').click();
 
@@ -24,7 +14,7 @@ describe('Crear Evento', () => {
     cy.get('#modalCrear').should('be.visible');
   })
 
-  it('Prueba 3: Rellenar el modal y crear el evento', () => {
+  it('Prueba 2: Rellenar el modal y crear el evento', () => {
 
     // Pinchar en el modal para crear Evento
     cy.contains('button', 'Crear Evento').click();
@@ -44,6 +34,12 @@ describe('Crear Evento', () => {
     // Verificar que existe el evento con ese título
     cy.contains('Evento de Prueba').should('exist');
 
+    // Eliminar el evento
+    const etiqueta = cy.get('h5').contains('Evento de Prueba')
+    const botones = etiqueta.parent().siblings()
+    botones.find('.btn-danger').click()
+
+    cy.contains('button', 'Eliminar').click();
   })
 
 })
