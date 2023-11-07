@@ -47,7 +47,7 @@ function EventosPage() {
     // Luego, ordena el arreglo de eventos por nombre y actualiza el estado con los eventos obtenidos.
     const fetchEventos = async () => {
         const eventosFirebase = await getDocs(collection(db, "Eventos"));
-        console.log(eventosFirebase);
+        //console.log(eventosFirebase);
         const eventosArray = eventosFirebase.docs.map((evento, index) => {
             return {
                 id: evento.id,
@@ -232,7 +232,7 @@ function EventosPage() {
                 ubicacion: nuevoEvento.ubicacion,
                 invitados: nuevoEvento.invitados,
             });
-            console.log("Document written with ID: ", docRef.id);
+            //console.log("Document written with ID: ", docRef.id);
 
             const fechaDate = new Date(nuevoEvento.fecha);
             const options = { year: "numeric", month: "long", day: "numeric" };
@@ -310,7 +310,7 @@ function EventosPage() {
             console.error("Error adding document: ", e);
             return;
         }
-        console.log(eventoCambiar);
+        //console.log(eventoCambiar);
     };
 
     // El hook useEffect se utiliza para hacer la peticion a Cloud Firestore y mostrar

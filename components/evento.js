@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Modal, ListGroup, Form, Button, Row, Col } from "react-bootstrap";
 import db from "../firebase";
 import { doc, updateDoc } from "firebase/firestore";
+import Ruleta from "./ruletaNombres/ruleta";
 
 function Evento({
     id,
@@ -21,6 +22,7 @@ function Evento({
     const [DNIInvalido, setDNIInvalido] = useState(false);
     const [invitadoExistente, setInvitadoExistente] = useState(false);
     const [showInvitados, setShowInvitados] = useState(false);
+    const [showSorteo, setShowSorteo] = useState(false);
     const [showConfirmacionEliminar, setShowConfirmacionEliminar] =
         useState(false);
     const [indexInvitadoEliminar, setIndexInvitadoEliminar] = useState(null);
@@ -152,7 +154,7 @@ function Evento({
                                             </span>
                                         </span>
                                         <span className="fw-bold d-block mt-1">
-                                            DNI:{" "}
+                                            DNI/NIE:{" "}
                                             <span className="fw-light">
                                                 {invitado.DNI}
                                             </span>
@@ -207,11 +209,11 @@ function Evento({
                         <Row className="mb-3">
                             <Form.Group
                                 as={Col}
-                                md="8"
+                                md="7"
                                 className="mb-3"
                                 controlId="formNombre"
                             >
-                                <Form.Label>Nombre</Form.Label>
+                                <Form.Label>Nombre completo</Form.Label>
                                 <Form.Control
                                     type="text"
                                     placeholder="Introduzca nombre"
@@ -224,19 +226,19 @@ function Evento({
                             </Form.Group>
                             <Form.Group
                                 as={Col}
-                                md="4"
+                                md="5"
                                 className="mb-3"
                                 controlId="formDNI"
                             >
-                                <Form.Label>DNI</Form.Label>
+                                <Form.Label>DNI/NIE</Form.Label>
                                 <Form.Control
                                     type="text"
-                                    placeholder="Introduzca DNI"
+                                    placeholder="Introduzca DNI/NIE"
                                     required
                                     isInvalid={DNIInvalido}
                                 />
                                 <Form.Control.Feedback type="invalid">
-                                    DNI invalido
+                                    DNI o NIE invalido
                                 </Form.Control.Feedback>
                             </Form.Group>
 
@@ -264,9 +266,8 @@ function Evento({
                             )}
                             <div className="d-grid gap-2">
                                 <Button
-                                    className="btn btn-block"
+                                    className="btn btn-dark btn-block"
                                     type="submit"
-                                    variant="primary"
                                 >
                                     Añadir
                                 </Button>
@@ -275,6 +276,23 @@ function Evento({
                     </Form>
                     <hr className="hr" />
                     {listaInvitados()}
+                </Modal.Body>
+            </Modal>
+
+            {/* Modal del sorteo*/}
+            <Modal
+                className="pt-2 px-2 pt-md-0 px-md-0"
+                show={showSorteo}
+                onHide={() => {
+                    setShowSorteo(false);
+                }}
+                centered
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Sorteo</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Ruleta listaInvitados={invitadosArray} />
                 </Modal.Body>
             </Modal>
 
@@ -291,7 +309,10 @@ function Evento({
                     <Modal.Title>Confirmar eliminación</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    ¿Estás seguro de que quieres eliminar este invitado?
+                    ¿Estás seguro de que quieres eliminar al invitado{" "}
+                    <b>{invitadosArray[indexInvitadoEliminar]?.nombre}</b> con
+                    DNI/NIE: <b>{invitadosArray[indexInvitadoEliminar]?.DNI}</b>
+                    ?
                 </Modal.Body>
                 <Modal.Footer>
                     <Button
@@ -336,7 +357,18 @@ function Evento({
                             }}
                         >
                             {" "}
-                            Ver invitados
+                            Invitados
+                        </button>
+
+                        {/* Botón de ver sorteos  */}
+                        <button
+                            className="btn btn-secondary" // Estilo de botón primario
+                            onClick={() => {
+                                setShowSorteo(true);
+                            }}
+                        >
+                            {" "}
+                            Sorteo
                         </button>
 
                         {/* Botón de editar a la derecha */}
