@@ -1,5 +1,4 @@
 import { Button, ListGroup, ProgressBar, Spinner } from "react-bootstrap";
-import { userNames } from "./listaNombres";
 import { useState } from "react";
 
 function Ruleta({ listaInvitados }) {
