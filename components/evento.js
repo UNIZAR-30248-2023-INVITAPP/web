@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Modal, ListGroup, Form, Button, Row, Col } from "react-bootstrap";
 import db from "../firebase";
 import { doc, updateDoc } from "firebase/firestore";
+import Ruleta from "./ruletaNombres/ruleta";
 
 function Evento({
     id,
@@ -21,6 +22,7 @@ function Evento({
     const [DNIInvalido, setDNIInvalido] = useState(false);
     const [invitadoExistente, setInvitadoExistente] = useState(false);
     const [showInvitados, setShowInvitados] = useState(false);
+    const [showSorteo, setShowSorteo] = useState(false);
     const [showConfirmacionEliminar, setShowConfirmacionEliminar] =
         useState(false);
     const [indexInvitadoEliminar, setIndexInvitadoEliminar] = useState(null);
@@ -277,6 +279,23 @@ function Evento({
                 </Modal.Body>
             </Modal>
 
+            {/* Modal del sorteo*/}
+            <Modal
+                className="pt-2 px-2 pt-md-0 px-md-0"
+                show={showSorteo}
+                onHide={() => {
+                    setShowSorteo(false);
+                }}
+                centered
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Sorteo</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Ruleta listaInvitados={invitadosArray} />
+                </Modal.Body>
+            </Modal>
+
             {/* Modal de confirmación de eliminacion de invitado */}
             <Modal
                 id="modalConfirmarEliminacion"
@@ -338,7 +357,18 @@ function Evento({
                             }}
                         >
                             {" "}
-                            Ver invitados
+                            Invitados
+                        </button>
+
+                        {/* Botón de ver sorteos  */}
+                        <button
+                            className="btn btn-secondary" // Estilo de botón primario
+                            onClick={() => {
+                                setShowSorteo(true);
+                            }}
+                        >
+                            {" "}
+                            Sorteo
                         </button>
 
                         {/* Botón de editar a la derecha */}
