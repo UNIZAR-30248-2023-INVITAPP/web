@@ -1,8 +1,8 @@
 import { anadirEventoPrueba, eliminarEvento } from "../aux-funciones";
 
-describe("Añadir un invitado con campo invalido", () => {
+describe("Añadir dos invitados con el mismo DNI", () => {
     var docReference;
-    const nombreEvento = "Test - Añadir un invitado con campo invalido";
+    const nombreEvento = "Test - Añadir dos invitado con el mismo DNI";
 
     beforeEach(() => {
         docReference = anadirEventoPrueba(nombreEvento).then(
@@ -10,11 +10,6 @@ describe("Añadir un invitado con campo invalido", () => {
         );
         cy.wait(500);
 
-<<<<<<< HEAD
-    beforeEach(async () => {
-        docReference = await anadirEventoPrueba('Test - Añadir invitado');
-=======
->>>>>>> fa3a9d4b4f1549dc7e6e7525a86268c09fd93167
         cy.visit("http://localhost:3000/eventos");
     });
 
@@ -22,9 +17,9 @@ describe("Añadir un invitado con campo invalido", () => {
         eliminarEvento(docReference.id);
     });
 
-    it("Añadir un invitado con DNI invalido", () => {
+    it("Añadir dos invitados con el mismo DNI", () => {
         const nombreInvitado = "Nombre invitado";
-        const DNIInvitado = "DNI invalido";
+        const DNIInvitado = "11111111A";
         const emailInvitado = "prueba@correo.es";
         // Comprobar que no hay invitados
         const ultimoEvento = cy
@@ -47,27 +42,18 @@ describe("Añadir un invitado con campo invalido", () => {
         // Pulsar el boton
         cy.contains("button", "Añadir").click();
 
-        // Comprobar que no se ha añadido
-        cy.contains("DNI invalido").should("exist");
-        cy.contains("Aun no hay invitados para este evento").should("exist");
-    });
+        // Comprobar que se ha añadido
+        cy.contains("Aun no hay invitados para este evento").should(
+            "not.exist"
+        );
+        // Comprobar que aparece el nombre
+        cy.contains(nombreInvitado).should("exist");
+        // Comprobar que aparece el DNI
+        cy.contains(DNIInvitado).should("exist");
+        // Comprobar que aparece el Email
+        cy.contains(emailInvitado).should("exist");
 
-    it("Añadir un invitado con email invalido", () => {
-        const nombreInvitado = "Nombre invitado";
-        const DNIInvitado = "11111111A";
-        const emailInvitado = "esto no es un correo valido";
-        // Comprobar que no hay invitados
-        const ultimoEvento = cy
-            .get(".list-group")
-            .children()
-            .contains(nombreEvento)
-            .parent()
-            .parent();
-        ultimoEvento.contains("button", "Ver invitados").click();
-        // Comprobar que no hay invitados
-        cy.contains("Aun no hay invitados para este evento");
-
-        // Rellenar el formulario
+        // Rellenar el formulario otra vez
         // Rellenar el nombre del invitado
         cy.get("#formNombre").type(nombreInvitado);
         // Rellenar el DNI
@@ -77,7 +63,7 @@ describe("Añadir un invitado con campo invalido", () => {
         // Pulsar el boton
         cy.contains("button", "Añadir").click();
 
-        // Comprobar que no se ha añadido
-        cy.contains("Aun no hay invitados para este evento").should("exist");
+        // Comprobar que existe el mensaje de error
+        cy.contains("Ya existe un invitado con ese DNI").should("exist");
     });
 });
