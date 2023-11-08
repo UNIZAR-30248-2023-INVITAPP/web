@@ -28,7 +28,7 @@ describe("Añadir un invitado", () => {
             .contains(nombreEvento)
             .parent()
             .parent();
-        ultimoEvento.contains("button", "Ver invitados").click();
+        ultimoEvento.contains("button", "Invitados").click();
         // Comprobar que no hay invitados
         cy.contains("Aun no hay invitados para este evento");
 
