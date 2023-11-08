@@ -8,7 +8,7 @@ describe("Añadir dos invitados con el mismo DNI", () => {
         docReference = anadirEventoPrueba(nombreEvento).then(
             (result) => (docReference = result)
         );
-        cy.wait(500);
+        cy.wait(1000);
 
         cy.visit("http://localhost:3000/eventos");
     });

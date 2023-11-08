@@ -5,10 +5,13 @@ import {
 } from "../aux-funciones";
 
 describe("Eliminar un invitado", () => {
+    const nombreEvento = "Test Invitado - Eliminar un invitado";
     var docReference;
 
-    beforeEach(async () => {
-        docReference = await anadirEventoPruebaConInvitado();
+    beforeEach(() => {
+        docReference = anadirEventoPruebaConInvitado(nombreEvento).then(
+            (result) => (docReference = result)
+        );
         cy.visit("http://localhost:3000/eventos");
     });
 
@@ -18,7 +21,12 @@ describe("Eliminar un invitado", () => {
 
     it("Eliminar un invitado", () => {
         // Comprobar que no hay invitados
-        const ultimoEvento = cy.get(".list-group").children().last();
+        const ultimoEvento = cy
+            .get(".list-group")
+            .children()
+            .contains(nombreEvento)
+            .parent()
+            .parent();
         ultimoEvento.contains("button", "Ver invitados").click();
         // Comprobar que no aparece el mensaje de que hay invitados
         cy.contains("Aun no hay invitados para este evento").should(
@@ -38,7 +46,12 @@ describe("Eliminar un invitado", () => {
 
     it("Intentar eliminar un invitado pero cancelar en el modal", () => {
         // Comprobar que no hay invitados
-        const ultimoEvento = cy.get(".list-group").children().last();
+        const ultimoEvento = cy
+            .get(".list-group")
+            .children()
+            .contains(nombreEvento)
+            .parent()
+            .parent();
         ultimoEvento.contains("button", "Ver invitados").click();
         // Comprobar que no aparece el mensaje de que hay invitados
         cy.contains("Aun no hay invitados para este evento").should(
