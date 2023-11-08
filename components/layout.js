@@ -12,6 +12,7 @@ const Layout = ({ children }) => {
 		signOut(auth)
 			.then(() => {
 				// Redirecciona al usuario a la pantalla inicial
+				localStorage.clear();
 				router.push("/");
 				console.log("Signed out successfully");
 			})
@@ -27,7 +28,9 @@ const Layout = ({ children }) => {
 				<div className="container text-center">
 					<span className="navbar-brand mx-auto">InvitApp</span>
 					{/* Se ha incluido botón para gestionar el cierre de sesión */}
-					<Button onClick={() => handleLogout()}>Logout</Button>
+					<Button onClick={() => handleLogout()}>
+						Cerrar sesión
+					</Button>
 				</div>
 			</nav>
 

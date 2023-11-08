@@ -18,7 +18,7 @@ function Login() {
 				// Declaración de credenciales y token de acceso. NO SÉ SI SON NECESARIOS (!!)
 				const credential =
 					GoogleAuthProvider.credentialFromResult(result);
-				const token = credential.accessToken;
+				const token = credential.idToken;
 
 				// Declaración del usuario. NO SÉ SI ES NECESARIO (!!)
 				const user = result.user;
@@ -32,6 +32,7 @@ function Login() {
 				localStorage.setItem("nombre", nombre);
 				localStorage.setItem("email", email);
 				localStorage.setItem("foto", foto);
+				localStorage.setItem("idToken", token);
 
 				// Redireccionamos a eventos tras un inicio de sesión válido
 				router.push("/eventos");
@@ -61,38 +62,40 @@ function Login() {
 			<div className="form_container w-70 p-5 rounded border border-dark bg-white">
 				<Form>
 					<h3>Iniciar sesión</h3>
-					<div className="mb-2">
-						<Form.Label>Correo electrónico</Form.Label>
-						<input
-							type="email"
-							placeholder="Introduce correo"
-							className="form-control"
-						/>
-					</div>
-					<div className="mb-2">
-						<Form.Label>Contraseña</Form.Label>
-						<input
-							type="password"
-							placeholder="Introduce contraseña"
-							className="form-control"
-						/>
-					</div>
-					{/* Tal vez incrementar margin-top */}
-					<div className="d-grid">
-						{/* Por completar para inicio de sesión con correo y contraseña... */}
+					{/* --------DESCOMENTAR PARA SPRINT 3---------}
+                    <div className="mb-2">
+                        <Form.Label>Correo electrónico</Form.Label>
+                        <input
+                            type="email"
+                            placeholder="Introduce correo"
+                            className="form-control"
+                        />
+                    </div>
+                    <div className="mb-2">
+                        <Form.Label>Contraseña</Form.Label>
+                        <input
+                            type="password"
+                            placeholder="Introduce contraseña"
+                            className="form-control"
+                        />
+                    </div>
+                    */}
+					{/* -------DESCOMENTAR PARA SPRINT 3------- */}
+					{/* <div className="d-grid">
 						<Button>Iniciar sesión</Button>
-					</div>
+					</div> */}
 					<div className="mt-2 d-grid">
 						{/* Intentar cambiar formato botón Google */}
 						<Button onClick={signInWithGoogle}>
 							Iniciar sesión con Google
 						</Button>
 					</div>
-					<div className="mt-2 d-grid">
+					{/* -------DESCOMENTAR PARA SPRINT 3------- */}
+					{/* <div className="mt-2 d-grid">
 						<Button onClick={redirigirSignUp}>
 							¿No tienes cuenta?
 						</Button>
-					</div>
+					</div> */}
 				</Form>
 			</div>
 		</div>
