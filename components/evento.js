@@ -17,8 +17,8 @@ function Evento({
     onCambio,
 }) {
     const [invitadosArray, setInvitados] = useState(invitados);
-    const [emailInvalido, setEmailInvaido] = useState(false);
-    const [nombreInvalido, setNombrelInvaido] = useState(false);
+    const [emailInvalido, setEmailInvalido] = useState(false);
+    const [nombreInvalido, setNombrelInvalido] = useState(false);
     const [DNIInvalido, setDNIInvalido] = useState(false);
     const [invitadoExistente, setInvitadoExistente] = useState(false);
     const [showInvitados, setShowInvitados] = useState(false);
@@ -49,9 +49,9 @@ function Evento({
     // En caso satisfactorio añade el invitado a Firebase
     // En caso contrario muestra el mensaje de error correspondiente
     const handleSubmitAnadirInvitado = async (event) => {
-        setNombrelInvaido(false);
+        setNombrelInvalido(false);
         setDNIInvalido(false);
-        setEmailInvaido(false);
+        setEmailInvalido(false);
         event.preventDefault();
         const nombre = event.target.formNombre.value;
         const DNI = event.target.formDNI.value;
@@ -372,13 +372,13 @@ function Evento({
                             Sorteo
                         </button>
 
-                        {/* Botón de editar a la derecha */}
+                        {/* Botón de modificar a la derecha */}
                         <button
-                            className="btn btn-block btn-warning" // Estilo de botón de eliminación
-                            onClick={onCambio} // Manejador para eliminar el evento por índice
+                            className="btn btn-block btn-warning" // Estilo de botón de modificación
+                            onClick={onCambio} // Manejador para modificar el evento por índice
                         >
                             {" "}
-                            Editar
+                            Modificar
                         </button>
 
                         {/* Botón de eliminación a la derecha */}
@@ -387,7 +387,7 @@ function Evento({
                             onClick={onEliminar} // Manejador para eliminar el evento por índice
                         >
                             {" "}
-                            Borrar
+                            Eliminar
                         </button>
                     </div>
                 </div>
