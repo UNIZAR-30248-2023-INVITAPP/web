@@ -54,3 +54,11 @@ export const anadirEventoPruebaConInvitado = async (titulo) => {
 export const eliminarEvento = async (docId) => {
     await deleteDoc(doc(db, "Eventos", docId));
 };
+
+export const eliminarEventoDom = (evento) => {
+    // Eliminar el evento
+    const etiqueta = cy.get('h5').contains(evento)
+    const botones = etiqueta.parent().siblings()
+    botones.find('.btn-danger').click()
+    cy.contains('button', 'Eliminar').click();
+}

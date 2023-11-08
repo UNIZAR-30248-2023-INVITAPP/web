@@ -1,23 +1,21 @@
-import { anadirEventoPrueba, eliminarEvento } from "../aux-funciones";
+import { anadirEventoPrueba, eliminarEventoDom } from "../aux-funciones";
 
 
 describe('Crear un evento con las mismas propiedades que otro existente', () => {
-  var docReference
 
-  beforeEach(async () => {
-    docReference = await anadirEventoPrueba('Test - Crear evento existente');
+  const nombre = 'Test - Crear Evento existente'
+  beforeEach( () => {
     cy.visit('http://localhost:3000/eventos');
-    cy.wait(500)
-  })
-
-  afterEach(async () => {
-    await eliminarEvento(docReference.id);
   })
 
 
-  it('Prueba 1: Crear un evento con las mismas propiedades que uno creado', () => {
+  it('Prueba 1: Crear un evento', () => {
+    anadirEventoPrueba('Test - Crear Evento existente')
+  })
 
-    const nombre = 'Test - Crear Evento existente'
+  it('Prueba 2: Crear un evento con las mismas propiedades que uno creado', () => {
+
+    
     
     // Rellenar la fecha
     const fechaUnDiaDespues = new Date();
@@ -48,8 +46,14 @@ describe('Crear un evento con las mismas propiedades que otro existente', () => 
     // Crear Evento
     cy.get('#boton-crear-evento').click()
 
+    cy.wait(500)
     // Verificar que salta el error a la hora de crear el evento
     cy.contains('Ya existe un evento con esas propiedades').should('exist')
+
+  })
+
+  it('Prueba 3: Eliminar el evento', () => {
+    eliminarEventoDom(nombre)
   })
 
 })

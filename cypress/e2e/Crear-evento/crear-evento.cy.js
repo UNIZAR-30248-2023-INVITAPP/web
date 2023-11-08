@@ -1,6 +1,9 @@
+const { eliminarEventoDom } = require("../aux-funciones");
 
 
 describe('Crear Evento', () => {
+
+  const nombre = 'Test - Crear Evento'
   beforeEach(() => {
     cy.visit('http://localhost:3000/eventos')
   })
@@ -19,7 +22,7 @@ describe('Crear Evento', () => {
     // Pinchar en el modal para crear Evento
     cy.contains('button', 'Crear Evento').click();
     // Rellenar el nombre del evento
-    cy.get('#nombre').type('Evento de Prueba');
+    cy.get('#nombre').type(nombre);
     // Rellenar la fecha
     cy.get('#fecha').type('2025-12-31');
     // Rellenar la hora
@@ -32,14 +35,11 @@ describe('Crear Evento', () => {
     // Esperar a que se ejecute la función asíncrona
     cy.wait(500)
     // Verificar que existe el evento con ese título
-    cy.contains('Evento de Prueba').should('exist');
+    cy.contains(nombre).should('exist');
 
-    // Eliminar el evento
-    const etiqueta = cy.get('h5').contains('Evento de Prueba')
-    const botones = etiqueta.parent().siblings()
-    botones.find('.btn-danger').click()
-
-    cy.contains('button', 'Eliminar').click();
+    // Eliminar el evento creado
+    eliminarEventoDom(nombre)
   })
+
 
 })
