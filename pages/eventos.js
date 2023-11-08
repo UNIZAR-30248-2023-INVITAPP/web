@@ -333,9 +333,11 @@ function EventosPage() {
 							<form
 								className="d-flex mx-5 p-2 flex-grow-1 text-center"
 								role="search"
+								id="form"
 							>
 								<input
 									value={busqueda}
+									id='searchBar'
 									onChange={(e) =>
 										setBusqueda(e.target.value)
 									}

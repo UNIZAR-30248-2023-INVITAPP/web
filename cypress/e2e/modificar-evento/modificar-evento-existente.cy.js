@@ -1,3 +1,5 @@
+const { eliminarEventoDom, anadirEventoPrueba } = require("../aux-funciones")
+
 describe('En esta prueba se modifican las propiedades con las mismas que otro ya existente', () => {
 
     const nombreEvento1 = 'Evento de Prueba 1'
@@ -11,35 +13,12 @@ describe('En esta prueba se modifican las propiedades con las mismas que otro ya
 
 
     it('Prueba 1: Crear un evento "Evento de Prueba 1" ', () => {
-        // Pinchar en el modal para crear Evento
-        cy.contains('button', 'Crear Evento').click();
-        // Rellenar el nombre del evento
-        cy.get('#nombre').type(nombreEvento1);
-        // Rellenar la fecha
-        cy.get('#fecha').type('2025-12-31');
-        // Rellenar la hora
-        cy.get('#hora').type('21:30');
-        //Rellenar la ubicacion
-        cy.get('#ubicacion').type('Calle León XII');
-        // Crear Evento
-        cy.get('#boton-crear-evento').click()
-        cy.wait(1000)
+        anadirEventoPrueba(nombreEvento1)
     })
 
     it('Prueba 2: Crear un evento "Evento de Prueba 2" ', () => {
-        // Pinchar en el modal para crear Evento
-        cy.contains('button', 'Crear Evento').click();
-        // Rellenar el nombre del evento
-        cy.get('#nombre').type(nombreEvento2);
-        // Rellenar la fecha
-        cy.get('#fecha').type('2025-12-31');
-        // Rellenar la hora
-        cy.get('#hora').type('21:30');
-        //Rellenar la ubicacion
-        cy.get('#ubicacion').type('Calle León XII');
-        // Crear Evento
-        cy.get('#boton-crear-evento').click()
-        cy.wait(1000)
+        anadirEventoPrueba(nombreEvento2)
+        cy.wait(500)
     })
 
     it('Prueba 3: Seleccionar el segundo evento creado y ponerle el nombre del primero y comprobar el mensaje de error', () => {
@@ -56,9 +35,19 @@ describe('En esta prueba se modifican las propiedades con las mismas que otro ya
         //Cambiar el nombre a 'Evento de Prueba 1'
         cy.get('#nombre').clear().type(nombreEvento1)
         // Rellenar fecha
-        cy.get('#fecha').type('2025-12-31');
+        const fechaUnDiaDespues = new Date();
+        fechaUnDiaDespues.setDate(fechaUnDiaDespues.getDate() + 1);
+
+        // Formatea la fecha en el formato YYYY-MM-DD
+        const fechaUnDiaDespuesFormateada = `${fechaUnDiaDespues.getFullYear()}-${String(
+            fechaUnDiaDespues.getMonth() + 1
+        ).padStart(2, "0")}-${String(fechaUnDiaDespues.getDate()).padStart(
+            2,
+            "0"
+        )}`;
+        cy.get('#fecha').type(fechaUnDiaDespuesFormateada);
         // Rellenar la hora
-        cy.get('#hora').type('21:30');
+        cy.get('#hora').type('00:00');
         // Rellenar hora
         // Pinchar el botón de modificar evento
         cy.contains('button', 'Modificar evento').click()
@@ -67,21 +56,7 @@ describe('En esta prueba se modifican las propiedades con las mismas que otro ya
     })
 
     it('Prueba 4: Eliminar los eventos creados para la prueba', () => {
-        // Eliminar el primer evento
-        const etiqueta1 = cy.get('h5').contains(nombreEvento1)
-        const botones1 = etiqueta1.parent().siblings()
-        botones1.find('.btn-danger').click()
-        // Confirmar eliminación
-        cy.contains('button', 'Eliminar').click();
-
-        cy.wait(1000)
-
-        // Eliminar el segundo evento
-        const etiqueta2= cy.get('h5').contains(nombreEvento2)
-        const botones2 = etiqueta2.parent().siblings()
-        botones2.find('.btn-danger').click()
-        // Confirmar eliminación
-        cy.contains('button', 'Eliminar').click();
-
+        eliminarEventoDom(nombreEvento1)
+        eliminarEventoDom(nombreEvento2)
     })
 })

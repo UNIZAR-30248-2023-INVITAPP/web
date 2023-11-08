@@ -1,7 +1,7 @@
-import { anadirEventoPrueba, eliminarEvento } from "../aux-funciones";
+import { anadirEventoPrueba, eliminarEventoDom } from "../aux-funciones";
 
 
-describe('Comprobar que después de borrar un evento aparece uno menos en el DOM', () => {
+describe('Comprobar que se borra un evento correctamente', () => {
     
       const nombreEvento = 'Test - Eliminar Evento'
       beforeEach(() => {
@@ -9,20 +9,18 @@ describe('Comprobar que después de borrar un evento aparece uno menos en el DOM
       });
   
   
-      it('Prueba 1: Eliminar el evento "Test - Eliminar Evento"', async () => {
-        await anadirEventoPrueba(nombreEvento);
-
-        cy.debug()
-
-
-        const etiqueta = cy.get('h5').contains(nombreEvento)
-        const botones = etiqueta.parent().siblings()
-        botones.find('.btn-danger').click()
-        
+      it('Prueba 1: Crear un evento', () => {
+          anadirEventoPrueba(nombreEvento);
+          cy.wait(1000)
       })
 
-      it('Prueba 2: Comprobar que ya no aparece dicho evento', () => {
+      it('Prueba 2: Eliminar el evento', () => {
+          eliminarEventoDom(nombreEvento)
+          cy.wait(500)
+      })
 
-
+      it('Prueba 3: Comprobar que dicho evento no aparece en el DOM', () => {
+        // Verifica que no haya un evento con el nombre 'Evento'
+        cy.get('.list-group-item').contains('h5', nombreEvento).should('not.exist');
       })
 })
