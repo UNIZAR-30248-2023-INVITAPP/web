@@ -197,6 +197,7 @@ function Evento({
                     setNombrelInvaido(false);
                     setDNIInvalido(false);
                     setEmailInvaido(false);
+                    setInvitadoExistente(false);
                     setShowInvitados(false);
                 }}
                 centered

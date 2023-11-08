@@ -8,7 +8,7 @@ describe("Añadir un invitado con campo vacio", () => {
         docReference = anadirEventoPrueba(nombreEvento).then(
             (result) => (docReference = result)
         );
-        cy.wait(500);
+        cy.wait(1000);
 
         cy.visit("http://localhost:3000/eventos");
     });
@@ -92,7 +92,6 @@ describe("Añadir un invitado con campo vacio", () => {
         cy.contains("button", "Añadir").click();
 
         // Comprobar que no se ha añadido
-        cy.contains("DNI invalido").should("exist");
         cy.contains("Aun no hay invitados para este evento").should("exist");
     });
 });

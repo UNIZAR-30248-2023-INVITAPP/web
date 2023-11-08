@@ -8,6 +8,7 @@ describe("Añadir un invitado", () => {
         docReference = anadirEventoPrueba(nombreEvento).then(
             (result) => (docReference = result)
         );
+
         cy.wait(1000);
 
         cy.visit("http://localhost:3000/eventos");
@@ -41,6 +42,9 @@ describe("Añadir un invitado", () => {
         cy.get("#formEmail").type(emailInvitado);
         // Pulsar el boton
         cy.contains("button", "Añadir").click();
+        // cy.intercept("*").as("fetch");
+
+        // cy.wait("@fetch");
 
         // Comprobar que se ha añadido
         cy.contains("Aun no hay invitados para este evento").should(
