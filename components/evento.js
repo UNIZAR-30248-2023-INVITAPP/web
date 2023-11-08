@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Modal, ListGroup, Form, Button, Row, Col } from "react-bootstrap";
 import db from "../firebase";
 import { doc, updateDoc } from "firebase/firestore";
-import Ruleta from "./ruletaNombres/ruleta";
+import Ruleta from "./ruleta";
 
 function Evento({
     id,
