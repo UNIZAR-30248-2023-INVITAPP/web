@@ -23,7 +23,7 @@ export const anadirEventoPrueba = async (titulo) => {
     return docReference;
 };
 
-export const anadirEventoPruebaConInvitado = async () => {
+export const anadirEventoPruebaConInvitado = async (titulo) => {
     const fechaUnDiaDespues = new Date();
     fechaUnDiaDespues.setDate(fechaUnDiaDespues.getDate() + 1);
 
@@ -35,7 +35,7 @@ export const anadirEventoPruebaConInvitado = async () => {
         "0"
     )}`;
     var docReference = await addDoc(collection(db, "Eventos"), {
-        nombre: "Test - Evento de prueba",
+        nombre: titulo,
         fecha: fechaUnDiaDespuesFormateada,
         hora: "00:00",
         ubicacion: "Ubicacion de prueba",

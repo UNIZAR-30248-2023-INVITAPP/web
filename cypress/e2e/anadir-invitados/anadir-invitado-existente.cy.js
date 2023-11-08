@@ -8,7 +8,7 @@ describe("Añadir dos invitados con el mismo DNI", () => {
         docReference = anadirEventoPrueba(nombreEvento).then(
             (result) => (docReference = result)
         );
-        cy.wait(500);
+        cy.wait(1000);
 
         cy.visit("http://localhost:3000/eventos");
     });
@@ -28,7 +28,7 @@ describe("Añadir dos invitados con el mismo DNI", () => {
             .contains(nombreEvento)
             .parent()
             .parent();
-        ultimoEvento.contains("button", "Ver invitados").click();
+        ultimoEvento.contains("button", "Invitados").click();
         // Comprobar que no hay invitados
         cy.contains("Aun no hay invitados para este evento");
 

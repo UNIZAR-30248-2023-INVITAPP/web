@@ -1,11 +1,13 @@
 import { Button, ListGroup, ProgressBar, Spinner } from "react-bootstrap";
 import { useState } from "react";
+import { Form, Row, Col } from "react-bootstrap";
 
 function Ruleta({ listaInvitados }) {
     // Lista de invitados que hay en el evento. SEGURAMENTE NO SE HAGA ASÍ (!!)
     const [invitados, setInvitados] = useState(listaInvitados);
     const [candidatosVisibles, setCandidatosVisibles] = useState(false);
     const [ganadoresVisibles, setGanadoresVisibles] = useState(false);
+    const [premios, setPremios] = useState(new Set());
 
     // Usuarios ganadores
     const [ganadores, setGanadores] = useState([]);
@@ -24,7 +26,8 @@ function Ruleta({ listaInvitados }) {
     }
 
     // Conseguir ganadores aleatoriamente
-    const devolverGanadores = () => {
+    const devolverGanadores = (event) => {
+        event.preventDefault();
         setComponentesRuleta({
             botonDisabled: true,
             spinnerVisible: true,
@@ -32,10 +35,14 @@ function Ruleta({ listaInvitados }) {
 
         // Añadimos un retardo para seleccionar el ganador y mostrar el spinner de carga
         setTimeout(() => {
+            const premio = event.target.formPremio.value;
+            setPremios(premios.add(premio));
             getInvitadoRandom();
+            console.log(premios);
 
             // Añadimos un ganador aleatorio a la lista de ganadores
-            setGanadores([...ganadores, invitadoRandom]);
+            setGanadores([...ganadores, { ...invitadoRandom, premio: premio }]);
+            console.log(ganadores);
 
             // Actualizamos la lista de invitados extrayendo el ganador. SEGURAMENTE NO SE HAGA ASÍ (!!)
             const actualizarLista = invitados.filter(
@@ -137,49 +144,86 @@ function Ruleta({ listaInvitados }) {
                     )}
                     {/*Sacamos por pantalla los ganadores del sorteo.*/}
                     {ganadoresVisibles && (
-                        <ListGroup id="userList" vertical="true">
-                            {ganadores.map((ganador, index) => (
-                                <ListGroup.Item
-                                    className="lista-ganadores"
-                                    key={index}
-                                    variant="warning"
-                                >
-                                    <div className="d-flex flex-column flex-md-row gap-2 justify-content-between ">
-                                        <div>
-                                            <span className="fw-bold d-block mt-1">
-                                                Nombre:{" "}
-                                                <span className="fw-light">
-                                                    {ganador.nombre}
-                                                </span>
-                                            </span>
-                                            <span className="fw-bold d-block mt-1">
-                                                Email:{" "}
-                                                <span className="fw-light">
-                                                    {ganador.email}
-                                                </span>
-                                            </span>
-                                            <span className="fw-bold d-block mt-1">
-                                                DNI/NIE:{" "}
-                                                <span className="fw-light">
-                                                    {ganador.DNI}
-                                                </span>
-                                            </span>
-                                        </div>
+                        <>
+                            {Array.from(premios).map((premio) => {
+                                return (
+                                    <div className="d-flex flex-column gap-2 justify-content-center align-items-center">
+                                        <span className="fs-5">{premio}</span>
+                                        <ListGroup
+                                            id="userList"
+                                            vertical="true"
+                                        >
+                                            {ganadores
+                                                .filter(
+                                                    (g) => g.premio == premio
+                                                )
+                                                .map((ganador, index) => (
+                                                    <ListGroup.Item
+                                                        className="lista-ganadores"
+                                                        key={index}
+                                                        variant="success"
+                                                    >
+                                                        <div className="d-flex flex-column flex-md-row gap-2 justify-content-between ">
+                                                            <div>
+                                                                <span className="fw-bold d-block mt-1">
+                                                                    Nombre:{" "}
+                                                                    <span className="fw-light">
+                                                                        {
+                                                                            ganador.nombre
+                                                                        }
+                                                                    </span>
+                                                                </span>
+                                                                <span className="fw-bold d-block mt-1">
+                                                                    Email:{" "}
+                                                                    <span className="fw-light">
+                                                                        {
+                                                                            ganador.email
+                                                                        }
+                                                                    </span>
+                                                                </span>
+                                                                <span className="fw-bold d-block mt-1">
+                                                                    DNI/NIE:{" "}
+                                                                    <span className="fw-light">
+                                                                        {
+                                                                            ganador.DNI
+                                                                        }
+                                                                    </span>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </ListGroup.Item>
+                                                ))}
+                                        </ListGroup>
                                     </div>
-                                </ListGroup.Item>
-                            ))}
-                        </ListGroup>
+                                );
+                            })}
+                        </>
                     )}
                 </div>
             </div>
             <hr />
             <div className="d-grid gap-3">
-                <Button
-                    onClick={devolverGanadores}
-                    disabled={componentesRuleta.botonDisabled}
-                >
-                    Generar ganador
-                </Button>
+                <Form onSubmit={devolverGanadores}>
+                    <Form.Group className="mb-3" controlId="formPremio">
+                        <Form.Label>Premio</Form.Label>
+                        <Form.Control
+                            type="text"
+                            placeholder="Introduzca premio"
+                            required
+                        />
+                        <Form.Control.Feedback type="invalid">
+                            El nombre no puede estar vacio
+                        </Form.Control.Feedback>
+                    </Form.Group>
+                    <div className="d-grid gap-2">
+                        <Button
+                            type="submit"
+                            disabled={componentesRuleta.botonDisabled}
+                        >
+                            Generar ganador
+                        </Button>
+                    </div>
+                </Form>
                 <Button variant="dark">Enviar email a los ganadores</Button>
             </div>
         </div>

@@ -61,6 +61,8 @@ function Login() {
 			{/* Tal vez aumentar anchura del div */}
 			<div className="form_container w-70 p-5 rounded border border-dark bg-white">
 				<Form>
+					<h1> InvitApp </h1>
+					<hr />
 					<h3>Iniciar sesión</h3>
 					{/* --------DESCOMENTAR PARA SPRINT 3---------}
                     <div className="mb-2">

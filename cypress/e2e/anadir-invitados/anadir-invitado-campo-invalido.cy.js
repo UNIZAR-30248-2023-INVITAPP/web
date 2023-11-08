@@ -8,7 +8,7 @@ describe("Añadir un invitado con campo invalido", () => {
         docReference = anadirEventoPrueba(nombreEvento).then(
             (result) => (docReference = result)
         );
-        cy.wait(500);
+        cy.wait(1000);
 
         cy.visit("http://localhost:3000/eventos");
     });
@@ -28,7 +28,7 @@ describe("Añadir un invitado con campo invalido", () => {
             .contains(nombreEvento)
             .parent()
             .parent();
-        ultimoEvento.contains("button", "Ver invitados").click();
+        ultimoEvento.contains("button", "Invitados").click();
         // Comprobar que no hay invitados
         cy.contains("Aun no hay invitados para este evento");
 
@@ -43,7 +43,7 @@ describe("Añadir un invitado con campo invalido", () => {
         cy.contains("button", "Añadir").click();
 
         // Comprobar que no se ha añadido
-        cy.contains("DNI invalido").should("exist");
+        cy.contains("DNI o NIE invalido").should("exist");
         cy.contains("Aun no hay invitados para este evento").should("exist");
     });
 
@@ -58,7 +58,7 @@ describe("Añadir un invitado con campo invalido", () => {
             .contains(nombreEvento)
             .parent()
             .parent();
-        ultimoEvento.contains("button", "Ver invitados").click();
+        ultimoEvento.contains("button", "Invitados").click();
         // Comprobar que no hay invitados
         cy.contains("Aun no hay invitados para este evento");
 
