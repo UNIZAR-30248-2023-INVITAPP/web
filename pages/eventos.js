@@ -343,7 +343,7 @@ function EventosPage() {
 									}
 									className="form-control border-2"
 									type="search"
-									placeholder="Busque un evento..."
+									placeholder="Buscar un evento..."
 									aria-label="Search"
 								/>
 							</form>

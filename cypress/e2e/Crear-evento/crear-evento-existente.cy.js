@@ -54,6 +54,7 @@ describe('Crear un evento con las mismas propiedades que otro existente', () => 
 
   it('Prueba 3: Eliminar el evento', () => {
     eliminarEventoDom(nombre)
+    cy.wait(500)
   })
 
 })

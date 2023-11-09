@@ -37,8 +37,13 @@ describe('Crear Evento', () => {
     // Verificar que existe el evento con ese título
     cy.contains(nombre).should('exist');
 
+  })
+
+
+  it('Eliminar el evento creado', () => {
     // Eliminar el evento creado
     eliminarEventoDom(nombre)
+    cy.wait(500)
   })
 
 
