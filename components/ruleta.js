@@ -224,7 +224,7 @@ function Ruleta({ listaInvitados }) {
                         </Button>
                     </div>
                 </Form>
-                <Button variant="dark">Enviar email a los ganadores</Button>
+                {/* <Button variant="dark">Enviar email a los ganadores</Button> */}
             </div>
         </div>
     );
