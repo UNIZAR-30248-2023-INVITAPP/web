@@ -27,14 +27,16 @@ describe("Eliminar un invitado", () => {
             .contains(nombreEvento)
             .parent()
             .parent();
-        ultimoEvento.contains("button", "Ver invitados").click();
+        ultimoEvento.contains("button", "Invitados").click();
         // Comprobar que no aparece el mensaje de que hay invitados
         cy.contains("Aun no hay invitados para este evento").should(
             "not.exist"
         );
 
+        // Comprobar que aparece el modal de eliminar invitado
+        const listainvitados = cy.get("#modalListaInvitado");
         // Pulsar el boton de eliminar
-        cy.contains("button", "Eliminar").click();
+        listainvitados.contains("button", "Eliminar").click();
 
         // Comprobar que aparece el modal de eliminar invitado
         const modal = cy.get("#modalConfirmarEliminacion");
@@ -52,17 +54,21 @@ describe("Eliminar un invitado", () => {
             .contains(nombreEvento)
             .parent()
             .parent();
-        ultimoEvento.contains("button", "Ver invitados").click();
+        ultimoEvento.contains("button", "Invitados").click();
         // Comprobar que no aparece el mensaje de que hay invitados
         cy.contains("Aun no hay invitados para este evento").should(
             "not.exist"
         );
 
+        // Comprobar que aparece el modal de eliminar invitado
+        const listainvitados = cy.get("#modalListaInvitado");
         // Pulsar el boton de eliminar
-        cy.contains("button", "Eliminar").click();
+        listainvitados.contains("button", "Eliminar").click();
 
         // Comprobar que aparece el modal de eliminar invitado
         const modal = cy.get("#modalConfirmarEliminacion");
+
+        // Comprobar que aparece el modal de eliminar invitado
         modal.contains("button", "Cancelar").click();
 
         // Comprobar que se ha eliminado
