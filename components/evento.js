@@ -368,8 +368,10 @@ function Evento({
 
 					<input
 						type="checkbox"
-						className="form-check-input border-2"
+						id={`checkbox-${id}`}
+						className="form-check border-2"
 						onChange={onSelectEvento} // Manejador para marcar/desmarcar evento
+						checked={Seleccionado}
 					/>
                     <div>
                         <h5 className="fw-bold">{nombre}</h5>
