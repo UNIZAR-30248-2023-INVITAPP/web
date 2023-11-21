@@ -11,6 +11,7 @@ import {
 	getDocs,
 } from "firebase/firestore";
 import db from "../firebase";
+import ModalManual from "@/components/modal";
 
 // Componente que se corresponde con la página que se muestra de inicio, donde aparece la lista de los eventos
 function EventosPage() {
@@ -20,10 +21,19 @@ function EventosPage() {
 	const [showModalModificar, setShowModalModificar] = useState(false);
 	// Modal de confirmación a la hora de borrar un evento
 	const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+	const [showConfirmBorradoMultiple, setShowConfirmBorradoMultiple] = useState(false)
 	const [eventToDeleteIndex, setEventToDeleteIndex] = useState(null);
 	const [eventToUpdateIndex, setEventToUpdateIndex] = useState(null);
 	// Estado para almacenar el conjunto de los eventos
 	const [eventos, setEventos] = useState([]);
+
+	// Variable para mostrar el botón de eliminación múltiple
+	const [showBotonMultiple,setShowBotonMultiple] = useState(false)
+
+	// Estado para registrar aquellos eventos que se han seleccionado
+	const [eventosSeleccionados, setEventosSeleccionados] = useState([])
+
 	// Para mostrar el mensaje de error a la hora de crear el evento
 	const [error, setError] = useState(null);
 	const [errorFecha, setErrorFecha] = useState(null);
@@ -89,6 +99,30 @@ function EventosPage() {
 		setEventos(eventosFechaDate);
 	};
 
+	// Función empleada para eliminar/añadir un evento a la lista de eventos seleccionados
+	const handleSelectEvento = (index) => {
+		
+		// Verificar si el evento ya está seleccionad
+		const isSelected = eventosSeleccionados.includes(index);
+	
+		if (isSelected) {
+		  // Si ya está seleccionado, quitarlo de la lista de seleccionados
+		  setEventosSeleccionados(eventosSeleccionados.filter(id => id !== index));
+		} else {
+		  // Si no está seleccionado, agregarlo a la lista de seleccionados
+		  setEventosSeleccionados([...eventosSeleccionados, index]);
+		}
+
+	  };
+
+	useEffect(() => {
+		 // Mostrar el boton de borrado múltiple en función del número de eventos seleccionados
+		 eventosSeleccionados.length >= 1
+		 ? setShowBotonMultiple(true)
+		 : setShowBotonMultiple(false);
+	 }, [eventosSeleccionados])
+	 
+
 	// Función para eliminar definitivamente el evento cuando aparece el modal de confirmación
 	const confirmarEliminacion = async () => {
 		if (eventToDeleteIndex !== null) {
@@ -102,11 +136,34 @@ function EventosPage() {
 		setShowConfirmModal(false); // Cierra el modal de confirmación
 	};
 
+	// Almacenar los eventos que se van a mantener, y enviar la peticion 
+	// Firebase para eliminar todos los eventos que se han seleccionado
+	const handleEliminarEventoMultiple = async () => {
+		try {
+			const nuevosEventos = eventos.filter((evento, index) => !eventosSeleccionados.includes(index));
+		
+			await Promise.all(
+			  eventosSeleccionados.map(async (selectedIndex) => {
+				const idFirebase = eventos[selectedIndex].id;
+				await deleteDoc(doc(db, "Eventos", idFirebase));
+			  })
+			);
+		
+			setEventos(nuevosEventos);
+			setEventosSeleccionados([]);
+			setShowConfirmBorradoMultiple(false);
+		  } catch (error) {
+			console.error("Error al eliminar eventos múltiples:", error);
+		  }
+	}
+
 	// Almacena en el estado el índice del evento a borrar y muestra el modal de confirmación
 	const handleEliminarEvento = (index) => {
 		setEventToDeleteIndex(index);
 		setShowConfirmModal(true);
 	};
+	
+	
 
 	// Muestra el modal de crear evento
 	const handleShow = () => setShowModalCrear(true);
@@ -354,6 +411,15 @@ function EventosPage() {
 								Crear Evento
 							</button>
 						</div>
+						<ModalManual 
+							show={showConfirmBorradoMultiple}
+							titulo="Borrar los eventos seleccionados"
+							cuerpo="¿Está seguro de que desea eliminar los eventos seleccionados?"
+							onHide={() => setShowConfirmBorradoMultiple(false)}
+							onEliminar={() => handleEliminarEventoMultiple()}
+						/>
+
+						
 
 						{/* Modal de modificar evento */}
 						<Modal
@@ -629,6 +695,17 @@ function EventosPage() {
 						{/* Carrusel donde aparecen todos los eventos */}
 						<div className="p-3 p-md-5 mt-3 rounded bg-light">
 							{/* Carrusel de eventos */}
+							{showBotonMultiple ? (
+								<Button
+									className="mx-auto d-block mb-3"
+									variant = "danger"
+									size = "lg"
+									onClick={() => setShowConfirmBorradoMultiple(true)}
+									
+								>
+									Eliminar los eventos seleccionados
+								</Button>
+							) : null }
 							<ul className="list-group">
 								{eventos
 									.filter((evento) =>
@@ -659,6 +736,9 @@ function EventosPage() {
 											onEliminar={() =>
 												handleEliminarEvento(index)
 											}
+											showBoton = {showBotonMultiple}
+											onSelectEvento={ () => handleSelectEvento(index)}
+											Seleccionado = { eventosSeleccionados.includes(index) ? true : false}
 										/>
 									))}
 							</ul>

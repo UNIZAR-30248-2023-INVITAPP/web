@@ -24,6 +24,8 @@ function Evento({
 	invitados,
 	onEliminar,
 	onCambio,
+	onSelectEvento,
+	Seleccionado
 }) {
 	const [invitadosArray, setInvitados] = useState(invitados);
 	const [emailInvalido, setEmailInvalido] = useState(false);
@@ -362,6 +364,12 @@ function Evento({
 			</ToastContainer> */}
 			<li className="mb-4 list-group-item border border-2 rounded col-12 col-lg-8 mx-auto">
 				<div className="d-flex flex-column py-2 flex-md-row gap-3 justify-content-between align-items-center">
+
+					<input
+						type="checkbox"
+						className="form-check-input border-2"
+						onChange={onSelectEvento} // Manejador para marcar/desmarcar evento
+					/>
 					<div>
 						<h5 className="fw-bold">{nombre}</h5>
 						<span className="fw-bold d-block mt-1">
@@ -375,7 +383,10 @@ function Evento({
 							<span className="fw-light">{ubicacion}</span>
 						</span>
 					</div>
+
 					<div className="d-flex flex-column pb-3 pb-md-0 flex-md-row gap-3">
+
+					
 						{/* Botón de ver invitados a la derecha */}
 						<button
 							className="btn btn-primary" // Estilo de botón primario
@@ -409,7 +420,7 @@ function Evento({
 
 						{/* Botón de eliminación a la derecha */}
 						<button
-							className="btn btn-block btn-danger" // Estilo de botón de eliminación
+							className={`btn btn-danger ${Seleccionado ? 'disabled' : ''}`} // Estilo de botón de eliminación
 							onClick={onEliminar} // Manejador para eliminar el evento por índice
 						>
 							{" "}
