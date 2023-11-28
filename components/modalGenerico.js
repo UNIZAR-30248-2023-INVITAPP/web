@@ -4,7 +4,7 @@ import { Button, Modal } from "react-bootstrap"
 
 // Este componente representa un modal genérico en nuestra aplicación.
 // Se puede personalizar para cada caso de uso concreto pasandole las props necesarias
-export default function ModalPlantilla({id,show, titulo, cuerpo, onHide, onEliminar}) {
+export default function ModalGenerico({id, show, titulo, cuerpo, onHide, onEliminar}) {
   return (
     <>
         <Modal
@@ -19,22 +19,19 @@ export default function ModalPlantilla({id,show, titulo, cuerpo, onHide, onElimi
             <Modal.Body>
                 {cuerpo}
             </Modal.Body>
-            <Modal.Footer>
-                <Button
-                    variant="secondary"
-                    onClick={onHide}
-                >
+            {onEliminar !== undefined && (
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={onHide}>
                     Cancelar
-                </Button>
-                <Button
-                    variant="danger"
-                    onClick={onEliminar}
-                >
+                    </Button>
+                    <Button variant="danger" onClick={onEliminar}>
                     Eliminar
-                </Button>
-			</Modal.Footer>
-
-        </Modal>
+                    </Button>
+                </Modal.Footer>
+            )}
+            
+                
+      </Modal>
     </>
   )
 }

@@ -11,7 +11,8 @@ import {
 	getDocs,
 } from "firebase/firestore";
 import db from "../firebase";
-import ModalPlantilla from "@/components/modal";
+import ModalGenerico from "@/components/modalGenerico";
+import BodyModalCrearEvento from "@/components/bodyModalCrearEvento";
 
 // Componente que se corresponde con la página que se muestra de inicio, donde aparece la lista de los eventos
 function EventosPage() {
@@ -413,7 +414,7 @@ function EventosPage() {
 						</div>
 
 						{/* Modal de confirmación borrado múltiple de eventos */}
-						<ModalPlantilla 
+						<ModalGenerico 
 							id="modalConfirmacionEliminarEventoMultiple"
 							show={showConfirmBorradoMultiple}
 							titulo="Borrar los eventos seleccionados"
@@ -546,164 +547,54 @@ function EventosPage() {
 						</Modal>
 
 						{/* Modal de confirmación de eliminación de evento */ }
-						<ModalPlantilla
+						<ModalGenerico
 							id="modalConfirmarEliminarEventoSimple" 
 							show={showConfirmModal}
 							titulo="Confirmar eliminación"
-							cuerpo="¿Estás seguro de que quieres eliminar este evento?"
+							cuerpo="¿Estás seguro de que deseas eliminar este evento?"
 							onHide={() => setShowConfirmModal(false)}
 							onEliminar={confirmarEliminacion}
 						/>
 						{ /* ----------------------------------------------- */}
 
-						{/* Modal de confirmación de eliminación de evento
-						<Modal
-							id="modalConfirmar"
-							show={showConfirmModal}
-							onHide={() => setShowConfirmModal(false)}
-							centered
-						>
-							<Modal.Header closeButton>
-								<Modal.Title>Confirmar eliminación</Modal.Title>
-							</Modal.Header>
-							<Modal.Body>
-								¿Estás seguro de que quieres eliminar este
-								evento?
-							</Modal.Body>
-							<Modal.Footer>
-								<Button
-									variant="secondary"
-									onClick={() => setShowConfirmModal(false)}
-								>
-									Cancelar
-								</Button>
-								<Button
-									variant="danger"
-									onClick={confirmarEliminacion}
-								>
-									Eliminar
-								</Button>
-							</Modal.Footer>
-						</Modal> */}
-
-						{/* Modal de crear evento */}
-						<Modal
-							id="modalCrear"
+						{ /* Modal de crear evento */ }    
+						<ModalGenerico
+							id="modalCrearEvento"
 							show={showModalCrear}
-							onHide={handleCloseCrear}
-							centered
-						>
-							<Modal.Header closeButton>
-								<Modal.Title>Crear un nuevo evento</Modal.Title>
-							</Modal.Header>
-							<Modal.Body>
-								<form>
-									<div className="mb-3">
-										<label
-											htmlFor="nombre"
-											className="form-label fw-bold"
-										>
-											Nombre del evento
-										</label>
-										<input
-											type="text"
-											className="form-control"
-											id="nombre"
-											value={nuevoEvento.nombre}
-											placeholder="Ingrese el nombre del evento"
-											onChange={(e) =>
-												setNuevoEvento({
-													...nuevoEvento,
-													nombre: e.target.value,
-												})
-											}
-										/>
-									</div>
-									<div className="mb-3">
-										<label
-											htmlFor="fecha"
-											className="form-label fw-bold"
-										>
-											Fecha
-										</label>
-										<input
-											type="date"
-											className="form-control"
-											id="fecha"
-											value={nuevoEvento.fecha}
-											onChange={(e) =>
-												setNuevoEvento({
-													...nuevoEvento,
-													fecha: e.target.value,
-												})
-											}
-										/>
-										{errorFecha && (
-											<p className="text-center text-danger">
-												{errorFecha}
-											</p>
-										)}{" "}
-										{/* Mostrar mensaje de error */}
-									</div>
-									<div className="mb-3">
-										<label
-											htmlFor="hora"
-											className="form-label fw-bold"
-										>
-											Hora
-										</label>
-										<input
-											type="time"
-											className="form-control"
-											id="hora"
-											value={nuevoEvento.hora}
-											onChange={(e) =>
-												setNuevoEvento({
-													...nuevoEvento,
-													hora: e.target.value,
-												})
-											}
-										/>
-									</div>
-									<div className="mb-3">
-										<label
-											htmlFor="ubicacion"
-											className="form-label fw-bold"
-										>
-											Ubicación
-										</label>
-										<input
-											type="text"
-											className="form-control"
-											id="ubicacion"
-											placeholder="Ingrese la ubicación del evento"
-											value={nuevoEvento.ubicacion}
-											onChange={(e) =>
-												setNuevoEvento({
-													...nuevoEvento,
-													ubicacion: e.target.value,
-												})
-											}
-										/>
-									</div>
-									<div className="text-center">
-										{error && (
-											<p className="text-danger">
-												{error}
-											</p>
-										)}{" "}
-										{/* Mostrar mensaje de error */}
-										<button
-											id="boton-crear-evento"
-											className="btn btn-dark w-100"
-											onClick={handleCrearEvento}
-										>
-											Crear evento
-										</button>
-									</div>
-								</form>
-							</Modal.Body>
-						</Modal>
+							titulo="Crear un nuevo evento"
+							cuerpo={<BodyModalCrearEvento 
+										nombreEvento={nuevoEvento.nombre}
+										onChangeNombre={(e) =>
+											setNuevoEvento({
+												...nuevoEvento,
+												nombre: e.target.value,
+											})}
+										fechaEvento={nuevoEvento.fecha}
+										onChangeFecha={(e) =>
+											setNuevoEvento({
+												...nuevoEvento,
+												fecha: e.target.value,
+											})}
+										horaEvento={nuevoEvento.hora}
+										onChangeHora={(e) =>
+											setNuevoEvento({
+												...nuevoEvento,
+												hora: e.target.value,
+											})}
+										ubicacionEvento={nuevoEvento.ubicacion}
+										onChangeUbicacion={(e) =>
+											setNuevoEvento({
+												...nuevoEvento,
+												ubicacion: e.target.value,
+											})}
+										error={error}
+										onCrearEvento={handleCrearEvento}
+										errorFecha={errorFecha}
+									/>}
+						    onHide={handleCloseCrear}
+						/>
+
+						
 
 						{/* Carrusel donde aparecen todos los eventos */}
 						<div className="p-3 p-md-5 mt-3 rounded bg-light">
