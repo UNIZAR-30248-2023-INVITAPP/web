@@ -736,7 +736,7 @@ function EventosPage() {
 											onEliminar={() =>
 												handleEliminarEvento(index)
 											}
-											showBoton = {showBotonMultiple}
+											showBoton = {showBotonMultiple} 
 											onSelectEvento={ () => handleSelectEvento(index)}
 											Seleccionado = { eventosSeleccionados.includes(index) ? true : false}
 										/>
