@@ -1,11 +1,14 @@
 import React from 'react'
 import { Button, Modal } from "react-bootstrap"
 
-export default function ModalManual({show, titulo, cuerpo, onHide, onEliminar}) {
+
+// Este componente representa un modal genérico en nuestra aplicación.
+// Se puede personalizar para cada caso de uso concreto pasandole las props necesarias
+export default function ModalPlantilla({id,show, titulo, cuerpo, onHide, onEliminar}) {
   return (
     <>
         <Modal
-            id="modalBorradoMultiple"
+            id={id}
             show={show}
             centered
             onHide={onHide}

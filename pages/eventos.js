@@ -11,7 +11,7 @@ import {
 	getDocs,
 } from "firebase/firestore";
 import db from "../firebase";
-import ModalManual from "@/components/modal";
+import ModalPlantilla from "@/components/modal";
 
 // Componente que se corresponde con la página que se muestra de inicio, donde aparece la lista de los eventos
 function EventosPage() {
@@ -411,15 +411,17 @@ function EventosPage() {
 								Crear Evento
 							</button>
 						</div>
-						<ModalManual 
+
+						{/* Modal de confirmación borrado múltiple de eventos */}
+						<ModalPlantilla 
+							id="modalConfirmacionEliminarEventoMultiple"
 							show={showConfirmBorradoMultiple}
 							titulo="Borrar los eventos seleccionados"
 							cuerpo="¿Está seguro de que desea eliminar los eventos seleccionados?"
 							onHide={() => setShowConfirmBorradoMultiple(false)}
 							onEliminar={() => handleEliminarEventoMultiple()}
 						/>
-
-						
+						{/* ------------------------------------------------------- */}
 
 						{/* Modal de modificar evento */}
 						<Modal
@@ -543,7 +545,18 @@ function EventosPage() {
 							</Modal.Body>
 						</Modal>
 
-						{/* Modal de confirmación de eliminación de evento */}
+						{/* Modal de confirmación de eliminación de evento */ }
+						<ModalPlantilla
+							id="modalConfirmarEliminarEventoSimple" 
+							show={showConfirmModal}
+							titulo="Confirmar eliminación"
+							cuerpo="¿Estás seguro de que quieres eliminar este evento?"
+							onHide={() => setShowConfirmModal(false)}
+							onEliminar={confirmarEliminacion}
+						/>
+						{ /* ----------------------------------------------- */}
+
+						{/* Modal de confirmación de eliminación de evento
 						<Modal
 							id="modalConfirmar"
 							show={showConfirmModal}
@@ -571,7 +584,7 @@ function EventosPage() {
 									Eliminar
 								</Button>
 							</Modal.Footer>
-						</Modal>
+						</Modal> */}
 
 						{/* Modal de crear evento */}
 						<Modal
