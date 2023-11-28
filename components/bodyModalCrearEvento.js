@@ -2,7 +2,7 @@ import React from "react";
 
 
 
-const BodyModalCrearEvento = ({ 
+const BodyModal = ({ 
     nombreEvento, 
     onChangeNombre, 
     fechaEvento, 
@@ -12,8 +12,9 @@ const BodyModalCrearEvento = ({
     ubicacionEvento,
     onChangeUbicacion,
     error,
-    onCrearEvento,
-    errorFecha
+    onClickEvento,
+    errorFecha,
+    buttonName //Nombre del boton en el body del modal
     }) => {
     return ( 
         <>
@@ -96,9 +97,9 @@ const BodyModalCrearEvento = ({
                     <button
                         id="boton-crear-evento"
                         className="btn btn-dark w-100"
-                        onClick={onCrearEvento}
+                        onClick={onClickEvento}
                     >
-                        Crear evento
+                        {buttonName}
                     </button>
                 </div>
             </form>
@@ -107,4 +108,4 @@ const BodyModalCrearEvento = ({
     );
 }
  
-export default BodyModalCrearEvento;
+export default BodyModal;
