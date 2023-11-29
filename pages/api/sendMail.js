@@ -18,8 +18,8 @@ export default async function handler(req, res) {
         from: 'jsanclementev@gmail.com', 
         to: listaInvitados,
         subject: 'InvitApp - Evento cancelado',
-        text: `El evento ${nombreEvento} programado para el día ${fechaEvento} ha sido cancelado`,
-        html: `El evento ${nombreEvento} programado para el día ${fechaEvento} ha sido cancelado`
+        text: `El evento "${nombreEvento}" programado para el día ${fechaEvento} ha sido cancelado`,
+        html: `El evento "${nombreEvento}" programado para el día ${fechaEvento} ha sido cancelado`
       };
 
       try {

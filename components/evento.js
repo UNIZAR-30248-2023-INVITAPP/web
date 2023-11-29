@@ -123,7 +123,7 @@ function Evento({
 
     const handleEliminarEvento = () => {
         onEliminar()
-        setUsuariosPendientesCorreo(invitadosArray) 
+        setUsuariosPendientesCorreo(invitadosArray,nombre,fecha)
     }
 
     // Funcion que maneja el evento del boton Confirmar del modal de

@@ -29,6 +29,9 @@ function EventosPage() {
 	// Cuando se vaya a eliminar un evento, se añadirán en esta lista
 	const [usuariosPendientesCorreo,setUsuariosPendientesCorreo] = useState([])
 
+	const [nombreEventoAeliminar,setNombreEventoAeliminar] = useState("")
+	const [fechaEventoAeliminar,setFechaEventoAeliminar] = useState("")
+
 	const [showConfirmBorradoMultiple, setShowConfirmBorradoMultiple] = useState(false)
 	const [eventToDeleteIndex, setEventToDeleteIndex] = useState(null);
 	const [eventToUpdateIndex, setEventToUpdateIndex] = useState(null);
@@ -133,8 +136,8 @@ function EventosPage() {
 	 const crearJsonRequestCorreo = () => {
 		const emailsReceptores = usuariosPendientesCorreo.map((usuario) => usuario.email)
 		const bodyJson = {
-			nombreEvento: "Evento de las mil ostias",
-			fechaEvento: "12/05/2025",
+			nombreEvento: nombreEventoAeliminar,
+			fechaEvento: fechaEventoAeliminar,
 			emails: emailsReceptores
 		}
 		return bodyJson
@@ -177,17 +180,18 @@ function EventosPage() {
 				await deleteDoc(doc(db, "Eventos", id));
 				setEventos(nuevosEventos);
 
-				// TODO: Mandar correos electrónicos a los invitados
+				// TODO: Descomentar la línea de debajo para que se envíen los correos electrónicos
 				const bodyRequest = crearJsonRequestCorreo()
-				// await sendPostRequestToMailService(bodyRequest)
+				await sendPostRequestToMailService(bodyRequest)
 			}
 		} catch(error){
 			console.log("Error: ", error)
 		} finally {
+			setShowConfirmModal(false);
 			setEventToDeleteIndex(null); // Limpia el evento a eliminar
 			setShowSpinner(false)
 			setUsuariosPendientesCorreo([])
-			setShowConfirmModal(false);
+			
 		}
 	};
 
@@ -218,8 +222,10 @@ function EventosPage() {
 		setShowConfirmModal(true);
 	};
 
-	const establecerUsuariosPendientesCorreo = (invitados) => {
+	const establecerPropiedadesCorreo = (invitados,nombre,fecha) => {
 		setUsuariosPendientesCorreo(invitados)
+		setNombreEventoAeliminar(nombre)
+		setFechaEventoAeliminar(fecha)
 	}
 	
 	
@@ -628,7 +634,7 @@ function EventosPage() {
 											showBoton = {showBotonMultiple} 
 											onSelectEvento={ () => handleSelectEvento(index)}
 											Seleccionado = { eventosSeleccionados.includes(index) ? true : false}
-											setUsuariosPendientesCorreo={establecerUsuariosPendientesCorreo}
+											setUsuariosPendientesCorreo={establecerPropiedadesCorreo}
 										/>
 									))}
 							</ul>
