@@ -124,7 +124,6 @@ function Evento({
     const handleEliminarEvento = () => {
         onEliminar()
         setUsuariosPendientesCorreo(invitadosArray) 
-        setInvitados([])
     }
 
     // Funcion que maneja el evento del boton Confirmar del modal de
@@ -210,7 +209,7 @@ function Evento({
         <>
             {/* Modal de listado de invitados */}
             <Modal
-                id="modalListaInvitado"
+                id={`modalListaInvitados-${id}`}
                 className="pt-2 px-2 pt-md-0 px-md-0"
                 show={showInvitados}
                 onHide={() => {
