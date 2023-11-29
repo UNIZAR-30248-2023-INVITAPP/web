@@ -149,6 +149,8 @@ function Evento({
             });
             // Actualizo mis invitados
             setInvitados([...nuevosInvitados]);
+
+            actualizarInvitados([...nuevosInvitados]);
             //
         } catch (e) {
             console.error("Error adding document: ", e);
@@ -195,7 +197,9 @@ function Evento({
                                     <div className="d-grid my-auto d-md-inline gap-2">
                                         <button
                                             className="my-2 btn btn-danger"
-                                            onClick={handleEliminarInvitado}
+                                            onClick={() =>
+                                                handleEliminarInvitado(index)
+                                            }
                                         >
                                             {" "}
                                             Eliminar
