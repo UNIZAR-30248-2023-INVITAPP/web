@@ -24,9 +24,10 @@ function Evento({
     invitados,
     onEliminar,
     onCambio,
-	onSelectEvento,
-	Seleccionado,
-    setUsuariosPendientesCorreo
+    onSelectEvento,
+    Seleccionado,
+    setUsuariosPendientesCorreo,
+    actualizarInvitados,
 }) {
     const [invitadosArray, setInvitados] = useState(invitados);
     const [emailInvalido, setEmailInvalido] = useState(false);
@@ -103,7 +104,16 @@ function Evento({
                     DNI: DNI,
                 },
             ]);
-            //
+
+            actualizarInvitados([
+                ...invitadosArray,
+                {
+                    nombre: nombre,
+                    email: email,
+                    DNI: DNI,
+                },
+            ]);
+
             event.target.formNombre.value = null;
             event.target.formDNI.value = null;
             event.target.formEmail.value = null;
@@ -122,9 +132,9 @@ function Evento({
     };
 
     const handleEliminarEvento = () => {
-        onEliminar()
-        setUsuariosPendientesCorreo(invitadosArray,nombre,fecha)
-    }
+        onEliminar();
+        setUsuariosPendientesCorreo(invitadosArray, nombre, fecha);
+    };
 
     // Funcion que maneja el evento del boton Confirmar del modal de
     // confirmacion de eliminacion de invitado
@@ -158,7 +168,7 @@ function Evento({
                 <ListGroup>
                     {invitadosArray.map((invitado, index) => {
                         return (
-                            <ListGroup.Item key={index}>
+                            <ListGroup.Item key={invitado.DNI}>
                                 <div className="d-flex flex-column flex-md-row gap-2 justify-content-between ">
                                     <div>
                                         <span className="fw-bold d-block mt-1">
@@ -184,8 +194,8 @@ function Evento({
                                     {/* Botón de eliminación a la derecha */}
                                     <div className="d-grid my-auto d-md-inline gap-2">
                                         <button
-                                            className="my-2 btn btn-danger" 
-                                            onClick={handleEliminarInvitado} 
+                                            className="my-2 btn btn-danger"
+                                            onClick={handleEliminarInvitado}
                                         >
                                             {" "}
                                             Eliminar
@@ -369,14 +379,13 @@ function Evento({
 			</ToastContainer> */}
             <li className="mb-4 list-group-item border border-2 rounded col-12 col-lg-8 mx-auto">
                 <div className="d-flex flex-column py-2 flex-md-row gap-3 justify-content-between align-items-center">
-
-					<input
-						type="checkbox"
-						id={`checkbox-${id}`}
-						className="form-check border-2"
-						onChange={onSelectEvento} // Manejador para marcar/desmarcar evento
-						checked={Seleccionado}
-					/>
+                    <input
+                        type="checkbox"
+                        id={`checkbox-${id}`}
+                        className="form-check border-2"
+                        onChange={onSelectEvento} // Manejador para marcar/desmarcar evento
+                        checked={Seleccionado}
+                    />
                     <div>
                         <h5 className="fw-bold">{nombre}</h5>
                         <span className="fw-bold d-block mt-1">
@@ -392,8 +401,6 @@ function Evento({
                     </div>
 
                     <div className="d-flex flex-column pb-3 pb-md-0 flex-md-row gap-3">
-
-					
                         {/* Botón de ver invitados a la derecha */}
                         <button
                             className="btn btn-primary" // Estilo de botón primario
@@ -425,19 +432,21 @@ function Evento({
                             Modificar
                         </button>
 
-						{/* Botón de eliminación a la derecha */}
-						<button
-							className={`btn btn-danger ${Seleccionado ? 'disabled' : ''}`} // Estilo de botón de eliminación
-							onClick={handleEliminarEvento} // Manejador para eliminar el evento por índice
-						>
-							{" "}
-							Eliminar
-						</button>
-					</div>
-				</div>
-			</li>
-		</>
-	);
+                        {/* Botón de eliminación a la derecha */}
+                        <button
+                            className={`btn btn-danger ${
+                                Seleccionado ? "disabled" : ""
+                            }`} // Estilo de botón de eliminación
+                            onClick={handleEliminarEvento} // Manejador para eliminar el evento por índice
+                        >
+                            {" "}
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+            </li>
+        </>
+    );
 }
 
 export default Evento;
