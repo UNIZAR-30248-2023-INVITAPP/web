@@ -25,7 +25,8 @@ function Evento({
     onEliminar,
     onCambio,
 	onSelectEvento,
-	Seleccionado
+	Seleccionado,
+    setUsuariosPendientesCorreo
 }) {
     const [invitadosArray, setInvitados] = useState(invitados);
     const [emailInvalido, setEmailInvalido] = useState(false);
@@ -120,6 +121,12 @@ function Evento({
         setShowConfirmacionEliminar(true);
     };
 
+    const handleEliminarEvento = () => {
+        onEliminar()
+        setUsuariosPendientesCorreo(invitadosArray) 
+        setInvitados([])
+    }
+
     // Funcion que maneja el evento del boton Confirmar del modal de
     // confirmacion de eliminacion de invitado
     // Actualiza la lista de invitados y actualiza los invitados en Firebase
@@ -178,10 +185,8 @@ function Evento({
                                     {/* Botón de eliminación a la derecha */}
                                     <div className="d-grid my-auto d-md-inline gap-2">
                                         <button
-                                            className="my-2 btn btn-danger" // Estilo de botón de eliminación
-                                            onClick={() =>
-                                                handleEliminarInvitado(index)
-                                            } // Manejador para eliminar el evento por índice
+                                            className="my-2 btn btn-danger" 
+                                            onClick={handleEliminarInvitado} 
                                         >
                                             {" "}
                                             Eliminar
@@ -424,7 +429,7 @@ function Evento({
 						{/* Botón de eliminación a la derecha */}
 						<button
 							className={`btn btn-danger ${Seleccionado ? 'disabled' : ''}`} // Estilo de botón de eliminación
-							onClick={onEliminar} // Manejador para eliminar el evento por índice
+							onClick={handleEliminarEvento} // Manejador para eliminar el evento por índice
 						>
 							{" "}
 							Eliminar

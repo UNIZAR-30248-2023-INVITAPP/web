@@ -12,7 +12,8 @@ import {
 } from "firebase/firestore";
 import db from "../firebase";
 import ModalGenerico from "@/components/modalGenerico";
-import BodyModal from "@/components/bodyModalCrearEvento";
+import BodyModal from "@/components/bodyModal";
+import Spinner from "@/components/Spinner"
 
 // Componente que se corresponde con la página que se muestra de inicio, donde aparece la lista de los eventos
 function EventosPage() {
@@ -22,6 +23,11 @@ function EventosPage() {
 	const [showModalModificar, setShowModalModificar] = useState(false);
 	// Modal de confirmación a la hora de borrar un evento
 	const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+	const [showSpinner,setShowSpinner] = useState(false)
+
+	// Cuando se vaya a eliminar un evento, se añadirán en esta lista
+	const [usuariosPendientesCorreo,setUsuariosPendientesCorreo] = useState([])
 
 	const [showConfirmBorradoMultiple, setShowConfirmBorradoMultiple] = useState(false)
 	const [eventToDeleteIndex, setEventToDeleteIndex] = useState(null);
@@ -123,18 +129,66 @@ function EventosPage() {
 		 : setShowBotonMultiple(false);
 	 }, [eventosSeleccionados])
 	 
+	 // Esta funcion crea el JSON necesario para enviar en el request al servicio web que envía los correos electrónicos
+	 const crearJsonRequestCorreo = () => {
+		const emailsReceptores = usuariosPendientesCorreo.map((usuario) => usuario.email)
+		const bodyJson = {
+			nombreEvento: "Evento de las mil ostias",
+			fechaEvento: "12/05/2025",
+			emails: emailsReceptores
+		}
+		return bodyJson
+	 }
+
+	 const sendPostRequestToMailService = async (json) => {
+		try {
+			const requestOptions = {
+			  method: 'POST', 
+			  headers: {
+				'Content-Type': 'application/json'
+			  },
+			  body: JSON.stringify(json)
+			};
+		
+			const response = await fetch('/api/sendMail', requestOptions);
+		
+			if (!response.ok) {
+			  // Manejar errores de red o servidor
+			  throw new Error('Error al enviar la solicitud');
+			}
+		
+			const data = await response.json();
+			console.log(data.message); // Mensaje de confirmación del servidor
+		  } catch (error) {
+			console.error('Error al enviar los correos desde React:', error);
+			// Manejar el error de manera apropiada para tu aplicación
+		  }
+	 }
 
 	// Función para eliminar definitivamente el evento cuando aparece el modal de confirmación
-	const confirmarEliminacion = async () => {
-		if (eventToDeleteIndex !== null) {
-			const id = eventos[eventToDeleteIndex].id;
-			const nuevosEventos = [...eventos];
-			nuevosEventos.splice(eventToDeleteIndex, 1);
-			await deleteDoc(doc(db, "Eventos", id));
-			setEventos(nuevosEventos);
+	// Además en esta función es donde se gestiona el envío de correos electrónicos a los invitados
+	const confirmarEliminacionEvento = async () => {
+		setShowSpinner(true)
+		try {
+			if (eventToDeleteIndex !== null) {
+				const id = eventos[eventToDeleteIndex].id;
+				const nuevosEventos = [...eventos];
+				nuevosEventos.splice(eventToDeleteIndex, 1);
+				await deleteDoc(doc(db, "Eventos", id));
+				setEventos(nuevosEventos);
+
+				// TODO: Mandar correos electrónicos a los invitados
+				const bodyRequest = crearJsonRequestCorreo()
+				// await sendPostRequestToMailService(bodyRequest)
+			}
+		} catch(error){
+			console.log("Error: ", error)
+		} finally {
+			setEventToDeleteIndex(null); // Limpia el evento a eliminar
+			setShowSpinner(false)
+			setUsuariosPendientesCorreo([])
+			setShowConfirmModal(false);
 		}
-		setEventToDeleteIndex(null); // Limpia el evento a eliminar
-		setShowConfirmModal(false); // Cierra el modal de confirmación
 	};
 
 	// Almacenar los eventos que se van a mantener, y enviar la peticion 
@@ -163,6 +217,10 @@ function EventosPage() {
 		setEventToDeleteIndex(index);
 		setShowConfirmModal(true);
 	};
+
+	const establecerUsuariosPendientesCorreo = (invitados) => {
+		setUsuariosPendientesCorreo(invitados)
+	}
 	
 	
 
@@ -183,6 +241,7 @@ function EventosPage() {
 		});
 		setError("");
 	};
+
 
 	// Función que se utiliza para verificar si la fecha introducida es posterior a la actual
 	const validarFecha = (fecha) => {
@@ -240,6 +299,11 @@ function EventosPage() {
 			return false;
 		}
 	};
+
+	const handleHideConfirmacionModal = () => {
+		setShowConfirmModal(false)
+		setUsuariosPendientesCorreo([])
+	}
 
 	// Funcion que se ejecuta al crear evento en el modal de "crear evento"
 	const handleCrearEvento = async (e) => {
@@ -424,6 +488,7 @@ function EventosPage() {
 						/>
 						{/* ------------------------------------------------------- */}
 
+
 						{/* Modal de modificar eventos */}
 						<ModalGenerico
 							id="modalModificar"
@@ -473,10 +538,11 @@ function EventosPage() {
 							show={showConfirmModal}
 							titulo="Confirmar eliminación"
 							cuerpo="¿Estás seguro de que deseas eliminar este evento?"
-							onHide={() => setShowConfirmModal(false)}
-							onEliminar={confirmarEliminacion}
+							onHide={() => handleHideConfirmacionModal()}
+							onEliminar={confirmarEliminacionEvento}
 						/>
 						{ /* ----------------------------------------------- */}
+
 
 						{ /* Modal de crear evento */ }    
 						<ModalGenerico
@@ -516,7 +582,6 @@ function EventosPage() {
 						    onHide={handleCloseCrear}
 						/>
 
-						
 
 						{/* Carrusel donde aparecen todos los eventos */}
 						<div className="p-3 p-md-5 mt-3 rounded bg-light">
@@ -559,12 +624,11 @@ function EventosPage() {
 												});
 												setShowModalModificar(true);
 											}}
-											onEliminar={() =>
-												handleEliminarEvento(index)
-											}
+											onEliminar={() => handleEliminarEvento(index)}
 											showBoton = {showBotonMultiple} 
 											onSelectEvento={ () => handleSelectEvento(index)}
 											Seleccionado = { eventosSeleccionados.includes(index) ? true : false}
+											setUsuariosPendientesCorreo={establecerUsuariosPendientesCorreo}
 										/>
 									))}
 							</ul>
