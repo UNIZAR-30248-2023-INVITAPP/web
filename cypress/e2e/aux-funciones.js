@@ -60,7 +60,7 @@ export const eliminarEventoDom = (evento) => {
     const etiqueta = cy.get('h5').contains(evento)
     const botones = etiqueta.parent().siblings()
     botones.find('.btn-danger').click()
-    cy.get('#modalConfirmar')  // Selecciona el modal por su ID
+    cy.get('#modalConfirmarEliminarEventoSimple')  // Selecciona el modal por su ID
     .find('Button')  // Encuentra todos los elementos tipo botón dentro del modal
     .last()  // Selecciona el último botón (asumiendo que "Eliminar" es el último)
     .click();  // Realiza clic en el botón

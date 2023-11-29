@@ -182,7 +182,7 @@ function EventosPage() {
 
 				// TODO: Descomentar la línea de debajo para que se envíen los correos electrónicos
 				const bodyRequest = crearJsonRequestCorreo()
-				await sendPostRequestToMailService(bodyRequest)
+				// await sendPostRequestToMailService(bodyRequest)
 			}
 		} catch(error){
 			console.log("Error: ", error)
@@ -594,6 +594,7 @@ function EventosPage() {
 							{/* Carrusel de eventos */}
 							{showBotonMultiple ? (
 								<Button
+									id="boton-borrado-multiple"
 									className="mx-auto d-block mb-3"
 									variant = "danger"
 									size = "lg"
