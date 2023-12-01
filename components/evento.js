@@ -312,7 +312,7 @@ function Evento({
                     <Modal.Title>Sorteo</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Ruleta listaInvitados={invitadosArray} />
+                    <Ruleta listaInvitados={invitadosArray} nombreEvento={nombre} />
                 </Modal.Body>
             </Modal>
 

@@ -2,12 +2,16 @@ import { Button, ListGroup, ProgressBar, Spinner } from "react-bootstrap";
 import { useState } from "react";
 import { Form, Row, Col } from "react-bootstrap";
 
-function Ruleta({ listaInvitados }) {
+function Ruleta({ listaInvitados, nombreEvento }) {
     // Lista de invitados que hay en el evento. SEGURAMENTE NO SE HAGA ASÍ (!!)
     const [invitados, setInvitados] = useState(listaInvitados);
     const [candidatosVisibles, setCandidatosVisibles] = useState(false);
     const [ganadoresVisibles, setGanadoresVisibles] = useState(false);
     const [premios, setPremios] = useState(new Set());
+    
+    const [mensajeCorreoEnviado, setMensajeCorreoEnviado] = useState("")
+
+    const [spinnerCorreo, setSpinnerCorreo] = useState(false)
 
     // Usuarios ganadores
     const [ganadores, setGanadores] = useState([]);
@@ -24,6 +28,44 @@ function Ruleta({ listaInvitados }) {
         return (invitadoRandom =
             invitados[Math.floor(Math.random() * invitados.length)]);
     }
+
+    // Boton para enviar correo al ganador del correo
+    const handleClickBotonCorreo = async () => {
+        try {
+            setSpinnerCorreo(true)
+            const dataToSend = ganadores.map(ganador => ({
+                premio: ganador.premio, // Valor del premio
+                nombreEvento: nombreEvento, // Nombre del evento
+                email: ganador.email // Email del ganador
+            }));
+            console.log(dataToSend)
+            const response = await fetch('/api/sendMail', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dataToSend),
+            });
+    
+            if (response.ok) {
+                setMensajeCorreoEnviado(`El correo se ha enviado correctamente ${ganadores.length === 1 ? 'al ganador' : 'a los ganadores'} del sorteo`)
+                // Mostrar el mensaje durante 3 segundos
+                setTimeout(() => {
+                    setMensajeCorreoEnviado('');
+                }, 3000);
+            } else {
+                console.error('Error al enviar el correo');
+                // Aquí podrías manejar el error al enviar el correo
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            // Manejo de errores en caso de problemas con la solicitud
+        }
+        finally {
+            setSpinnerCorreo(false)
+        }
+        
+    };
 
     // Conseguir ganadores aleatoriamente
     const devolverGanadores = (event) => {
@@ -190,6 +232,7 @@ function Ruleta({ listaInvitados }) {
                                                                     </span>
                                                                 </span>
                                                             </div>
+                                                            
                                                         </div>
                                                     </ListGroup.Item>
                                                 ))}
@@ -197,6 +240,23 @@ function Ruleta({ listaInvitados }) {
                                     </div>
                                 );
                             })}
+                            {mensajeCorreoEnviado && (
+                                <>
+                                    <p className="text-success">{mensajeCorreoEnviado}</p>
+                                </>
+                            )}
+                            {spinnerCorreo && (
+                                        <Spinner animation="border" variant="primary" />
+                            )}
+                            {!spinnerCorreo && !mensajeCorreoEnviado && (
+                                <Button
+                                className="btn btn-dark"
+                                onClick={handleClickBotonCorreo}
+                                >
+                                    {`Enviar correo ${ganadores.length === 1 ? 'al ganador' : 'a los ganadores'}`}
+                                </Button>
+                            )}
+                            
                         </>
                     )}
                 </div>
