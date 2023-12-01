@@ -29,9 +29,6 @@ function EventosPage() {
 	// Cuando se vaya a eliminar un evento, se añadirán en esta lista
 	const [usuariosPendientesCorreo,setUsuariosPendientesCorreo] = useState([])
 
-	const [nombreEventoAeliminar,setNombreEventoAeliminar] = useState("")
-	const [fechaEventoAeliminar,setFechaEventoAeliminar] = useState("")
-
 	const [showConfirmBorradoMultiple, setShowConfirmBorradoMultiple] = useState(false)
 	const [eventToDeleteIndex, setEventToDeleteIndex] = useState(null);
 	const [eventToUpdateIndex, setEventToUpdateIndex] = useState(null);
@@ -133,15 +130,15 @@ function EventosPage() {
 	 }, [eventosSeleccionados])
 	 
 	 // Esta funcion crea el JSON necesario para enviar en el request al servicio web que envía los correos electrónicos
-	 const crearJsonRequestCorreo = () => {
-		const emailsReceptores = usuariosPendientesCorreo.map((usuario) => usuario.email)
-		const bodyJson = {
-			nombreEvento: nombreEventoAeliminar,
-			fechaEvento: fechaEventoAeliminar,
-			emails: emailsReceptores
-		}
-		return bodyJson
-	 }
+	//  const crearJsonRequestCorreo = () => {
+	// 	const emailsReceptores = usuariosPendientesCorreo.map((usuario) => usuario.email)
+	// 	const bodyJson = {
+	// 		nombreEvento: nombreEventoAeliminar,
+	// 		fechaEvento: fechaEventoAeliminar,
+	// 		emails: emailsReceptores
+	// 	}
+	// 	return bodyJson
+	//  }
 
 	 const sendPostRequestToMailService = async (json) => {
 		try {
@@ -180,18 +177,19 @@ function EventosPage() {
 				await deleteDoc(doc(db, "Eventos", id));
 				setEventos(nuevosEventos);
 
+				console.log(usuariosPendientesCorreo)
 				// TODO: Descomentar la línea de debajo para que se envíen los correos electrónicos
-				const bodyRequest = crearJsonRequestCorreo()
-				// await sendPostRequestToMailService(bodyRequest)
+				if (usuariosPendientesCorreo.length > 0) { // Solo se manda peticion de correo si hay invitados en el evento
+					await sendPostRequestToMailService(usuariosPendientesCorreo);
+				}
 			}
 		} catch(error){
 			console.log("Error: ", error)
 		} finally {
-			setShowConfirmModal(false);
 			setEventToDeleteIndex(null); // Limpia el evento a eliminar
-			setShowSpinner(false)
 			setUsuariosPendientesCorreo([])
-			
+			setShowConfirmModal(false);
+			setShowSpinner(false)
 		}
 	};
 
@@ -223,9 +221,14 @@ function EventosPage() {
 	};
 
 	const establecerPropiedadesCorreo = (invitados,nombre,fecha) => {
-		setUsuariosPendientesCorreo(invitados)
-		setNombreEventoAeliminar(nombre)
-		setFechaEventoAeliminar(fecha)
+		const correosConPropiedades = invitados.map(invitado => {
+			return {
+			  email: invitado.email,
+			  nombre: nombre,
+			  fecha: fecha
+			}
+	  	})
+		setUsuariosPendientesCorreo(correosConPropiedades)
 	}
 	
 	
@@ -543,9 +546,13 @@ function EventosPage() {
 							id="modalConfirmarEliminarEventoSimple" 
 							show={showConfirmModal}
 							titulo="Confirmar eliminación"
-							cuerpo="¿Estás seguro de que deseas eliminar este evento?"
+							cuerpo={`¿Estás seguro de que deseas eliminar este evento?\n
+									 Se enviarán correos
+									 electrónicos a todos los invitados avisando de la cancelación del evento.\n
+									 `}
 							onHide={() => handleHideConfirmacionModal()}
 							onEliminar={confirmarEliminacionEvento}
+							showSpinner={showSpinner}
 						/>
 						{ /* ----------------------------------------------- */}
 

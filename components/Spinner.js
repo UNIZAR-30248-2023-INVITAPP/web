@@ -4,7 +4,7 @@ const Spinner = ({ show }) => {
     return ( 
         <>
             {show && 
-                (<div class="spinner-border" role="status">
+                (<div class="spinner-border"  role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>)
             }  

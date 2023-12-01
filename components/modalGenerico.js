@@ -1,10 +1,10 @@
 import React from 'react'
-import { Button, Modal } from "react-bootstrap"
+import { Button, Modal, Spinner } from "react-bootstrap"
 
 
 // Este componente representa un modal genérico en nuestra aplicación.
 // Se puede personalizar para cada caso de uso concreto pasandole las props necesarias
-export default function ModalGenerico({id, show, titulo, cuerpo, onHide, onEliminar}) {
+export default function ModalGenerico({id, show, titulo, cuerpo, onHide, onEliminar, showSpinner}) {
   return (
     <>
         <Modal
@@ -17,7 +17,11 @@ export default function ModalGenerico({id, show, titulo, cuerpo, onHide, onElimi
                 <Modal.Title>{titulo}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                {cuerpo}
+                {showSpinner ? (
+                    <Spinner show={showSpinner.toString()} />
+                ) : (
+                    <p>{cuerpo}</p>
+                )}
             </Modal.Body>
             {onEliminar !== undefined && (
                 <Modal.Footer>
