@@ -1,3 +1,5 @@
+import { anadirEventoPrueba, eliminarEventoDom } from "../aux-funciones";
+
 describe("Comprobar que aparece modal confirmación en la eliminación del evento", () => {
     beforeEach(() => {
         cy.visit("http://localhost:3000/eventos");
@@ -7,11 +9,20 @@ describe("Comprobar que aparece modal confirmación en la eliminación del event
         cy.get("h1").should("have.text", "Mis Eventos");
     });
 
-    it("Prueba 2: Verificar que al pinchar en el botón de eliminar evento aparece un modal de confirmación", () => {
+    it('Prueba 2: Crear un evento ', async () => {
+        await anadirEventoPrueba("Test - Eliminar evento comprobar modal");
+    });
+
+    it("Prueba 3: Verificar que al pinchar en el botón de eliminar evento aparece un modal de confirmación", () => {
         // Pinchar en el boton 'Borrar' para eliminar el evento
         cy.contains("button", "Eliminar").click();
 
         // Comprobar que se abre el modal de Confirmacion
-        cy.get("#modalConfirmar", { timeout: 10000 }).should("be.visible");
+        cy.get("#modalConfirmarEliminarEventoSimple").should("be.visible");
+    });
+
+    it('Prueba 4: Eliminar el evento creado',() => {
+        eliminarEventoDom("Test - Eliminar evento comprobar modal")
+        cy.wait(1000)
     });
 });

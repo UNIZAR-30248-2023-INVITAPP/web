@@ -16,8 +16,8 @@ describe("Buscar un evento en la barra de búsqueda", () => {
         );
     });
 
-    it("Prueba 2: Crear un evento", () => {
-        anadirEventoPrueba("Test - Buscar Evento");
+    it("Prueba 2: Crear un evento", async  () => {
+        await anadirEventoPrueba("Test - Buscar Evento");
     });
 
     it("Prueba 3: Buscar el evento en la barra de búsqueda y comprobar que aparece", () => {

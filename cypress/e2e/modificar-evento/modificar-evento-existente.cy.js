@@ -12,13 +12,12 @@ describe('En esta prueba se modifican las propiedades con las mismas que otro ya
     })
 
 
-    it('Prueba 1: Crear un evento "Evento de Prueba 1" ', () => {
-        anadirEventoPrueba(nombreEvento1)
+    it('Prueba 1: Crear un evento "Evento de Prueba 1" ', async () => {
+        await anadirEventoPrueba(nombreEvento1)
     })
 
-    it('Prueba 2: Crear un evento "Evento de Prueba 2" ', () => {
-        anadirEventoPrueba(nombreEvento2)
-        cy.wait(500)
+    it('Prueba 2: Crear un evento "Evento de Prueba 2" ', async () => {
+        await anadirEventoPrueba(nombreEvento2)
     })
 
     it('Prueba 3: Seleccionar el segundo evento creado y ponerle el nombre del primero y comprobar el mensaje de error', () => {
@@ -28,7 +27,7 @@ describe('En esta prueba se modifican las propiedades con las mismas que otro ya
         .parent() // Selecciona el padre del elemento h5
         .next() // Selecciona el siguiente elemento (que sería el div hermano del padre del h5)
         .within(() => {
-            cy.get('button:contains("Editar")') // Busca el botón con el texto "Editar"
+            cy.get('button:contains("Modificar")') // Busca el botón con el texto "Editar"
             .click(); // Realiza clic en el botón "Editar"
         });
 
@@ -50,7 +49,8 @@ describe('En esta prueba se modifican las propiedades con las mismas que otro ya
         cy.get('#hora').type('00:00');
         // Rellenar hora
         // Pinchar el botón de modificar evento
-        cy.contains('button', 'Modificar evento').click()
+        cy.get('button.btn-dark').contains('Modificar Evento').click()
+
         // Verificar que aparece el error
         cy.contains('Ya existe un evento con esas propiedades').should('exist')
     })
@@ -58,5 +58,6 @@ describe('En esta prueba se modifican las propiedades con las mismas que otro ya
     it('Prueba 4: Eliminar los eventos creados para la prueba', () => {
         eliminarEventoDom(nombreEvento1)
         eliminarEventoDom(nombreEvento2)
+        cy.wait(1000)
     })
 })

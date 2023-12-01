@@ -2,7 +2,7 @@ import { anadirEventoPrueba, eliminarEventoDom } from "../aux-funciones"
 
 describe('En esta prueba se modifican el nombre, fecha, hora y ubicacion de un evento', () => {
 
-    const nombreEvento = 'Test - Modificar Evento'
+    const nombreEvento = 'Test - Evento a modificar'
     const nombreEventoModificado = 'Test - Evento modificado'
 
     beforeEach(() => {
@@ -10,9 +10,8 @@ describe('En esta prueba se modifican el nombre, fecha, hora y ubicacion de un e
     })
 
 
-    it('Prueba 1: Crear evento', () => {
-      anadirEventoPrueba('Test - Modificar Evento')
-      cy.wait(500)
+    it('Prueba 1: Crear evento', async () => {
+      await anadirEventoPrueba(nombreEvento)
     })
 
     it('Prueba 2: Modificar el campo nombre del evento y comprobar que se ha cambiado', () => {
@@ -25,12 +24,11 @@ describe('En esta prueba se modifican el nombre, fecha, hora y ubicacion de un e
         cy.get('#modalModificar').should('contain', 'Modificar un evento');
 
         // Rellenar el nombre del evento
-        const nombreEventoModificado = 'Test - Evento modificado'
         cy.get('#nombre').clear().type(nombreEventoModificado)
         cy.get('#fecha').type('2025-01-01');
         cy.get('#hora').type('22:30');
 
-        cy.contains('button', 'Modificar evento').click()
+        cy.get('button.btn-dark').contains('Modificar Evento').click()
 
         cy.wait(1000)
 
@@ -51,7 +49,7 @@ describe('En esta prueba se modifican el nombre, fecha, hora y ubicacion de un e
         cy.get('#fecha').type('2025-01-15');
         cy.get('#hora').type('22:30');
 
-        cy.contains('button', 'Modificar evento').click()
+        cy.get('button.btn-dark').contains('Modificar Evento').click()
 
         cy.wait(1000)
 
@@ -73,7 +71,7 @@ describe('En esta prueba se modifican el nombre, fecha, hora y ubicacion de un e
       cy.get('#fecha').type('2025-01-01');
       cy.get('#hora').type('23:00');
 
-      cy.contains('button', 'Modificar evento').click()
+      cy.get('button.btn-dark').contains('Modificar Evento').click()
 
       cy.wait(1000)
 
@@ -97,7 +95,7 @@ describe('En esta prueba se modifican el nombre, fecha, hora y ubicacion de un e
     cy.get('#hora').type('22:30');
     cy.get('#ubicacion').clear().type('Calle Francisco Federico')
 
-    cy.contains('button', 'Modificar evento').click()
+    cy.get('button.btn-dark').contains('Modificar Evento').click()
 
     cy.wait(1000)
 
@@ -108,8 +106,7 @@ describe('En esta prueba se modifican el nombre, fecha, hora y ubicacion de un e
   })
 
   it('Eliminar el evento de prueba', () => {
-      cy.wait(1000)
-      // Eliminar el evento de test
       eliminarEventoDom(nombreEventoModificado)
+      cy.wait(500)
   })
 })
