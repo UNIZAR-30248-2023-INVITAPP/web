@@ -6,8 +6,8 @@ export default async function handler(req, res) {
       host: "smtp.gmail.com",
       port: 587,
       auth: {
-        user: 'jsanclementev@gmail.com',
-        pass: 'vhed sfpy kmul ixid' // Contraseña de aplicación generada
+        user: 'invitapp.unizar@gmail.com',
+        pass: 'evkz cizc kvla ocie'
       }
     });
 
@@ -16,7 +16,7 @@ export default async function handler(req, res) {
       const eventos = req.body;
       for (const evento of eventos) {
         const mailOptions = {
-          from: 'jsanclementev@gmail.com',
+          from: 'invitapp.unizar@gmail.com',
           to: evento.email,
           subject: 'InvitApp - Evento cancelado',
           text: `El evento "${evento.nombre}" programado para el día ${evento.fecha} ha sido cancelado.`,
