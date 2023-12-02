@@ -11,6 +11,9 @@ import {
 	getDocs,
 } from "firebase/firestore";
 import db from "../firebase";
+import ModalGenerico from "@/components/modalGenerico";
+import BodyModal from "@/components/bodyModal";
+import Spinner from "@/components/Spinner";
 import { useRouter } from "next/router";
 
 // Componente que se corresponde con la página que se muestra de inicio, donde aparece la lista de los eventos
@@ -21,10 +24,27 @@ function EventosPage() {
 	const [showModalModificar, setShowModalModificar] = useState(false);
 	// Modal de confirmación a la hora de borrar un evento
 	const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+	const [showSpinner, setShowSpinner] = useState(false);
+
+	// Cuando se vaya a eliminar un evento, se añadirán en esta lista
+	const [usuariosPendientesCorreo, setUsuariosPendientesCorreo] = useState(
+		[]
+	);
+
+	const [showConfirmBorradoMultiple, setShowConfirmBorradoMultiple] =
+		useState(false);
 	const [eventToDeleteIndex, setEventToDeleteIndex] = useState(null);
 	const [eventToUpdateIndex, setEventToUpdateIndex] = useState(null);
 	// Estado para almacenar el conjunto de los eventos
 	const [eventos, setEventos] = useState([]);
+
+	// Variable para mostrar el botón de eliminación múltiple
+	const [showBotonMultiple, setShowBotonMultiple] = useState(false);
+
+	// Estado para registrar aquellos eventos que se han seleccionado
+	const [eventosSeleccionados, setEventosSeleccionados] = useState([]);
+
 	// Para mostrar el mensaje de error a la hora de crear el evento
 	const [error, setError] = useState(null);
 	const [errorFecha, setErrorFecha] = useState(null);
@@ -45,6 +65,8 @@ function EventosPage() {
 	});
 
 	const [eventoCambiar, setEventoCambiar] = useState({});
+
+	const [eliminandoEvento, setEliminandoEvento] = useState(false);
 
 	// Esta función se encarga de recuperar eventos desde una base de datos Firebase,
 	// formatear los datos obtenidos y almacenarlos en un arreglo de eventos.
@@ -93,23 +115,153 @@ function EventosPage() {
 		setEventos(eventosFechaDate);
 	};
 
-	// Función para eliminar definitivamente el evento cuando aparece el modal de confirmación
-	const confirmarEliminacion = async () => {
-		if (eventToDeleteIndex !== null) {
-			const id = eventos[eventToDeleteIndex].id;
-			const nuevosEventos = [...eventos];
-			nuevosEventos.splice(eventToDeleteIndex, 1);
-			await deleteDoc(doc(db, "Eventos", id));
-			setEventos(nuevosEventos);
+	// Función empleada para eliminar/añadir un evento a la lista de eventos seleccionados
+	const handleSelectEvento = (id) => {
+		// Verificar si el evento ya está seleccionad
+		const isSelected = eventosSeleccionados.includes(id);
+		if (isSelected) {
+			// Si ya está seleccionado, quitarlo de la lista de seleccionados
+			setEventosSeleccionados(
+				eventosSeleccionados.filter((idFirebase) => idFirebase !== id)
+			);
+		} else {
+			// Si no está seleccionado, agregarlo a la lista de seleccionados
+			setEventosSeleccionados([...eventosSeleccionados, id]);
+			// TODO: añadir a usuariosCorreoPendientes el id
 		}
-		setEventToDeleteIndex(null); // Limpia el evento a eliminar
-		setShowConfirmModal(false); // Cierra el modal de confirmación
+		return isSelected;
+	};
+
+	useEffect(() => {
+		// Mostrar el boton de borrado múltiple en función del número de eventos seleccionados
+		eventosSeleccionados.length >= 1
+			? setShowBotonMultiple(true)
+			: setShowBotonMultiple(false);
+	}, [eventosSeleccionados]);
+
+	// Esta funcion crea el JSON necesario para enviar en el request al servicio web que envía los correos electrónicos
+	//  const crearJsonRequestCorreo = () => {
+	// 	const emailsReceptores = usuariosPendientesCorreo.map((usuario) => usuario.email)
+	// 	const bodyJson = {
+	// 		nombreEvento: nombreEventoAeliminar,
+	// 		fechaEvento: fechaEventoAeliminar,
+	// 		emails: emailsReceptores
+	// 	}
+	// 	return bodyJson
+	//  }
+
+	const sendPostRequestToMailService = async (json) => {
+		try {
+			const requestOptions = {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(json),
+			};
+
+			const response = await fetch("/api/sendMail", requestOptions);
+
+			if (!response.ok) {
+				// Manejar errores de red o servidor
+				throw new Error("Error al enviar la solicitud");
+			}
+
+			const data = await response.json();
+			console.log(data.message); // Mensaje de confirmación del servidor
+		} catch (error) {
+			console.error("Error al enviar los correos desde React:", error);
+			// Manejar el error de manera apropiada para tu aplicación
+		}
+	};
+
+	// Función para eliminar definitivamente el evento cuando aparece el modal de confirmación
+	// Además en esta función es donde se gestiona el envío de correos electrónicos a los invitados
+	const confirmarEliminacionEvento = async () => {
+		if (!eliminandoEvento) {
+			setEliminandoEvento(true);
+			setShowSpinner(true);
+			try {
+				if (eventToDeleteIndex !== null) {
+					const id = eventos[eventToDeleteIndex].id;
+					const nuevosEventos = [...eventos];
+					nuevosEventos.splice(eventToDeleteIndex, 1);
+					await deleteDoc(doc(db, "Eventos", id));
+					setEventos(nuevosEventos);
+
+					console.log(usuariosPendientesCorreo);
+					// TODO: Descomentar la línea de debajo para que se envíen los correos electrónicos
+					if (usuariosPendientesCorreo.length > 0) {
+						// Solo se manda peticion de correo si hay invitados en el evento
+						await sendPostRequestToMailService(
+							usuariosPendientesCorreo
+						);
+					}
+				}
+			} catch (error) {
+				console.log("Error: ", error);
+			} finally {
+				setEventToDeleteIndex(null); // Limpia el evento a eliminar
+				setUsuariosPendientesCorreo([]);
+				setShowConfirmModal(false);
+				setShowSpinner(false);
+				setEliminandoEvento(false);
+			}
+		}
+	};
+
+	// Almacenar los eventos que se van a mantener, y enviar la peticion
+	// Firebase para eliminar todos los eventos que se han seleccionado
+	const handleEliminarEventoMultiple = async () => {
+		try {
+			const nuevosEventos = eventos.filter(
+				(evento) => !eventosSeleccionados.includes(evento.id)
+			);
+
+			await Promise.all(
+				eventosSeleccionados.map(async (idFirebase) => {
+					await deleteDoc(doc(db, "Eventos", idFirebase));
+				})
+			);
+
+			await sendPostRequestToMailService(usuariosPendientesCorreo);
+
+			setEventos(nuevosEventos);
+			setEventosSeleccionados([]);
+			setUsuariosPendientesCorreo([]);
+			setShowConfirmBorradoMultiple(false);
+		} catch (error) {
+			console.error("Error al eliminar eventos múltiples:", error);
+		}
 	};
 
 	// Almacena en el estado el índice del evento a borrar y muestra el modal de confirmación
 	const handleEliminarEvento = (index) => {
 		setEventToDeleteIndex(index);
 		setShowConfirmModal(true);
+	};
+
+	const establecerPropiedadesCorreo = (invitados, nombre, fecha, id) => {
+		const correosConPropiedades = invitados.map((invitado) => {
+			return {
+				email: invitado.email,
+				nombre: nombre, // Nombre del evento al que está invitado el usuario "email"
+				fecha: fecha, // Fecha del evento
+				idEvento: id, // Id del evento
+			};
+		});
+		setUsuariosPendientesCorreo([
+			...usuariosPendientesCorreo,
+			...correosConPropiedades,
+		]);
+	};
+
+	// Funcion que elimina los correos electronicos de la lista de correos cuando se des-selecciona un evento
+	const eliminarCorreosLista = (id) => {
+		const eventosFiltradosSinId = usuariosPendientesCorreo.filter(
+			(objeto) => objeto.idEvento !== id
+		);
+		setUsuariosPendientesCorreo(eventosFiltradosSinId);
 	};
 
 	// Muestra el modal de crear evento
@@ -188,6 +340,11 @@ function EventosPage() {
 			);
 			return false;
 		}
+	};
+
+	const handleHideConfirmacionModal = () => {
+		setShowConfirmModal(false);
+		setUsuariosPendientesCorreo([]);
 	};
 
 	// Funcion que se ejecuta al crear evento en el modal de "crear evento"
@@ -318,7 +475,6 @@ function EventosPage() {
 			console.error("Error adding document: ", e);
 			return;
 		}
-		//console.log(eventoCambiar);
 	};
 
 	// El hook useEffect se utiliza para hacer la peticion a Cloud Firestore y mostrar
@@ -350,7 +506,7 @@ function EventosPage() {
 									}
 									className="form-control border-2"
 									type="search"
-									placeholder="Busque un evento..."
+									placeholder="Buscar un evento..."
 									aria-label="Search"
 								/>
 							</form>
@@ -362,280 +518,142 @@ function EventosPage() {
 							</button>
 						</div>
 
-						{/* Modal de modificar evento */}
-						<Modal
+						{/* Modal de confirmación borrado múltiple de eventos */}
+						<ModalGenerico
+							id="modalConfirmacionEliminarEventoMultiple"
+							show={showConfirmBorradoMultiple}
+							titulo="Borrar los eventos seleccionados"
+							cuerpo="¿Está seguro de que desea eliminar los eventos seleccionados? Se enviará un correo
+									electrónico avisando a todos los asistentes a los eventos que vas a eliminar."
+							onHide={() => setShowConfirmBorradoMultiple(false)}
+							onEliminar={() => handleEliminarEventoMultiple()}
+						/>
+						{/* ------------------------------------------------------- */}
+
+						{/* Modal de modificar eventos */}
+						<ModalGenerico
 							id="modalModificar"
 							show={showModalModificar}
+							titulo="Modificar un evento"
+							cuerpo={
+								<BodyModal
+									nombreEvento={eventoCambiar.nombre}
+									onChangeNombre={(e) =>
+										setEventoCambiar({
+											...eventoCambiar,
+											nombre: e.target.value,
+										})
+									}
+									fechaEvento={eventoCambiar.fecha}
+									onChangeFecha={(e) =>
+										setEventoCambiar({
+											...eventoCambiar,
+											fecha: e.target.value,
+										})
+									}
+									horaEvento={eventoCambiar.hora}
+									onChangeHora={(e) =>
+										setEventoCambiar({
+											...eventoCambiar,
+											hora: e.target.value,
+										})
+									}
+									ubicacionEvento={eventoCambiar.ubicacion}
+									onChangeUbicacion={(e) =>
+										setEventoCambiar({
+											...eventoCambiar,
+											ubicacion: e.target.value,
+										})
+									}
+									error={error}
+									onClickEvento={handleModificarEvento}
+									errorFecha={errorFecha}
+									buttonName="Modificar Evento"
+								/>
+							}
 							onHide={() => {
 								setShowModalModificar(false);
 								setErrorFecha("");
 								setError(null);
 							}}
-							centered
-						>
-							<Modal.Header closeButton>
-								<Modal.Title>Modificar un evento</Modal.Title>
-							</Modal.Header>
-							<Modal.Body>
-								<form>
-									<div className="mb-3">
-										<label
-											htmlFor="nombre"
-											className="form-label fw-bold"
-										>
-											Nombre del evento
-										</label>
-										<input
-											type="text"
-											className="form-control"
-											id="nombre"
-											value={eventoCambiar.nombre}
-											placeholder="Ingrese el nombre del evento"
-											onChange={(e) =>
-												setEventoCambiar({
-													...eventoCambiar,
-													nombre: e.target.value,
-												})
-											}
-										/>
-									</div>
-									<div className="mb-3">
-										<label
-											htmlFor="fecha"
-											className="form-label fw-bold"
-										>
-											Fecha
-										</label>
-										<input
-											type="date"
-											className="form-control"
-											id="fecha"
-											value={eventoCambiar.fecha}
-											onChange={(e) =>
-												setEventoCambiar({
-													...eventoCambiar,
-													fecha: e.target.value,
-												})
-											}
-										/>
-										{errorFecha && (
-											<p className="text-center text-danger">
-												{errorFecha}
-											</p>
-										)}{" "}
-										{/* Mostrar mensaje de error */}
-									</div>
-									<div className="mb-3">
-										<label
-											htmlFor="hora"
-											className="form-label fw-bold"
-										>
-											Hora
-										</label>
-										<input
-											type="time"
-											className="form-control"
-											id="hora"
-											value={eventoCambiar.hora}
-											onChange={(e) =>
-												setEventoCambiar({
-													...eventoCambiar,
-													hora: e.target.value,
-												})
-											}
-										/>
-									</div>
-									<div className="mb-3">
-										<label
-											htmlFor="ubicacion"
-											className="form-label fw-bold"
-										>
-											Ubicación
-										</label>
-										<input
-											type="text"
-											className="form-control"
-											id="ubicacion"
-											placeholder="Ingrese la ubicación del evento"
-											value={eventoCambiar.ubicacion}
-											onChange={(e) =>
-												setEventoCambiar({
-													...eventoCambiar,
-													ubicacion: e.target.value,
-												})
-											}
-										/>
-									</div>
-									<div className="text-center">
-										{error && (
-											<p className="text-danger">
-												{error}
-											</p>
-										)}{" "}
-										{/* Mostrar mensaje de error */}
-										<button
-											className="btn btn-dark w-100"
-											onClick={handleModificarEvento}
-										>
-											Modificar evento
-										</button>
-									</div>
-								</form>
-							</Modal.Body>
-						</Modal>
+						/>
+						{/* ----------------------------------------------- */}
 
-						{/* Modal de confirmación de eliminación de evento */}
-						<Modal
-							id="modalConfirmar"
+						{/* Modal de confirmación de eliminación de evento simple */}
+						<ModalGenerico
+							id="modalConfirmarEliminarEventoSimple"
 							show={showConfirmModal}
-							onHide={() => setShowConfirmModal(false)}
-							centered
-						>
-							<Modal.Header closeButton>
-								<Modal.Title>Confirmar eliminación</Modal.Title>
-							</Modal.Header>
-							<Modal.Body>
-								¿Estás seguro de que quieres eliminar este
-								evento?
-							</Modal.Body>
-							<Modal.Footer>
-								<Button
-									variant="secondary"
-									onClick={() => setShowConfirmModal(false)}
-								>
-									Cancelar
-								</Button>
-								<Button
-									variant="danger"
-									onClick={confirmarEliminacion}
-								>
-									Eliminar
-								</Button>
-							</Modal.Footer>
-						</Modal>
+							titulo="Confirmar eliminación"
+							cuerpo={`¿Estás seguro de que deseas eliminar este evento?\n
+									 Se enviarán correos
+									 electrónicos a todos los invitados avisando de la cancelación del evento.\n
+									 `}
+							onHide={() => handleHideConfirmacionModal()}
+							onEliminar={confirmarEliminacionEvento}
+							showSpinner={showSpinner}
+						/>
+						{/* ----------------------------------------------- */}
 
 						{/* Modal de crear evento */}
-						<Modal
-							id="modalCrear"
+						<ModalGenerico
+							id="modalCrearEvento"
 							show={showModalCrear}
+							titulo="Crear un nuevo evento"
+							cuerpo={
+								<BodyModal
+									nombreEvento={nuevoEvento.nombre}
+									onChangeNombre={(e) =>
+										setNuevoEvento({
+											...nuevoEvento,
+											nombre: e.target.value,
+										})
+									}
+									fechaEvento={nuevoEvento.fecha}
+									onChangeFecha={(e) =>
+										setNuevoEvento({
+											...nuevoEvento,
+											fecha: e.target.value,
+										})
+									}
+									horaEvento={nuevoEvento.hora}
+									onChangeHora={(e) =>
+										setNuevoEvento({
+											...nuevoEvento,
+											hora: e.target.value,
+										})
+									}
+									ubicacionEvento={nuevoEvento.ubicacion}
+									onChangeUbicacion={(e) =>
+										setNuevoEvento({
+											...nuevoEvento,
+											ubicacion: e.target.value,
+										})
+									}
+									error={error}
+									onClickEvento={handleCrearEvento}
+									errorFecha={errorFecha}
+									buttonName="Crear Evento"
+								/>
+							}
 							onHide={handleCloseCrear}
-							centered
-						>
-							<Modal.Header closeButton>
-								<Modal.Title>Crear un nuevo evento</Modal.Title>
-							</Modal.Header>
-							<Modal.Body>
-								<form>
-									<div className="mb-3">
-										<label
-											htmlFor="nombre"
-											className="form-label fw-bold"
-										>
-											Nombre del evento
-										</label>
-										<input
-											type="text"
-											className="form-control"
-											id="nombre"
-											value={nuevoEvento.nombre}
-											placeholder="Ingrese el nombre del evento"
-											onChange={(e) =>
-												setNuevoEvento({
-													...nuevoEvento,
-													nombre: e.target.value,
-												})
-											}
-										/>
-									</div>
-									<div className="mb-3">
-										<label
-											htmlFor="fecha"
-											className="form-label fw-bold"
-										>
-											Fecha
-										</label>
-										<input
-											type="date"
-											className="form-control"
-											id="fecha"
-											value={nuevoEvento.fecha}
-											onChange={(e) =>
-												setNuevoEvento({
-													...nuevoEvento,
-													fecha: e.target.value,
-												})
-											}
-										/>
-										{errorFecha && (
-											<p className="text-center text-danger">
-												{errorFecha}
-											</p>
-										)}{" "}
-										{/* Mostrar mensaje de error */}
-									</div>
-									<div className="mb-3">
-										<label
-											htmlFor="hora"
-											className="form-label fw-bold"
-										>
-											Hora
-										</label>
-										<input
-											type="time"
-											className="form-control"
-											id="hora"
-											value={nuevoEvento.hora}
-											onChange={(e) =>
-												setNuevoEvento({
-													...nuevoEvento,
-													hora: e.target.value,
-												})
-											}
-										/>
-									</div>
-									<div className="mb-3">
-										<label
-											htmlFor="ubicacion"
-											className="form-label fw-bold"
-										>
-											Ubicación
-										</label>
-										<input
-											type="text"
-											className="form-control"
-											id="ubicacion"
-											placeholder="Ingrese la ubicación del evento"
-											value={nuevoEvento.ubicacion}
-											onChange={(e) =>
-												setNuevoEvento({
-													...nuevoEvento,
-													ubicacion: e.target.value,
-												})
-											}
-										/>
-									</div>
-									<div className="text-center">
-										{error && (
-											<p className="text-danger">
-												{error}
-											</p>
-										)}{" "}
-										{/* Mostrar mensaje de error */}
-										<button
-											id="boton-crear-evento"
-											className="btn btn-dark w-100"
-											onClick={handleCrearEvento}
-										>
-											Crear evento
-										</button>
-									</div>
-								</form>
-							</Modal.Body>
-						</Modal>
+						/>
 
 						{/* Carrusel donde aparecen todos los eventos */}
 						<div className="p-3 p-md-5 mt-3 rounded bg-light">
 							{/* Carrusel de eventos */}
+							{showBotonMultiple ? (
+								<Button
+									id="boton-borrado-multiple"
+									className="mx-auto d-block mb-3"
+									variant="danger"
+									size="lg"
+									onClick={() =>
+										setShowConfirmBorradoMultiple(true)
+									}
+								>
+									Eliminar los eventos seleccionados
+								</Button>
+							) : null}
 							<ul className="list-group">
 								{eventos
 									.filter((evento) =>
@@ -650,7 +668,7 @@ function EventosPage() {
 									)
 									.map((evento, index) => (
 										<Evento
-											key={index}
+											key={evento.id}
 											{...evento}
 											onCambio={() => {
 												setEventToUpdateIndex(index);
@@ -668,6 +686,23 @@ function EventosPage() {
 											}
 											onEstadisticas={() =>
 												handleEstadisticas()
+											}
+											showBoton={showBotonMultiple}
+											onSelectEvento={() =>
+												handleSelectEvento(evento.id)
+											}
+											Seleccionado={
+												eventosSeleccionados.includes(
+													evento.id
+												)
+													? true
+													: false
+											}
+											setUsuariosPendientesCorreo={
+												establecerPropiedadesCorreo
+											}
+											quitarUsuariosPendientesCorreo={
+												eliminarCorreosLista
 											}
 										/>
 									))}

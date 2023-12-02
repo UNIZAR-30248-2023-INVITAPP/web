@@ -84,7 +84,7 @@ function Evento({
 		try {
 			const res = await updateDoc(doc(db, "Eventos", id), {
 				invitados: [
-					...invitados,
+					...invitadosArray,
 					{
 						nombre: nombre,
 						email: email,
@@ -119,6 +119,22 @@ function Evento({
 		setShowConfirmacionEliminar(true);
 	};
 
+	const handleEliminarEvento = () => {
+		onEliminar();
+		setUsuariosPendientesCorreo(invitadosArray, nombre, fecha, id);
+	};
+
+	const handleSelectEvento = () => {
+		const eventIsSelected = onSelectEvento();
+		if (eventIsSelected) {
+			// TODO: Quitarlo de los correos
+			quitarUsuariosPendientesCorreo(id);
+		} else {
+			// TODO: Añadir a lista de correos pendientes
+			setUsuariosPendientesCorreo(invitadosArray, nombre, fecha, id);
+		}
+	};
+
 	// Funcion que maneja el evento del boton Confirmar del modal de
 	// confirmacion de eliminacion de invitado
 	// Actualiza la lista de invitados y actualiza los invitados en Firebase
@@ -139,7 +155,7 @@ function Evento({
 		setIndexInvitadoEliminar(null);
 		setShowConfirmacionEliminar(false);
 		setShowInvitados(true);
-		setShowToastEliminarInvitado(true);
+		// setShowToastEliminarInvitado(true);
 	};
 
 	// Componente visual de la lista de invitados
@@ -177,10 +193,8 @@ function Evento({
 									{/* Botón de eliminación a la derecha */}
 									<div className="d-grid my-auto d-md-inline gap-2">
 										<button
-											className="my-2 btn btn-danger" // Estilo de botón de eliminación
-											onClick={() =>
-												handleEliminarInvitado(index)
-											} // Manejador para eliminar el evento por índice
+											className="my-2 btn btn-danger"
+											onClick={handleEliminarInvitado}
 										>
 											{" "}
 											Eliminar
@@ -204,6 +218,7 @@ function Evento({
 		<>
 			{/* Modal de listado de invitados */}
 			<Modal
+				id={`modalListaInvitados-${id}`}
 				className="pt-2 px-2 pt-md-0 px-md-0"
 				show={showInvitados}
 				onHide={() => {
@@ -306,7 +321,10 @@ function Evento({
 					<Modal.Title>Sorteo</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					<Ruleta listaInvitados={invitadosArray} />
+					<Ruleta
+						listaInvitados={invitadosArray}
+						nombreEvento={nombre}
+					/>
 				</Modal.Body>
 			</Modal>
 
@@ -363,6 +381,13 @@ function Evento({
 			</ToastContainer> */}
 			<li className="mb-4 list-group-item border border-2 rounded col-12 col-lg-8 mx-auto">
 				<div className="d-flex flex-column py-2 flex-md-row gap-3 justify-content-between align-items-center">
+					<input
+						type="checkbox"
+						id={`checkbox-${id}`}
+						className="form-check border-2"
+						onChange={handleSelectEvento} // Manejador para marcar/desmarcar evento
+						checked={Seleccionado}
+					/>
 					<div>
 						<h5 className="fw-bold">{nombre}</h5>
 						<span className="fw-bold d-block mt-1">
@@ -376,6 +401,7 @@ function Evento({
 							<span className="fw-light">{ubicacion}</span>
 						</span>
 					</div>
+
 					<div className="d-flex flex-column pb-3 pb-md-0 flex-md-row gap-3">
 						{/* Botón de ver invitados a la derecha */}
 						<button
@@ -410,8 +436,10 @@ function Evento({
 
 						{/* Botón de eliminación a la derecha */}
 						<button
-							className="btn btn-block btn-danger" // Estilo de botón de eliminación
-							onClick={onEliminar} // Manejador para eliminar el evento por índice
+							className={`btn btn-danger ${
+								Seleccionado ? "disabled" : ""
+							}`} // Estilo de botón de eliminación
+							onClick={handleEliminarEvento} // Manejador para eliminar el evento por índice
 						>
 							{" "}
 							Eliminar

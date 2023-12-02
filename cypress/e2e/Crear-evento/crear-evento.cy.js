@@ -4,6 +4,7 @@ const { eliminarEventoDom } = require("../aux-funciones");
 describe('Crear Evento', () => {
 
   const nombre = 'Test - Crear Evento'
+  
   beforeEach(() => {
     cy.visit('http://localhost:3000/eventos')
   })
@@ -14,7 +15,7 @@ describe('Crear Evento', () => {
     cy.contains('button', 'Crear Evento').click();
 
     // Comprobar que se abre el modal de Crear Evento
-    cy.get('#modalCrear').should('be.visible');
+    cy.get('#modalCrearEvento').should('be.visible');
   })
 
   it('Prueba 2: Rellenar el modal y crear el evento', () => {
@@ -37,8 +38,13 @@ describe('Crear Evento', () => {
     // Verificar que existe el evento con ese título
     cy.contains(nombre).should('exist');
 
+  })
+
+
+  it('Eliminar el evento creado', () => {
     // Eliminar el evento creado
     eliminarEventoDom(nombre)
+    cy.wait(500)
   })
 
 

@@ -9,7 +9,7 @@ describe('Crear evento con una fecha anterior a la actual', () => {
       cy.contains('button', 'Crear Evento').click();
 
       // Comprobar que se abre el modal de Crear Evento
-      cy.get('#modalCrear').should('be.visible');
+      cy.get('#modalCrearEvento').should('be.visible');
 
       // Rellenar el nombre del evento
       cy.get('#nombre').type('Evento de Prueba con Fecha No Valida');
@@ -33,7 +33,7 @@ describe('Crear evento con una fecha anterior a la actual', () => {
     cy.contains('button', 'Crear Evento').click();
 
     // Comprobar que se abre el modal de Crear Evento
-    cy.get('#modalCrear').should('be.visible');
+    cy.get('#modalCrearEvento').should('be.visible');
 
     // Rellenar el nombre del evento
     cy.get('#nombre').type('Evento de Prueba con Fecha No Valida');
@@ -63,7 +63,7 @@ describe('Crear evento con una fecha anterior a la actual', () => {
     cy.contains('button', 'Crear Evento').click();
 
     // Comprobar que se abre el modal de Crear Evento
-    cy.get('#modalCrear').should('be.visible');
+    cy.get('#modalCrearEvento').should('be.visible');
 
     // Rellenar el nombre del evento
     cy.get('#nombre').type('Evento de Prueba con Fecha No Valida');
@@ -105,7 +105,7 @@ describe('Crear evento con una fecha anterior a la actual', () => {
     cy.contains('button', 'Crear Evento').click();
 
     // Comprobar que se abre el modal de Crear Evento
-    cy.get('#modalCrear').should('be.visible');
+    cy.get('#modalCrearEvento').should('be.visible');
 
     // Rellenar el nombre del evento
     cy.get('#nombre').type('Evento de Prueba con Fecha No Valida');
