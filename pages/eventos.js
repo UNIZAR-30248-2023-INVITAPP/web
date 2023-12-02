@@ -494,7 +494,7 @@ function EventosPage() {
 								Mis Eventos
 							</h1>
 							<form
-								className="d-flex mx-5 p-2 flex-grow-1 text-center"
+								className="d-flex mx-0 py-2 mx-md-5 p-md-2 flex-grow-1 text-center"
 								role="search"
 								id="form"
 							>
@@ -630,7 +630,7 @@ function EventosPage() {
 
 
 						{/* Carrusel donde aparecen todos los eventos */}
-						<div className="p-3 d-flex flex-column p-md-5 mt-3 rounded bg-light gap-4">
+						<div className="p-3 d-flex flex-column p-md-5 mt-3 rounded bg-light gap-2">
 							{/* Botones para filtrado por estado eventos [pasado, futuro] */}
                             <div className="btn-group" role="group" aria-label="Basic radio toggle button group">
                                 <input type="radio" className="btn-check" name="filtroEventos" id="futuros" onClick={()=>{setFiltroEventosFuturos(true)}} autoComplete="off" defaultChecked/>
@@ -639,8 +639,10 @@ function EventosPage() {
                                 <input type="radio" className="btn-check" name="filtroEventos" id="pasados" onClick={()=>{setFiltroEventosFuturos(false)}} autoComplete="off"/>
                                 <label className="btn btn-outline-primary" htmlFor="pasados">Eventos pasados</label>
                             </div>
+							<hr/>
                             {/* Botones para ordenacion de eventos [nombre, fecha] */}
-                            <div className="btn-group" role="group" aria-label="Basic radio toggle button group">
+							<h5 className="fw-bold text-center">Ordenar por: </h5>
+                            <div className="btn-group mb-4" role="group" aria-label="Basic radio toggle button group">
                                 <input type="radio" className="btn-check" name="ordenarEventos" id="ordenarNombre" onChange={()=>{setOrdenarPorFecha(false);setOrdenarPorNombre(true);}} autoComplete="off" checked={ordenarPorNombre}/>
                                 <label className="btn btn-outline-dark" htmlFor="ordenarNombre">Nombre</label>
 
@@ -660,8 +662,8 @@ function EventosPage() {
 									Eliminar los eventos seleccionados
 								</Button>
 							) : null }
-                            {ordenarPorFecha && "ordenarPorFecha"}
-                            {ordenarPorNombre && "ordenarPorNombre"}
+                            {/* {ordenarPorFecha && "ordenarPorFecha"}
+                            {ordenarPorNombre && "ordenarPorNombre"} */}
                             {/* Carrusel de eventos */}
 							<ul className="list-group">
 								{eventos
@@ -685,7 +687,7 @@ function EventosPage() {
 									)
 									.sort((a, b) => {if (ordenarPorFecha) return (new Date(a.fechaOriginal) - new Date(b.fechaOriginal))
 													// else if (ordenarPorNombre) return ((a, b) => a.nombre.trim().toLowerCase().localeCompare(b.nombre.trim().toLowerCase()))
-													else if (ordenarPorNombre) return ((a, b) => a.nombre.trim().toLowerCase().localeCompare(b.nombre.trim().toLowerCase()))
+													else if (ordenarPorNombre) return ((a,b) => a.nombre.localeCompare(b.nombre))
 													else return 0
 												})
 									.map((evento, index) => (
