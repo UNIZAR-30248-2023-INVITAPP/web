@@ -1,4 +1,4 @@
-import { doc, collection, deleteDoc, addDoc } from "firebase/firestore";
+import { doc, collection, deleteDoc, addDoc, query, where, getDocs } from "firebase/firestore";
 import db from "../../firebase";
 
 export const anadirEventoPrueba = async (titulo) => {
@@ -65,3 +65,12 @@ export const eliminarEventoDom = (evento) => {
     .last()  // Selecciona el último botón (asumiendo que "Eliminar" es el último)
     .click();  // Realiza clic en el botón
 }
+
+/**
+ * Esta función devuelve un querySnapshot (que es un array de documentos) de los
+ * invitados que hay en el Evento con eventiId.
+ */
+export const listaInvitadosDeEvento = async (eventoId) => {
+    const querySnapshot = await getDocs(collection(db, "Eventos", eventoId, "Invitados"));
+    return querySnapshot;
+};
