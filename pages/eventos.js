@@ -50,6 +50,9 @@ function EventosPage() {
 
     const [filtroEventosFuturos, setFiltroEventosFuturos] = useState(true)
 
+    const [ordenarPorNombre, setOrdenarPorNombre] = useState(false)
+    const [ordenarPorFecha, setOrdenarPorFecha] = useState(false)
+
 	// State para crear un nuevo evento
 	const [nuevoEvento, setNuevoEvento] = useState({
 		nombre: "",
@@ -97,7 +100,8 @@ function EventosPage() {
 			};
 		});
 
-		eventosArray.sort((a, b) => a.nombre.localeCompare(b.nombre));
+		// eventosArray.sort((a, b) => a.nombre.localeCompare(b.nombre));
+        //eventosArray.sort((a, b) => new Date(a.fechaOriginal) - new Date(b.fechaOriginal));    
 
 		// Cambia el formato de la fecha para que se vea en el DOM de manera más legible
 		const eventosFechaDate = eventosArray.map((evento) => {
@@ -134,6 +138,13 @@ function EventosPage() {
 		 ? setShowBotonMultiple(true)
 		 : setShowBotonMultiple(false);
 	 }, [eventosSeleccionados])
+
+    useEffect(() => {
+        //if (ordenarPorFecha) setEventos(eventos.sort((a, b) => new Date(a.fechaOriginal) - new Date(b.fechaOriginal)));
+        //if (ordenarPorNombre) setEventos(eventos.sort((a, b) => a.nombre.trim().toLowerCase().localeCompare(b.nombre.trim().toLowerCase())));    
+    }, [ordenarPorFecha, ordenarPorNombre])
+
+     
 	 
 	 // Esta funcion crea el JSON necesario para enviar en el request al servicio web que envía los correos electrónicos
 	//  const crearJsonRequestCorreo = () => {
@@ -621,14 +632,23 @@ function EventosPage() {
 
 						{/* Carrusel donde aparecen todos los eventos */}
 						<div className="p-3 d-flex flex-column p-md-5 mt-3 rounded bg-light gap-4">
-							{/* Carrusel de eventos */}
+							{/* Botones para filtrado por estado eventos [pasado, futuro] */}
                             <div className="btn-group" role="group" aria-label="Basic radio toggle button group">
-                                <input type="radio" className="btn-check" name="btnradio" id="futuros" onClick={()=>{setFiltroEventosFuturos(true)}} autoComplete="off" defaultChecked/>
+                                <input type="radio" className="btn-check" name="filtroEventos" id="futuros" onClick={()=>{setFiltroEventosFuturos(true)}} autoComplete="off" defaultChecked/>
                                 <label className="btn btn-outline-primary" htmlFor="futuros">Eventos futuros</label>
 
-                                <input type="radio" className="btn-check" name="btnradio" id="pasados" onClick={()=>{setFiltroEventosFuturos(false)}} autoComplete="off"/>
+                                <input type="radio" className="btn-check" name="filtroEventos" id="pasados" onClick={()=>{setFiltroEventosFuturos(false)}} autoComplete="off"/>
                                 <label className="btn btn-outline-primary" htmlFor="pasados">Eventos pasados</label>
                             </div>
+                            {/* Botones para ordenacion de eventos [nombre, fecha] */}
+                            <div className="btn-group" role="group" aria-label="Basic radio toggle button group">
+                                <input type="radio" className="btn-check" name="ordenarEventos" id="ordenarNombre" onChange={()=>{setOrdenarPorFecha(false);setOrdenarPorNombre(true);}} autoComplete="off" checked={ordenarPorNombre}/>
+                                <label className="btn btn-outline-dark" htmlFor="ordenarNombre">Nombre</label>
+
+                                <input type="radio" className="btn-check" name="ordenarEventos" id="ordenarFecha" onChange={()=>{setOrdenarPorNombre(false);setOrdenarPorFecha(true)}} autoComplete="off" checked={ordenarPorFecha}/>
+                                <label className="btn btn-outline-dark" htmlFor="ordenarFecha">Fecha</label>
+                            </div>
+                            {/* Boton de eliminacion multiple */}
 							{showBotonMultiple ? (
 								<Button
 									id="boton-borrado-multiple"
@@ -641,6 +661,9 @@ function EventosPage() {
 									Eliminar los eventos seleccionados
 								</Button>
 							) : null }
+                            {ordenarPorFecha && "ordenarPorFecha"}
+                            {ordenarPorNombre && "ordenarPorNombre"}
+                            {/* Carrusel de eventos */}
 							<ul className="list-group">
 								{eventos
                                     .filter((evento) => {
@@ -661,6 +684,11 @@ function EventosPage() {
 													.toLocaleLowerCase()
 											)
 									)
+									.sort((a, b) => {if (ordenarPorFecha) return (new Date(a.fechaOriginal) - new Date(b.fechaOriginal))
+													// else if (ordenarPorNombre) return ((a, b) => a.nombre.trim().toLowerCase().localeCompare(b.nombre.trim().toLowerCase()))
+													else if (ordenarPorNombre) return ((a, b) => a.nombre.trim().toLowerCase().localeCompare(b.nombre.trim().toLowerCase()))
+													else return 0
+												})
 									.map((evento, index) => (
 										<Evento
 											key={evento.id}
