@@ -26,7 +26,8 @@ function Evento({
     onCambio,
 	onSelectEvento,
 	Seleccionado,
-    setUsuariosPendientesCorreo
+    setUsuariosPendientesCorreo,
+    quitarUsuariosPendientesCorreo,
 }) {
     const [invitadosArray, setInvitados] = useState(invitados);
     const [emailInvalido, setEmailInvalido] = useState(false);
@@ -123,7 +124,18 @@ function Evento({
 
     const handleEliminarEvento = () => {
         onEliminar()
-        setUsuariosPendientesCorreo(invitadosArray,nombre,fecha)
+        setUsuariosPendientesCorreo(invitadosArray,nombre,fecha,id)
+    }
+
+    const handleSelectEvento = () => {
+        const eventIsSelected = onSelectEvento()
+        if(eventIsSelected) {
+            // TODO: Quitarlo de los correos
+            quitarUsuariosPendientesCorreo(id)
+        } else {
+            // TODO: Añadir a lista de correos pendientes
+            setUsuariosPendientesCorreo(invitadosArray,nombre,fecha,id)
+        }
     }
 
     // Funcion que maneja el evento del boton Confirmar del modal de
@@ -374,7 +386,7 @@ function Evento({
 						type="checkbox"
 						id={`checkbox-${id}`}
 						className="form-check border-2"
-						onChange={onSelectEvento} // Manejador para marcar/desmarcar evento
+						onChange={handleSelectEvento} // Manejador para marcar/desmarcar evento
 						checked={Seleccionado}
 					/>
                     <div>

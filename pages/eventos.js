@@ -107,19 +107,19 @@ function EventosPage() {
 	};
 
 	// Función empleada para eliminar/añadir un evento a la lista de eventos seleccionados
-	const handleSelectEvento = (index) => {
+	const handleSelectEvento = (id) => {
 		
 		// Verificar si el evento ya está seleccionad
-		const isSelected = eventosSeleccionados.includes(index);
-	
+		const isSelected = eventosSeleccionados.includes(id);
 		if (isSelected) {
 		  // Si ya está seleccionado, quitarlo de la lista de seleccionados
-		  setEventosSeleccionados(eventosSeleccionados.filter(id => id !== index));
+		  setEventosSeleccionados(eventosSeleccionados.filter(idFirebase => idFirebase !== id));
 		} else {
 		  // Si no está seleccionado, agregarlo a la lista de seleccionados
-		  setEventosSeleccionados([...eventosSeleccionados, index]);
+		  setEventosSeleccionados([...eventosSeleccionados, id]);
+		  // TODO: añadir a usuariosCorreoPendientes el id
 		}
-
+		return isSelected
 	  };
 
 	useEffect(() => {
@@ -177,7 +177,6 @@ function EventosPage() {
 				await deleteDoc(doc(db, "Eventos", id));
 				setEventos(nuevosEventos);
 
-				console.log(usuariosPendientesCorreo)
 				// TODO: Descomentar la línea de debajo para que se envíen los correos electrónicos
 				if (usuariosPendientesCorreo.length > 0) { // Solo se manda peticion de correo si hay invitados en el evento
 					await sendPostRequestToMailService(usuariosPendientesCorreo);
@@ -197,17 +196,19 @@ function EventosPage() {
 	// Firebase para eliminar todos los eventos que se han seleccionado
 	const handleEliminarEventoMultiple = async () => {
 		try {
-			const nuevosEventos = eventos.filter((evento, index) => !eventosSeleccionados.includes(index));
+			const nuevosEventos = eventos.filter((evento) => !eventosSeleccionados.includes(evento.id));
 		
 			await Promise.all(
-			  eventosSeleccionados.map(async (selectedIndex) => {
-				const idFirebase = eventos[selectedIndex].id;
+			  eventosSeleccionados.map(async (idFirebase) => {
 				await deleteDoc(doc(db, "Eventos", idFirebase));
 			  })
 			);
+
+			await sendPostRequestToMailService(usuariosPendientesCorreo)
 		
 			setEventos(nuevosEventos);
 			setEventosSeleccionados([]);
+			setUsuariosPendientesCorreo([])
 			setShowConfirmBorradoMultiple(false);
 		  } catch (error) {
 			console.error("Error al eliminar eventos múltiples:", error);
@@ -220,16 +221,23 @@ function EventosPage() {
 		setShowConfirmModal(true);
 	};
 
-	const establecerPropiedadesCorreo = (invitados,nombre,fecha) => {
+	const establecerPropiedadesCorreo = (invitados,nombre,fecha,id) => {
 		const correosConPropiedades = invitados.map(invitado => {
 			return {
 			  email: invitado.email,
-			  nombre: nombre,
-			  fecha: fecha
+			  nombre: nombre, // Nombre del evento al que está invitado el usuario "email"
+			  fecha: fecha,  // Fecha del evento
+			  idEvento: id	// Id del evento
 			}
 	  	})
-		setUsuariosPendientesCorreo(correosConPropiedades)
+		setUsuariosPendientesCorreo([...usuariosPendientesCorreo,...correosConPropiedades])
 	}
+
+	// Funcion que elimina los correos electronicos de la lista de correos cuando se des-selecciona un evento
+	const eliminarCorreosLista = (id) => {
+		const eventosFiltradosSinId =  usuariosPendientesCorreo.filter(objeto => objeto.idEvento !== id);
+		setUsuariosPendientesCorreo(eventosFiltradosSinId)
+	};
 	
 	
 
@@ -442,7 +450,6 @@ function EventosPage() {
 			console.error("Error adding document: ", e);
 			return;
 		}
-		//console.log(eventoCambiar);
 	};
 
 	// El hook useEffect se utiliza para hacer la peticion a Cloud Firestore y mostrar
@@ -491,7 +498,8 @@ function EventosPage() {
 							id="modalConfirmacionEliminarEventoMultiple"
 							show={showConfirmBorradoMultiple}
 							titulo="Borrar los eventos seleccionados"
-							cuerpo="¿Está seguro de que desea eliminar los eventos seleccionados?"
+							cuerpo="¿Está seguro de que desea eliminar los eventos seleccionados? Se enviará un correo
+									electrónico avisando a todos los asistentes a los eventos que vas a eliminar."
 							onHide={() => setShowConfirmBorradoMultiple(false)}
 							onEliminar={() => handleEliminarEventoMultiple()}
 						/>
@@ -541,7 +549,7 @@ function EventosPage() {
 						/>
 						{ /* ----------------------------------------------- */}
 
-						{/* Modal de confirmación de eliminación de evento */ }
+						{/* Modal de confirmación de eliminación de evento simple */ }
 						<ModalGenerico
 							id="modalConfirmarEliminarEventoSimple" 
 							show={showConfirmModal}
@@ -640,9 +648,10 @@ function EventosPage() {
 											}}
 											onEliminar={() => handleEliminarEvento(index)}
 											showBoton = {showBotonMultiple} 
-											onSelectEvento={ () => handleSelectEvento(index)}
-											Seleccionado = { eventosSeleccionados.includes(index) ? true : false}
+											onSelectEvento={ () => handleSelectEvento(evento.id)}
+											Seleccionado = { eventosSeleccionados.includes(evento.id) ? true : false}
 											setUsuariosPendientesCorreo={establecerPropiedadesCorreo}
+											quitarUsuariosPendientesCorreo={eliminarCorreosLista}
 										/>
 									))}
 							</ul>
