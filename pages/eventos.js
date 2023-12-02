@@ -11,6 +11,7 @@ import {
 	getDocs,
 } from "firebase/firestore";
 import db from "../firebase";
+import { useRouter } from "next/router";
 
 // Componente que se corresponde con la página que se muestra de inicio, donde aparece la lista de los eventos
 function EventosPage() {
@@ -29,6 +30,9 @@ function EventosPage() {
 	const [errorFecha, setErrorFecha] = useState(null);
 
 	const [busqueda, setBusqueda] = useState("");
+
+	// Uso del componente router para redirección entre páginas
+	const router = useRouter();
 
 	// State para crear un nuevo evento
 	const [nuevoEvento, setNuevoEvento] = useState({
@@ -110,6 +114,9 @@ function EventosPage() {
 
 	// Muestra el modal de crear evento
 	const handleShow = () => setShowModalCrear(true);
+
+	// Maneja el pulsar boton eventos
+	const handleEstadisticas = () => router.push("/estadisticas");
 
 	// Función para cerrar el modal de crear evento.
 	// Se cierra el modal y se limpian los campos corresponientes a un nuevo evento
@@ -337,7 +344,7 @@ function EventosPage() {
 							>
 								<input
 									value={busqueda}
-									id='searchBar'
+									id="searchBar"
 									onChange={(e) =>
 										setBusqueda(e.target.value)
 									}
@@ -658,6 +665,9 @@ function EventosPage() {
 											}}
 											onEliminar={() =>
 												handleEliminarEvento(index)
+											}
+											onEstadisticas={() =>
+												handleEstadisticas()
 											}
 										/>
 									))}
