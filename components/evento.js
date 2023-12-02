@@ -180,7 +180,19 @@ function Evento({
                                             </span>
                                         </span>
                                     </div>
-
+                                    <div className="d-flex flex-column flex-md-row flex-md-row gap-2 justify-content-between ">
+                                        {/* Botón de modificar a la derecha */}
+                                    <div className="d-grid my-auto d-md-inline gap-2">
+                                        <button
+                                                className="my-2 btn btn-warning" 
+                                                onClick={()=>{
+                                                    
+                                                }} 
+                                            >
+                                            {" "}
+                                            Modificar
+                                        </button>
+                                    </div>
                                     {/* Botón de eliminación a la derecha */}
                                     <div className="d-grid my-auto d-md-inline gap-2">
                                         <button
@@ -191,6 +203,8 @@ function Evento({
                                             Eliminar
                                         </button>
                                     </div>
+                                    </div>
+                                    
                                 </div>
                             </ListGroup.Item>
                         );
@@ -208,9 +222,9 @@ function Evento({
     return (
         <>
             {/* Modal de listado de invitados */}
-            <Modal
+            <Modal 
                 id={`modalListaInvitados-${id}`}
-                className="pt-2 px-2 pt-md-0 px-md-0"
+                className="modal-lg pt-2 px-2 pt-md-0 px-md-0"
                 show={showInvitados}
                 onHide={() => {
                     setNombrelInvalido(false);
