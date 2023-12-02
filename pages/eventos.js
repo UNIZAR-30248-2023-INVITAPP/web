@@ -31,7 +31,7 @@ function EventosPage() {
 	const [usuariosPendientesCorreo,setUsuariosPendientesCorreo] = useState([])
 
 	const [showConfirmBorradoMultiple, setShowConfirmBorradoMultiple] = useState(false)
-	const [eventToDeleteIndex, setEventToDeleteIndex] = useState(null);
+	const [eventToDeleteId, setEventToDeleteId] = useState(null);
 	const [eventToUpdateIndex, setEventToUpdateIndex] = useState(null);
 	// Estado para almacenar el conjunto de los eventos
 	const [eventos, setEventos] = useState([]);
@@ -50,7 +50,7 @@ function EventosPage() {
 
     const [filtroEventosFuturos, setFiltroEventosFuturos] = useState(true)
 
-    const [ordenarPorNombre, setOrdenarPorNombre] = useState(false)
+    const [ordenarPorNombre, setOrdenarPorNombre] = useState(true)
     const [ordenarPorFecha, setOrdenarPorFecha] = useState(false)
 
 	// State para crear un nuevo evento
@@ -189,11 +189,10 @@ function EventosPage() {
             setEliminandoEvento(true)
             setShowSpinner(true)
             try {
-                if (eventToDeleteIndex !== null) {
-                    const id = eventos[eventToDeleteIndex].id;
-                    const nuevosEventos = [...eventos];
-                    nuevosEventos.splice(eventToDeleteIndex, 1);
-                    await deleteDoc(doc(db, "Eventos", id));
+                if (eventToDeleteId !== null) {
+                    const nuevosEventos = [...eventos].filter((e) => e.id != eventToDeleteId);
+                    //nuevosEventos.splice(eventToDeleteId, 1);
+                    await deleteDoc(doc(db, "Eventos", eventToDeleteId));
                     setEventos(nuevosEventos);
 
                     console.log(usuariosPendientesCorreo)
@@ -205,7 +204,7 @@ function EventosPage() {
             } catch(error){
                 console.log("Error: ", error)
             } finally {
-                setEventToDeleteIndex(null); // Limpia el evento a eliminar
+                setEventToDeleteId(null); // Limpia el evento a eliminar
                 setUsuariosPendientesCorreo([])
                 setShowConfirmModal(false);
                 setShowSpinner(false)
@@ -238,8 +237,8 @@ function EventosPage() {
 	}
 
 	// Almacena en el estado el índice del evento a borrar y muestra el modal de confirmación
-	const handleEliminarEvento = (index) => {
-		setEventToDeleteIndex(index);
+	const handleEliminarEvento = (id) => {
+		setEventToDeleteId(id);
 		setShowConfirmModal(true);
 	};
 
@@ -705,7 +704,7 @@ function EventosPage() {
 												});
 												setShowModalModificar(true);
 											}}
-											onEliminar={() => handleEliminarEvento(index)}
+											onEliminar={() => handleEliminarEvento(evento.id)}
 											showBoton = {showBotonMultiple} 
 											onSelectEvento={ () => handleSelectEvento(evento.id)}
 											Seleccionado = { eventosSeleccionados.includes(evento.id) ? true : false}
