@@ -20,7 +20,7 @@ export default function ModalGenerico({id, show, titulo, cuerpo, onHide, onElimi
                 {showSpinner ? (
                     <Spinner show={showSpinner.toString()} />
                 ) : (
-                    <p>{cuerpo}</p>
+                    <div>{cuerpo}</div>
                 )}
             </Modal.Body>
             {onEliminar !== undefined && (

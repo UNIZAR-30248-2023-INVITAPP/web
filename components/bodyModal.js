@@ -1,4 +1,5 @@
-import React from "react";
+import moment from "moment";
+import React, { useEffect } from "react";
 
 
 
@@ -16,6 +17,10 @@ const BodyModal = ({
     errorFecha,
     buttonName //Nombre del boton en el body del modal
     }) => {
+        useEffect(() => {
+            const value = moment(new Date(fechaEvento)).format('YYYY-MM-DD')
+            onChangeFecha({target: {value}})
+        }, [])
     return ( 
         <>
             <form>
@@ -46,7 +51,7 @@ const BodyModal = ({
                         type="date"
                         className="form-control"
                         id="fecha"
-                        value={fechaEvento}
+                        defaultValue={moment(new Date(fechaEvento)).format('yyyy-MM-DD')}
                         onChange={onChangeFecha}
                     />
                     {errorFecha && (

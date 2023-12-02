@@ -14,6 +14,7 @@ import db from "../firebase";
 import ModalGenerico from "@/components/modalGenerico";
 import BodyModal from "@/components/bodyModal";
 import Spinner from "@/components/Spinner"
+import moment from "moment";
 
 // Componente que se corresponde con la página que se muestra de inicio, donde aparece la lista de los eventos
 function EventosPage() {
@@ -46,6 +47,8 @@ function EventosPage() {
 	const [errorFecha, setErrorFecha] = useState(null);
 
 	const [busqueda, setBusqueda] = useState("");
+
+    const [filtroEventosFuturos, setFiltroEventosFuturos] = useState(true)
 
 	// State para crear un nuevo evento
 	const [nuevoEvento, setNuevoEvento] = useState({
@@ -103,6 +106,7 @@ function EventosPage() {
 			// Formatear la fecha en un formato legible
 			const options = { year: "numeric", month: "long", day: "numeric" };
 			eventoCopia.fecha = fechaDate.toLocaleDateString("es-ES", options);
+            eventoCopia.fechaOriginal = fechaDate;
 			return eventoCopia;
 		});
 		setEventos(eventosFechaDate);
@@ -386,13 +390,17 @@ function EventosPage() {
 				"es-ES",
 				options
 			);
+            nuevoEvento.fechaOriginal = nuevoEvento.fecha;
 			nuevoEvento.fecha = fechaFormateada;
 			const nuevoEventoConId = {
 				...nuevoEvento,
 				id: docRef.id, // Almacena el ID del documento recién creado
 			};
 			// Agregar el nuevo evento al estado de eventos
-			setEventos([...eventos, nuevoEventoConId]);
+            // Esto quiza cambiarlo
+			//setEventos([...eventos, nuevoEventoConId]);
+            // Agregar el cambio de  evento al estado de eventos
+			await fetchEventos();
 			handleCloseCrear(); // Cerrar el modal después de guardar
 			setErrorFecha(null);
 			setError(null);
@@ -525,12 +533,12 @@ function EventosPage() {
 											...eventoCambiar,
 											nombre: e.target.value,
 										})}
-									fechaEvento={eventoCambiar.fecha}
-									onChangeFecha={(e) =>
+									fechaEvento={eventoCambiar.fechaOriginal}
+									onChangeFecha={(e) =>{
 										setEventoCambiar({
 											...eventoCambiar,
 											fecha: e.target.value,
-										})}
+										})}}
 									horaEvento={eventoCambiar.hora}
 									onChangeHora={(e) =>
 										setEventoCambiar({
@@ -612,8 +620,15 @@ function EventosPage() {
 
 
 						{/* Carrusel donde aparecen todos los eventos */}
-						<div className="p-3 p-md-5 mt-3 rounded bg-light">
+						<div className="p-3 d-flex flex-column p-md-5 mt-3 rounded bg-light gap-4">
 							{/* Carrusel de eventos */}
+                            <div className="btn-group" role="group" aria-label="Basic radio toggle button group">
+                                <input type="radio" className="btn-check" name="btnradio" id="futuros" onClick={()=>{setFiltroEventosFuturos(true)}} autoComplete="off" defaultChecked/>
+                                <label className="btn btn-outline-primary" htmlFor="futuros">Eventos futuros</label>
+
+                                <input type="radio" className="btn-check" name="btnradio" id="pasados" onClick={()=>{setFiltroEventosFuturos(false)}} autoComplete="off"/>
+                                <label className="btn btn-outline-primary" htmlFor="pasados">Eventos pasados</label>
+                            </div>
 							{showBotonMultiple ? (
 								<Button
 									id="boton-borrado-multiple"
@@ -628,6 +643,14 @@ function EventosPage() {
 							) : null }
 							<ul className="list-group">
 								{eventos
+                                    .filter((evento) => {
+                                        if (filtroEventosFuturos){
+                                            return evento.fechaOriginal >= new Date()
+                                        }
+                                        else{ 
+                                            return evento.fechaOriginal < new Date()
+                                        }
+                                    })
 									.filter((evento) =>
 										evento.nombre
 											.trim()
@@ -648,7 +671,8 @@ function EventosPage() {
 													id: evento.id,
 													nombre: evento.nombre,
 													fecha: evento.fecha,
-													hora: "",
+                                                    fechaOriginal: evento.fechaOriginal,
+													hora: evento.hora,
 													ubicacion: evento.ubicacion,
 												});
 												setShowModalModificar(true);
