@@ -25,6 +25,7 @@ function Evento({
 	onEliminar,
 	onCambio,
 	onEstadisticas,
+	Seleccionado,
 }) {
 	const [invitadosArray, setInvitados] = useState(invitados);
 	const [emailInvalido, setEmailInvalido] = useState(false);
