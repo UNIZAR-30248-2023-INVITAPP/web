@@ -59,6 +59,8 @@ function EventosPage() {
 
 	const [eventoCambiar, setEventoCambiar] = useState({});
 
+    const [eliminandoEvento, setEliminandoEvento] = useState(false);
+
 	// Esta función se encarga de recuperar eventos desde una base de datos Firebase,
 	// formatear los datos obtenidos y almacenarlos en un arreglo de eventos.
 	// Luego, ordena el arreglo de eventos por nombre y actualiza el estado con los eventos obtenidos.
@@ -168,29 +170,33 @@ function EventosPage() {
 	// Función para eliminar definitivamente el evento cuando aparece el modal de confirmación
 	// Además en esta función es donde se gestiona el envío de correos electrónicos a los invitados
 	const confirmarEliminacionEvento = async () => {
-		setShowSpinner(true)
-		try {
-			if (eventToDeleteIndex !== null) {
-				const id = eventos[eventToDeleteIndex].id;
-				const nuevosEventos = [...eventos];
-				nuevosEventos.splice(eventToDeleteIndex, 1);
-				await deleteDoc(doc(db, "Eventos", id));
-				setEventos(nuevosEventos);
+        if (!eliminandoEvento) {
+            setEliminandoEvento(true)
+            setShowSpinner(true)
+            try {
+                if (eventToDeleteIndex !== null) {
+                    const id = eventos[eventToDeleteIndex].id;
+                    const nuevosEventos = [...eventos];
+                    nuevosEventos.splice(eventToDeleteIndex, 1);
+                    await deleteDoc(doc(db, "Eventos", id));
+                    setEventos(nuevosEventos);
 
-				console.log(usuariosPendientesCorreo)
-				// TODO: Descomentar la línea de debajo para que se envíen los correos electrónicos
-				if (usuariosPendientesCorreo.length > 0) { // Solo se manda peticion de correo si hay invitados en el evento
-					await sendPostRequestToMailService(usuariosPendientesCorreo);
-				}
-			}
-		} catch(error){
-			console.log("Error: ", error)
-		} finally {
-			setEventToDeleteIndex(null); // Limpia el evento a eliminar
-			setUsuariosPendientesCorreo([])
-			setShowConfirmModal(false);
-			setShowSpinner(false)
-		}
+                    console.log(usuariosPendientesCorreo)
+                    // TODO: Descomentar la línea de debajo para que se envíen los correos electrónicos
+                    if (usuariosPendientesCorreo.length > 0) { // Solo se manda peticion de correo si hay invitados en el evento
+                        await sendPostRequestToMailService(usuariosPendientesCorreo);
+                    }
+                }
+            } catch(error){
+                console.log("Error: ", error)
+            } finally {
+                setEventToDeleteIndex(null); // Limpia el evento a eliminar
+                setUsuariosPendientesCorreo([])
+                setShowConfirmModal(false);
+                setShowSpinner(false)
+                setEliminandoEvento(false)
+            }
+        }
 	};
 
 	// Almacenar los eventos que se van a mantener, y enviar la peticion 
@@ -625,7 +631,7 @@ function EventosPage() {
 									)
 									.map((evento, index) => (
 										<Evento
-											key={index}
+											key={evento.id}
 											{...evento}
 											onCambio={() => {
 												setEventToUpdateIndex(index);
