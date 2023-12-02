@@ -65,6 +65,8 @@ function EventosPage() {
 
     const [eventoCambiar, setEventoCambiar] = useState({});
 
+    const [eliminandoEvento, setEliminandoEvento] = useState(false);
+
     // Esta función se encarga de recuperar eventos desde una base de datos Firebase,
     // formatear los datos obtenidos y almacenarlos en un arreglo de eventos.
     // Luego, ordena el arreglo de eventos por nombre y actualiza el estado con los eventos obtenidos.
@@ -176,27 +178,31 @@ function EventosPage() {
     // Función para eliminar definitivamente el evento cuando aparece el modal de confirmación
     // Además en esta función es donde se gestiona el envío de correos electrónicos a los invitados
     const confirmarEliminacionEvento = async () => {
-        setShowSpinner(true);
-        console.log(eventos[eventToDeleteIndex].invitados);
-        try {
-            if (eventToDeleteIndex !== null) {
-                const id = eventos[eventToDeleteIndex].id;
-                const nuevosEventos = [...eventos];
-                nuevosEventos.splice(eventToDeleteIndex, 1);
-                await deleteDoc(doc(db, "Eventos", id));
-                setEventos(nuevosEventos);
+        if (!eliminandoEvento) {
+            setEliminandoEvento(true);
+            setShowSpinner(true);
+            try {
+                if (eventToDeleteIndex !== null) {
+                    console.log(eventos[eventToDeleteIndex].invitados);
+                    const id = eventos[eventToDeleteIndex].id;
+                    const nuevosEventos = [...eventos];
+                    nuevosEventos.splice(eventToDeleteIndex, 1);
+                    await deleteDoc(doc(db, "Eventos", id));
+                    setEventos(nuevosEventos);
 
-                // TODO: Descomentar la línea de debajo para que se envíen los correos electrónicos
-                //const bodyRequest = crearJsonRequestCorreo()
-                //await sendPostRequestToMailService(bodyRequest)
+                    // TODO: Descomentar la línea de debajo para que se envíen los correos electrónicos
+                    const bodyRequest = crearJsonRequestCorreo();
+                    await sendPostRequestToMailService(bodyRequest);
+                }
+            } catch (error) {
+                console.log("Error: ", error);
+            } finally {
+                setShowConfirmModal(false);
+                setEventToDeleteIndex(null); // Limpia el evento a eliminar
+                setShowSpinner(false);
+                setUsuariosPendientesCorreo([]);
+                setEliminandoEvento(false)
             }
-        } catch (error) {
-            console.log("Error: ", error);
-        } finally {
-            setShowConfirmModal(false);
-            setEventToDeleteIndex(null); // Limpia el evento a eliminar
-            setShowSpinner(false);
-            setUsuariosPendientesCorreo([]);
         }
     };
 
