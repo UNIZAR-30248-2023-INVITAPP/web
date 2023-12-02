@@ -74,3 +74,50 @@ export const listaInvitadosDeEvento = async (eventoId) => {
     const querySnapshot = await getDocs(collection(db, "Eventos", eventoId, "Invitados"));
     return querySnapshot;
 };
+
+/**
+ * Esta función añade un invitado a la lista de invitados del evento con eventoId
+ * Todos los campos a añadir son string
+ */
+export const anadirInvitadoDeEvento = async (eventoId, nombre, apellido, DNI, email, genero, nacimiento) => {
+
+    await addDoc(collection(db, "Eventos", eventoId, "Invitados"), {
+        nombre: nombre,
+        apellido: apellido,
+        dni: DNI,
+        correo: email,
+        genero: genero,//"masculino", "femenino"
+        nacimiento: nacimiento,
+        asistido: false
+    });
+};
+
+/**
+ * Esta función actualiza los campos de un invitado
+ * Dado el id del evento y el id del invitado, además de los campos que desee cambiar,
+ * si no desea cambiar un campo debe pasar el mismo valor que había antes de la actualizacion
+ */
+export const updateInvitadoDeEvento = async (eventoId, invitadoId, nombre, apellido, DNI, email, genero, nacimiento) => {
+
+    const invitadoRef = doc(db, "Eventos", eventoId, "Invitados", invitadoId);
+    
+    // Set the "capital" field of the city 'DC'
+    await updateDoc(invitadoRef, {
+        nombre: nombre,
+        apellido: apellido,
+        dni: DNI,
+        correo: email,
+        genero: genero,//"masculino", "femenino"
+        nacimiento: nacimiento
+        //no se puede cambiar el campo "asistido"
+    });
+};
+
+/**
+ * Esta función elimina el invitado con id de evento dado e id del invitado
+ */
+export const eliminaInvitadoDeEvento = async (eventoId, invitadoId) => {
+
+    const invitadoRef = doc(db, "Eventos", eventoId, "Invitados", invitadoId);
+    await deleteDoc(invitadoRef);
+};
