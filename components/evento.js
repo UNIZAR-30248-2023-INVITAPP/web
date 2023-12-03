@@ -107,7 +107,7 @@ function Evento({
 					{
 						nombre: nombre,
 						email: email,
-						DNI: DNI,
+						DNI: DNI.toUpperCase(),
 					},
 				],
 			});
@@ -117,7 +117,7 @@ function Evento({
 				{
 					nombre: nombre,
 					email: email,
-					DNI: DNI,
+					DNI: DNI.toUpperCase(),
 				},
 			]);
 			//
@@ -237,7 +237,7 @@ function Evento({
 										<div className="d-grid my-auto d-md-inline gap-2">
 											<button
 												className="my-2 btn btn-danger"
-												onClick={handleEliminarInvitado}
+												onClick={() => {handleEliminarInvitado(index)}}
 											>
 												{" "}
 												Eliminar
