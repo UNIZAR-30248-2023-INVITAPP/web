@@ -21,6 +21,8 @@ import { useRouter } from "next/router";
 function EventosPage() {
 	// Modal que aparece al crear un evento
 	const [showModalCrear, setShowModalCrear] = useState(false);
+	// Modal que aparece al crear un evento
+	const [showExitoCrearEvento, setShowExitoCrearEvento] = useState(false)
 	// Modal para modificar un determinado evento
 	const [showModalModificar, setShowModalModificar] = useState(false);
 	// Modal de confirmación a la hora de borrar un evento
@@ -438,6 +440,8 @@ function EventosPage() {
 			setTimeout(() => {
 				setShowSpinner(false);
 			  }, 500);
+
+			setShowExitoCrearEvento(true);//Mostramos el mensaje de exito
 			
 		} catch (e) {
 			console.error("Error adding document: ", e);
@@ -699,6 +703,13 @@ function EventosPage() {
 							onHide={handleCloseCrear}
 							showSpinner={showSpinner}
 						/>
+						{/* Modal de mensaje de exito al crear el evento */}
+						<Toast className='position-fixed bottom-0 end-0 p-3 m-2' show={showExitoCrearEvento} onClose={() => setShowExitoCrearEvento(false)} delay={3000} autohide>
+							<Toast.Header>
+							<strong className="me-auto">Evento creado</strong>
+							</Toast.Header>
+							<Toast.Body>El evento se ha creado correctamente</Toast.Body>
+						</Toast>
 
 						<Toast className='position-fixed bottom-0 end-0 p-3 m-2' show={showToast} onClose={() => setShowToast(false)} delay={3000} autohide>
 							<Toast.Header>

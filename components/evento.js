@@ -43,6 +43,11 @@ function Evento({
 	const [indexInvitadoEliminar, setIndexInvitadoEliminar] = useState(null);
 	const [invitadosAEliminar, setInvitadosAEliminar] = useState([])
 	const [showConfirmBorradoMultiple, setShowConfirmBorradoMultiple] = useState(false)
+	//UseState de mostrar mensaje de exito al crear un invitado
+	const [showExitoAgnadirInvitado, setShowExitoAgnadirInvitado] = useState(false)
+	//UseState de mostrar mensaje de exito al eliminar un invitado
+	const [showExitoEliminarInvitado, setShowExitoEliminarInvitado] = useState(false)
+
 	//useEffect(()=>{setInvitadosAEliminar(invitadosAEliminar.add("12345678A"))},[])
 	//const [showToastEliminarInvitado, setShowToastEliminarInvitado] =
 	//	useState(false);
@@ -125,6 +130,9 @@ function Evento({
 			event.target.formDNI.value = null;
 			event.target.formEmail.value = null;
 			setInvitadoExistente(false);
+			//Establcecemos mensaje de exito de crear invitado
+			setShowInvitados(false);
+			setShowExitoAgnadirInvitado(true);
 		} catch (e) {
 			console.error("Error adding document: ", e);
 		}
@@ -166,12 +174,14 @@ function Evento({
 			// Actualizo mis invitados
 			setInvitados([...nuevosInvitados]);
 			//
+			//Mostrar mensaje de exito al eliminar
+			setShowExitoEliminarInvitado(true);
+
 		} catch (e) {
 			console.error("Error adding document: ", e);
 		}
 		setIndexInvitadoEliminar(null);
 		setShowConfirmacionEliminar(false);
-		setShowInvitados(true);
 		// setShowToastEliminarInvitado(true);
 	};
 
@@ -368,6 +378,27 @@ function Evento({
 					{listaInvitados()}
 				</Modal.Body>
 			</Modal>
+
+			{/* Modal de mensaje de exito al añadir invitado */}
+			<ModalGenerico
+				id="modalExitoAgnadirInvitado"
+				show={showExitoAgnadirInvitado}
+				titulo="Invitado añadido"
+				cuerpo="El invitado se ha añadido con éxito en el evento"
+				onHide={() => {setShowExitoAgnadirInvitado(false); setShowInvitados(true);}}
+			/>
+			{/* ------------------------------------------------------- */}
+
+			{/* Modal de mensaje de exito al eliminar invitado */}
+			<ModalGenerico
+				id="modalExitoAgnadirInvitado"
+				show={showExitoEliminarInvitado}
+				titulo="Invitado eliminado"
+				cuerpo="El invitado se ha eliminado con éxito del evento"
+				onHide={() => {setShowExitoEliminarInvitado(false); setShowInvitados(true);}}
+			/>
+			{/* ------------------------------------------------------- */}
+
 
 			{/* Modal del sorteo*/}
 			<Modal

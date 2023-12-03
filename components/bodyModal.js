@@ -73,7 +73,7 @@ const BodyModal = ({
 						type="text"
 						className="form-control"
 						id="ubicacion"
-						placeholder="Ingrese la ubicación del evento"
+						placeholder="Introduzca la ubicación del evento"
 						value={ubicacionEvento}
 						onChange={onChangeUbicacion}
 					/>
