@@ -383,77 +383,90 @@ function Evento({
 					</Toast.Body>
 				</Toast>
 			</ToastContainer> */}
-			<li className="mb-4 list-group-item border border-2 rounded col-12 col-lg-8 mx-auto">
-				<div className="d-flex flex-column py-2 flex-md-row gap-3 justify-content-between align-items-center">
-					<input
-						type="checkbox"
-						id={`checkbox-${id}`}
-						className="form-check border-2"
-						onChange={handleSelectEvento} // Manejador para marcar/desmarcar evento
-						checked={Seleccionado}
-					/>
-					<div>
-						<h5 className="fw-bold">{nombre}</h5>
-						<span className="fw-bold d-block mt-1">
-							Fecha: <span className="fw-light">{fecha}</span>
-						</span>
-						<span className="fw-bold d-block mt-1">
-							Hora: <span className="fw-light">{hora}</span>
-						</span>
-						<span className="fw-bold d-block mt-1">
-							Ubicación:{" "}
-							<span className="fw-light">{ubicacion}</span>
-						</span>
-					</div>
+            <li className="mb-4 list-group-item border border-2 rounded col-12 col-lg-8 mx-auto">
+                <div className="d-flex flex-column py-2 flex-md-row gap-3 justify-content-between ">
+                        <input
+                            type="checkbox"
+                            id={`checkbox-${id}`}
+                            className="form-check border-2"
+                            onChange={handleSelectEvento} // Manejador para marcar/desmarcar evento
+                            checked={Seleccionado}
+                        />
+                    <div className="d-flex flex-column justify-content-between align-items-center">
+                        <div>
+                            <h5 className="fw-bold">{nombre}</h5>
+                            <span className="fw-bold d-block mt-1">
+                                Fecha: <span className="fw-light">{fecha}</span>
+                            </span>
+                            <span className="fw-bold d-block mt-1">
+                                Hora: <span className="fw-light">{hora}</span>
+                            </span>
+                            <span className="fw-bold d-block mt-1">
+                                Ubicación:{" "}
+                                <span className="fw-light">{ubicacion}</span>
+                            </span>
+                        </div>
+                    </div>
 
-					<div className="d-flex flex-column pb-3 pb-md-0 flex-md-row gap-3">
-						{/* Botón de ver invitados a la derecha */}
-						<button
-							className="btn btn-primary" // Estilo de botón primario
-							onClick={() => {
-								setShowInvitados(true);
-							}}
-						>
-							{" "}
-							Invitados
-						</button>
+                    {/* <div className="d-flex flex-column pb-3 pb-md-0 flex-md-row gap-3"> */}
+                    <div className="d-flex flex-column flex-md-row flex-md-row gap-2 justify-content-between">
+                        {/* Botón de ver invitados a la derecha */}
+                        <div className="d-grid my-auto d-md-inline gap-2">
+                            <button
+                                className="btn btn-primary" // Estilo de botón primario
+                                onClick={() => {
+                                    setShowInvitados(true);
+                                }}
+                            >
+                                {" "}
+                                Invitados
+                            </button>
+                        </div>
 
-						{/* Botón de ver sorteos  */}
-						<button
-							className="btn btn-secondary" // Estilo de botón primario
-							onClick={() => {
-								setShowSorteo(true);
-							}}
-						>
-							{" "}
-							Sorteo
-						</button>
+                        {/* Botón de ver sorteos  */}
+                        <div className="d-grid my-auto d-md-inline gap-2">
+                            <button
+                                className="btn btn-secondary" // Estilo de botón primario
+                                onClick={() => {
+                                    setShowSorteo(true);
+                                }}
+                            >
+                                {" "}
+                                Sorteo
+                            </button>
+                        </div>
 
-						{/* Botón de modificar a la derecha */}
-						<button
-							className="btn btn-block btn-warning" // Estilo de botón de modificación
-							onClick={onCambio} // Manejador para modificar el evento por índice
-						>
-							{" "}
-							Modificar
-						</button>
+                        {/* Botón de modificar a la derecha */}
+                        <div className="d-grid my-auto d-md-inline gap-2">
+                            <button
+                                className="btn btn-block btn-warning" // Estilo de botón de modificación
+                                onClick={onCambio} // Manejador para modificar el evento por índice
+                            >
+                                {" "}
+                                Modificar
+                            </button>
+                        </div>
 
 						{/* Botón de eliminación a la derecha */}
-						<button
-							className={`btn btn-danger ${
-								Seleccionado ? "disabled" : ""
-							}`} // Estilo de botón de eliminación
-							onClick={handleEliminarEvento} // Manejador para eliminar el evento por índice
-						>
-							{" "}
-							Eliminar
-						</button>
-						<button
-							className="btn btn-block btn-info" // Estilo de botón de estadísticas
-							onClick={onEstadisticas} // Manejador para abrir el modal correspondiente a las estadísticas
-						>
-							Estadisticas
-						</button>
+                        <div className="d-grid my-auto d-md-inline gap-2">
+                            <button
+                                className={`btn btn-danger ${Seleccionado ? 'disabled' : ''}`} // Estilo de botón de eliminación
+                                onClick={handleEliminarEvento} // Manejador para eliminar el evento por índice
+                            >
+                                {" "}
+                                Eliminar
+                            </button>
+                        </div>
+                        
+                        {/* Botón de eliminación a la derecha */}
+                        <div className="d-grid my-auto d-md-inline gap-2">
+                            <button
+                              className="btn btn-block btn-info" // Estilo de botón de estadísticas
+                              onClick={onEstadisticas} // Manejador para abrir el modal correspondiente a las estadísticas
+                            >
+                              Estadisticas
+                            </button>
+                        </div>
 					</div>
 				</div>
 			</li>

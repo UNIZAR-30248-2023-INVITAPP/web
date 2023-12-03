@@ -13,7 +13,8 @@ import {
 import db from "../firebase";
 import ModalGenerico from "@/components/modalGenerico";
 import BodyModal from "@/components/bodyModal";
-import Spinner from "@/components/Spinner";
+import Spinner from "@/components/Spinner"
+import moment from "moment";
 import { useRouter } from "next/router";
 
 // Componente que se corresponde con la página que se muestra de inicio, donde aparece la lista de los eventos
@@ -32,9 +33,8 @@ function EventosPage() {
 		[]
 	);
 
-	const [showConfirmBorradoMultiple, setShowConfirmBorradoMultiple] =
-		useState(false);
-	const [eventToDeleteIndex, setEventToDeleteIndex] = useState(null);
+	const [showConfirmBorradoMultiple, setShowConfirmBorradoMultiple] = useState(false)
+	const [eventToDeleteId, setEventToDeleteId] = useState(null);
 	const [eventToUpdateIndex, setEventToUpdateIndex] = useState(null);
 	// Estado para almacenar el conjunto de los eventos
 	const [eventos, setEventos] = useState([]);
@@ -51,6 +51,10 @@ function EventosPage() {
 
 	const [busqueda, setBusqueda] = useState("");
 
+    const [filtroEventosFuturos, setFiltroEventosFuturos] = useState(true)
+
+    const [ordenarPorNombre, setOrdenarPorNombre] = useState(true)
+    const [ordenarPorFecha, setOrdenarPorFecha] = useState(false)
 	// Uso del componente router para redirección entre páginas
 	const router = useRouter();
 
@@ -101,7 +105,8 @@ function EventosPage() {
 			};
 		});
 
-		eventosArray.sort((a, b) => a.nombre.localeCompare(b.nombre));
+		// eventosArray.sort((a, b) => a.nombre.localeCompare(b.nombre));
+        //eventosArray.sort((a, b) => new Date(a.fechaOriginal) - new Date(b.fechaOriginal));    
 
 		// Cambia el formato de la fecha para que se vea en el DOM de manera más legible
 		const eventosFechaDate = eventosArray.map((evento) => {
@@ -110,6 +115,7 @@ function EventosPage() {
 			// Formatear la fecha en un formato legible
 			const options = { year: "numeric", month: "long", day: "numeric" };
 			eventoCopia.fecha = fechaDate.toLocaleDateString("es-ES", options);
+            eventoCopia.fechaOriginal = fechaDate;
 			return eventoCopia;
 		});
 		setEventos(eventosFechaDate);
@@ -133,13 +139,20 @@ function EventosPage() {
 	};
 
 	useEffect(() => {
-		// Mostrar el boton de borrado múltiple en función del número de eventos seleccionados
-		eventosSeleccionados.length >= 1
-			? setShowBotonMultiple(true)
-			: setShowBotonMultiple(false);
-	}, [eventosSeleccionados]);
+		 // Mostrar el boton de borrado múltiple en función del número de eventos seleccionados
+		 eventosSeleccionados.length >= 1
+		 ? setShowBotonMultiple(true)
+		 : setShowBotonMultiple(false);
+	 }, [eventosSeleccionados])
 
-	// Esta funcion crea el JSON necesario para enviar en el request al servicio web que envía los correos electrónicos
+    useEffect(() => {
+        //if (ordenarPorFecha) setEventos(eventos.sort((a, b) => new Date(a.fechaOriginal) - new Date(b.fechaOriginal)));
+        //if (ordenarPorNombre) setEventos(eventos.sort((a, b) => a.nombre.trim().toLowerCase().localeCompare(b.nombre.trim().toLowerCase())));    
+    }, [ordenarPorFecha, ordenarPorNombre])
+
+     
+	 
+	 // Esta funcion crea el JSON necesario para enviar en el request al servicio web que envía los correos electrónicos
 	//  const crearJsonRequestCorreo = () => {
 	// 	const emailsReceptores = usuariosPendientesCorreo.map((usuario) => usuario.email)
 	// 	const bodyJson = {
@@ -178,36 +191,32 @@ function EventosPage() {
 	// Función para eliminar definitivamente el evento cuando aparece el modal de confirmación
 	// Además en esta función es donde se gestiona el envío de correos electrónicos a los invitados
 	const confirmarEliminacionEvento = async () => {
-		if (!eliminandoEvento) {
-			setEliminandoEvento(true);
-			setShowSpinner(true);
-			try {
-				if (eventToDeleteIndex !== null) {
-					const id = eventos[eventToDeleteIndex].id;
-					const nuevosEventos = [...eventos];
-					nuevosEventos.splice(eventToDeleteIndex, 1);
-					await deleteDoc(doc(db, "Eventos", id));
-					setEventos(nuevosEventos);
+        if (!eliminandoEvento) {
+            setEliminandoEvento(true)
+            setShowSpinner(true)
+            try {
+                if (eventToDeleteId !== null) {
+                    const nuevosEventos = [...eventos].filter((e) => e.id != eventToDeleteId);
+                    //nuevosEventos.splice(eventToDeleteId, 1);
+                    await deleteDoc(doc(db, "Eventos", eventToDeleteId));
+                    setEventos(nuevosEventos);
 
-					console.log(usuariosPendientesCorreo);
-					// TODO: Descomentar la línea de debajo para que se envíen los correos electrónicos
-					if (usuariosPendientesCorreo.length > 0) {
-						// Solo se manda peticion de correo si hay invitados en el evento
-						await sendPostRequestToMailService(
-							usuariosPendientesCorreo
-						);
-					}
-				}
-			} catch (error) {
-				console.log("Error: ", error);
-			} finally {
-				setEventToDeleteIndex(null); // Limpia el evento a eliminar
-				setUsuariosPendientesCorreo([]);
-				setShowConfirmModal(false);
-				setShowSpinner(false);
-				setEliminandoEvento(false);
-			}
-		}
+                    console.log(usuariosPendientesCorreo)
+                    // TODO: Descomentar la línea de debajo para que se envíen los correos electrónicos
+                    if (usuariosPendientesCorreo.length > 0) { // Solo se manda peticion de correo si hay invitados en el evento
+                        await sendPostRequestToMailService(usuariosPendientesCorreo);
+                    }
+                }
+            } catch(error){
+                console.log("Error: ", error)
+            } finally {
+                setEventToDeleteId(null); // Limpia el evento a eliminar
+                setUsuariosPendientesCorreo([])
+                setShowConfirmModal(false);
+                setShowSpinner(false)
+                setEliminandoEvento(false)
+            }
+        }
 	};
 
 	// Almacenar los eventos que se van a mantener, y enviar la peticion
@@ -236,8 +245,8 @@ function EventosPage() {
 	};
 
 	// Almacena en el estado el índice del evento a borrar y muestra el modal de confirmación
-	const handleEliminarEvento = (index) => {
-		setEventToDeleteIndex(index);
+	const handleEliminarEvento = (id) => {
+		setEventToDeleteId(id);
 		setShowConfirmModal(true);
 	};
 
@@ -404,13 +413,17 @@ function EventosPage() {
 				"es-ES",
 				options
 			);
+            nuevoEvento.fechaOriginal = nuevoEvento.fecha;
 			nuevoEvento.fecha = fechaFormateada;
 			const nuevoEventoConId = {
 				...nuevoEvento,
 				id: docRef.id, // Almacena el ID del documento recién creado
 			};
 			// Agregar el nuevo evento al estado de eventos
-			setEventos([...eventos, nuevoEventoConId]);
+            // Esto quiza cambiarlo
+			//setEventos([...eventos, nuevoEventoConId]);
+            // Agregar el cambio de  evento al estado de eventos
+			await fetchEventos();
 			handleCloseCrear(); // Cerrar el modal después de guardar
 			setErrorFecha(null);
 			setError(null);
@@ -440,7 +453,7 @@ function EventosPage() {
 			return;
 		}
 
-		// Se tiene que mantener que ningún evento tenga mismo nombre, fecha y ubicación
+		// Se tiene que mantener que ningún evento tenga mismo nombre, fecha, hora y ubicación
 		const fechaAux = eventoCambiar.fecha;
 		const fechaDate = new Date(fechaAux);
 		const options = { year: "numeric", month: "long", day: "numeric" };
@@ -451,6 +464,7 @@ function EventosPage() {
 			(evento) =>
 				evento.nombre === eventoCambiar.nombre &&
 				evento.fecha === fechaFormateada &&
+				evento.hora === eventoCambiar.hora &&
 				evento.ubicacion === eventoCambiar.ubicacion
 		);
 		if (eventoExistente) {
@@ -477,6 +491,43 @@ function EventosPage() {
 		}
 	};
 
+	const eventosOdenadosFiltrados = () => {
+		const eventosFiltrados = (eventos
+			.filter((evento) => {
+				if (filtroEventosFuturos){
+					return evento.fechaOriginal >= new Date()
+				}
+				else{ 
+					return evento.fechaOriginal < new Date()
+				}
+			})
+			.filter((evento) =>
+				evento.nombre
+					.trim()
+					.toLowerCase()
+					.includes(
+						busqueda
+							.trim()
+							.toLocaleLowerCase()
+					)
+			))
+		if (ordenarPorFecha) return eventosFiltrados
+			.sort((a, b) =>  (new Date(a.fechaOriginal) - new Date(b.fechaOriginal)))
+		else if (ordenarPorNombre) return eventosFiltrados
+			.sort(((a,b) => a.nombre.localeCompare(b.nombre)))
+		else return eventosFiltrados
+		return (
+			eventosFiltrados
+				.sort((a, b) => {if (ordenarPorFecha) return (new Date(a.fechaOriginal) - new Date(b.fechaOriginal))
+								// else if (ordenarPorNombre) return ((a, b) => a.nombre.trim().toLowerCase().localeCompare(b.nombre.trim().toLowerCase()))
+								else if (ordenarPorNombre) return ((a,b) => a.nombre.localeCompare(b.nombre))
+								else return 0
+							})
+		)
+	}
+
+	console.log(eventosOdenadosFiltrados())
+
 	// El hook useEffect se utiliza para hacer la peticion a Cloud Firestore y mostrar
 	// los datos de los eventos cuando se realiza la renderización del componente
 	useEffect(() => {
@@ -494,7 +545,7 @@ function EventosPage() {
 								Mis Eventos
 							</h1>
 							<form
-								className="d-flex mx-5 p-2 flex-grow-1 text-center"
+								className="d-flex mx-0 py-2 mx-md-5 p-md-2 flex-grow-1 text-center"
 								role="search"
 								id="form"
 							>
@@ -542,15 +593,13 @@ function EventosPage() {
 										setEventoCambiar({
 											...eventoCambiar,
 											nombre: e.target.value,
-										})
-									}
-									fechaEvento={eventoCambiar.fecha}
-									onChangeFecha={(e) =>
+										})}
+									fechaEvento={eventoCambiar.fechaOriginal}
+									onChangeFecha={(e) =>{
 										setEventoCambiar({
 											...eventoCambiar,
 											fecha: e.target.value,
-										})
-									}
+										})}}
 									horaEvento={eventoCambiar.hora}
 									onChangeHora={(e) =>
 										setEventoCambiar({
@@ -639,8 +688,26 @@ function EventosPage() {
 						/>
 
 						{/* Carrusel donde aparecen todos los eventos */}
-						<div className="p-3 p-md-5 mt-3 rounded bg-light">
-							{/* Carrusel de eventos */}
+						<div className="p-3 d-flex flex-column p-md-5 mt-3 rounded bg-light gap-2">
+							{/* Botones para filtrado por estado eventos [pasado, futuro] */}
+                            <div className="btn-group" role="group" aria-label="Basic radio toggle button group">
+                                <input type="radio" className="btn-check" name="filtroEventos" id="futuros" onClick={()=>{setFiltroEventosFuturos(true)}} autoComplete="off" defaultChecked/>
+                                <label className="btn btn-outline-primary" htmlFor="futuros">Eventos futuros</label>
+
+                                <input type="radio" className="btn-check" name="filtroEventos" id="pasados" onClick={()=>{setFiltroEventosFuturos(false)}} autoComplete="off"/>
+                                <label className="btn btn-outline-primary" htmlFor="pasados">Eventos pasados</label>
+                            </div>
+							<hr/>
+                            {/* Botones para ordenacion de eventos [nombre, fecha] */}
+							<h5 className="fw-bold text-center">Ordenar por: </h5>
+                            <div className="btn-group mb-4" role="group" aria-label="Basic radio toggle button group">
+                                <input type="radio" className="btn-check" name="ordenarEventos" id="ordenarNombre" onChange={()=>{setOrdenarPorFecha(false);setOrdenarPorNombre(true);}} autoComplete="off" checked={ordenarPorNombre}/>
+                                <label className="btn btn-outline-dark" htmlFor="ordenarNombre">Nombre</label>
+
+                                <input type="radio" className="btn-check" name="ordenarEventos" id="ordenarFecha" onChange={()=>{setOrdenarPorNombre(false);setOrdenarPorFecha(true)}} autoComplete="off" checked={ordenarPorFecha}/>
+                                <label className="btn btn-outline-dark" htmlFor="ordenarFecha">Fecha</label>
+                            </div>
+                            {/* Boton de eliminacion multiple */}
 							{showBotonMultiple ? (
 								<Button
 									id="boton-borrado-multiple"
@@ -653,20 +720,15 @@ function EventosPage() {
 								>
 									Eliminar los eventos seleccionados
 								</Button>
-							) : null}
+							) : null }
+              {/* Carrusel de eventos */}
 							<ul className="list-group">
-								{eventos
-									.filter((evento) =>
-										evento.nombre
-											.trim()
-											.toLowerCase()
-											.includes(
-												busqueda
-													.trim()
-													.toLocaleLowerCase()
-											)
-									)
-									.map((evento, index) => (
+								{
+									eventosOdenadosFiltrados().length == 0
+									?
+									<h3 className="fw-bold text-center">No hay eventos {filtroEventosFuturos? "futuros" : "pasados"}</h3>
+									:
+									eventosOdenadosFiltrados().map((evento, index) => (
 										<Evento
 											key={evento.id}
 											{...evento}
@@ -676,36 +738,21 @@ function EventosPage() {
 													id: evento.id,
 													nombre: evento.nombre,
 													fecha: evento.fecha,
-													hora: "",
+                                                    fechaOriginal: evento.fechaOriginal,
+													hora: evento.hora,
 													ubicacion: evento.ubicacion,
 												});
 												setShowModalModificar(true);
 											}}
-											onEliminar={() =>
-												handleEliminarEvento(index)
-											}
-											onEstadisticas={() =>
-												handleEstadisticas()
-											}
-											showBoton={showBotonMultiple}
-											onSelectEvento={() =>
-												handleSelectEvento(evento.id)
-											}
-											Seleccionado={
-												eventosSeleccionados.includes(
-													evento.id
-												)
-													? true
-													: false
-											}
-											setUsuariosPendientesCorreo={
-												establecerPropiedadesCorreo
-											}
-											quitarUsuariosPendientesCorreo={
-												eliminarCorreosLista
-											}
+											onEliminar={() => handleEliminarEvento(evento.id)}
+											showBoton = {showBotonMultiple} 
+											onSelectEvento={ () => handleSelectEvento(evento.id)}
+											Seleccionado = { eventosSeleccionados.includes(evento.id) ? true : false}
+											setUsuariosPendientesCorreo={establecerPropiedadesCorreo}
+											quitarUsuariosPendientesCorreo={eliminarCorreosLista}
 										/>
-									))}
+									))
+									}
 							</ul>
 						</div>
 					</div>
