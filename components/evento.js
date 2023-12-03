@@ -1,6 +1,6 @@
 // Evento.js
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Modal,
 	ListGroup,
@@ -14,6 +14,7 @@ import db from "../firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import Ruleta from "./ruleta";
 import Toast from "react-bootstrap/Toast";
+import ModalGenerico from "./modalGenerico";
 
 function Evento({
 	id,
@@ -40,6 +41,9 @@ function Evento({
 	const [showConfirmacionEliminar, setShowConfirmacionEliminar] =
 		useState(false);
 	const [indexInvitadoEliminar, setIndexInvitadoEliminar] = useState(null);
+	const [invitadosAEliminar, setInvitadosAEliminar] = useState([])
+	const [showConfirmBorradoMultiple, setShowConfirmBorradoMultiple] = useState(false)
+	//useEffect(()=>{setInvitadosAEliminar(invitadosAEliminar.add("12345678A"))},[])
 	//const [showToastEliminarInvitado, setShowToastEliminarInvitado] =
 	//	useState(false);
 
@@ -50,6 +54,7 @@ function Evento({
 	// donde D es un digito y L una letra
 	const validarDNI = (DNI) => {
 		// Validar DNI
+		var validChars = 'TRWAGMYFPDXBNJZSQVHLCKET';
 		var nifRexp = /^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKET]$/i;
 		var nieRexp = /^[XYZ][0-9]{7}[TRWAGMYFPDXBNJZSQVHLCKET]$/i;
 		DNI = DNI.toUpperCase();
@@ -57,7 +62,17 @@ function Evento({
 			return false;
 		}
 
-		return true;
+		var nie = DNI
+		.replace(/^[X]/, '0')
+		.replace(/^[Y]/, '1')
+		.replace(/^[Z]/, '2');
+
+		var letter = DNI.substr(-1);
+		var charIndex = parseInt(nie.substr(0, 8)) % 23;
+
+ 		if (validChars.charAt(charIndex) === letter) return true;
+
+		return false;
 	};
 
 	// Funcion que maneja el evento submit del formulario de añadir invitado
@@ -92,7 +107,7 @@ function Evento({
 					{
 						nombre: nombre,
 						email: email,
-						DNI: DNI,
+						DNI: DNI.toUpperCase(),
 					},
 				],
 			});
@@ -102,7 +117,7 @@ function Evento({
 				{
 					nombre: nombre,
 					email: email,
-					DNI: DNI,
+					DNI: DNI.toUpperCase(),
 				},
 			]);
 			//
@@ -166,47 +181,72 @@ function Evento({
 	const listaInvitados = () => {
 		if (invitadosArray?.length > 0) {
 			return (
-				<ListGroup>
-					{invitadosArray.map((invitado, index) => {
-						return (
-							<ListGroup.Item key={index}>
-								<div className="d-flex flex-column flex-md-row gap-2 justify-content-between ">
-									<div>
-										<span className="fw-bold d-block mt-1">
-											Nombre:{" "}
-											<span className="fw-light">
-												{invitado.nombre}
-											</span>
-										</span>
-										<span className="fw-bold d-block mt-1">
-											Email:{" "}
-											<span className="fw-light">
-												{invitado.email}
-											</span>
-										</span>
-										<span className="fw-bold d-block mt-1">
-											DNI/NIE:{" "}
-											<span className="fw-light">
-												{invitado.DNI}
-											</span>
-										</span>
-									</div>
+				<div className="d-flex flex-column gap-3">
+					<Button disabled={(invitadosAEliminar.length == 0)} className="btn btn-danger btn-block" 
+					onClick={()=>{
+						setShowInvitados(false);
+						setShowConfirmBorradoMultiple(true)}
+						}>
+						Eliminar invitados seleccionados</Button>
+					<ListGroup>
+						{invitadosArray.map((invitado, index) => {
+							return (
+								<ListGroup.Item key={invitado.DNI}>
+									<div className="d-flex flex-column flex-md-row gap-2 justify-content-between ">
+										<div className="d-flex flex-column gap-2 flex-md-row justify-content-between align-items-center">
+											<input
+												type="checkbox"
+												className="form-check-input border-2"
+												onChange={() => {
+													if (invitadosAEliminar.includes(invitado.DNI)) {
+														console.log("eliminando")
+														setInvitadosAEliminar(invitadosAEliminar.filter((i)=>i != invitado.DNI))
+													}
+													else {
+														console.log("añadiendo")
+														setInvitadosAEliminar([...invitadosAEliminar, invitado.DNI])
+													}
+												}} // Manejador para marcar/desmarcar invitado
+											/>
+											
+											<div>
+												<span className="fw-bold d-block mt-1">
+													Nombre:{" "}
+													<span className="fw-light">
+														{invitado.nombre}
+													</span>
+												</span>
+												<span className="fw-bold d-block mt-1">
+													Email:{" "}
+													<span className="fw-light">
+														{invitado.email}
+													</span>
+												</span>
+												<span className="fw-bold d-block mt-1">
+													DNI/NIE:{" "}
+													<span className="fw-light">
+														{invitado.DNI}
+													</span>
+												</span>
+											</div>
+										</div>
 
-									{/* Botón de eliminación a la derecha */}
-									<div className="d-grid my-auto d-md-inline gap-2">
-										<button
-											className="my-2 btn btn-danger"
-											onClick={handleEliminarInvitado}
-										>
-											{" "}
-											Eliminar
-										</button>
+										{/* Botón de eliminación a la derecha */}
+										<div className="d-grid my-auto d-md-inline gap-2">
+											<button
+												className="my-2 btn btn-danger"
+												onClick={() => {handleEliminarInvitado(index)}}
+											>
+												{" "}
+												Eliminar
+											</button>
+										</div>
 									</div>
-								</div>
-							</ListGroup.Item>
-						);
-					})}
-				</ListGroup>
+								</ListGroup.Item>
+							);
+						})}
+					</ListGroup>
+				</div>
 			);
 		} else
 			return (
@@ -216,6 +256,24 @@ function Evento({
 			);
 	};
 
+	const handleEliminarInvitadoMultiple = async () => {
+		if (invitadosAEliminar.length == 0) return;
+		const nuevosInvitados = [...invitadosArray].filter((i) => !invitadosAEliminar.includes(i.DNI))
+		console.log(nuevosInvitados)
+		try {
+			const res = await updateDoc(doc(db, "Eventos", id), {
+				invitados: [...nuevosInvitados],
+			});
+			// Actualizo mis invitados
+			setInvitados([...nuevosInvitados]);
+			//
+		} catch (e) {
+			console.error("Error adding document: ", e);
+		}
+		setShowConfirmBorradoMultiple(false)
+		setShowInvitados(true)
+	}
+
 	return (
 		<>
 			{/* Modal de listado de invitados */}
@@ -223,6 +281,7 @@ function Evento({
 				id={`modalListaInvitados-${id}`}
 				className="pt-2 px-2 pt-md-0 px-md-0"
 				show={showInvitados}
+				onEnter={()=>{setInvitadosAEliminar([])}}
 				onHide={() => {
 					setNombrelInvalido(false);
 					setDNIInvalido(false);
@@ -336,6 +395,7 @@ function Evento({
 				show={showConfirmacionEliminar}
 				onHide={() => {
 					setShowConfirmacionEliminar(false);
+					setShowInvitados(true);
 				}}
 				centered
 			>
@@ -366,6 +426,16 @@ function Evento({
 					</Button>
 				</Modal.Footer>
 			</Modal>
+
+			{/* Modal de confirmación borrado múltiple de invitados */}
+			<ModalGenerico
+							id="modalConfirmacionEliminarInvitadoMultiple"
+							show={showConfirmBorradoMultiple}
+							titulo="Borrar los invitados seleccionados"
+							cuerpo="¿Está seguro de que desea eliminar los invitados seleccionados?"
+							onHide={() => {setShowInvitados(true);setShowConfirmBorradoMultiple(false)}}
+							onEliminar={() => handleEliminarInvitadoMultiple()}
+						/>
 
 			{/* Toast para informar al usuario de la eliminación de un usuario */}
 			{/* <ToastContainer position="bottom-center">
