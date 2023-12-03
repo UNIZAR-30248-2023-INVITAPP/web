@@ -440,7 +440,7 @@ function EventosPage() {
 			return;
 		}
 
-		// Se tiene que mantener que ningún evento tenga mismo nombre, fecha y ubicación
+		// Se tiene que mantener que ningún evento tenga mismo nombre, fecha, hora y ubicación
 		const fechaAux = eventoCambiar.fecha;
 		const fechaDate = new Date(fechaAux);
 		const options = { year: "numeric", month: "long", day: "numeric" };
@@ -451,6 +451,7 @@ function EventosPage() {
 			(evento) =>
 				evento.nombre === eventoCambiar.nombre &&
 				evento.fecha === fechaFormateada &&
+				evento.hora === eventoCambiar.hora &&
 				evento.ubicacion === eventoCambiar.ubicacion
 		);
 		if (eventoExistente) {
