@@ -131,10 +131,8 @@ function Evento({
 	const handleSelectEvento = () => {
 		const eventIsSelected = onSelectEvento();
 		if (eventIsSelected) {
-			// TODO: Quitarlo de los correos
 			quitarUsuariosPendientesCorreo(id);
 		} else {
-			// TODO: Añadir a lista de correos pendientes
 			setUsuariosPendientesCorreo(invitadosArray, nombre, fecha, id);
 		}
 	};
@@ -408,7 +406,6 @@ function Evento({
                         </div>
                     </div>
 
-                    {/* <div className="d-flex flex-column pb-3 pb-md-0 flex-md-row gap-3"> */}
                     <div className="d-flex flex-column flex-md-row flex-md-row gap-2 justify-content-between">
                         {/* Botón de ver invitados a la derecha */}
                         <div className="d-grid my-auto d-md-inline gap-2">

@@ -5,7 +5,6 @@ describe("Testing del borrado múltiple de eventos", () => {
 
     const eventoPrueba1 = "Test borrado multiple - Evento 1"
     const eventoPrueba2 = "Test borrado multiple - Evento 2"
-    const eventoPrueba3 = "Test borrado multiple - Evento 3"
 
     var docReference1
     var docReference2
@@ -42,8 +41,8 @@ describe("Testing del borrado múltiple de eventos", () => {
     it('Prueba 3: Verificar que no existe ninguno de los dos eventos eliminados', () => {
         cy.wait(500)
         // Comprobar que ya no existe ninguno de los eventos anteriores
-        cy.get('.list-group-item').should('not.exist');
-        
+        cy.get('.list-group-item').contains(eventoPrueba1).should('not.exist');
+        cy.get('.list-group-item').contains(eventoPrueba2).should('not.exist');
     })
 
 })

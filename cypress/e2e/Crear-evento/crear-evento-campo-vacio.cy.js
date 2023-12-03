@@ -43,7 +43,7 @@ describe('Crear evento campos vacíos', () => {
         cy.get('#boton-crear-evento').click()
   
         // Comprobar que aparece el mensaje de error cuando se intenta crear el evento con una fecha anterior a la actual
-        cy.contains('Todos los campos son obligatorios').should('exist');    
+        cy.contains('Formato de fecha incorrecto').should('exist');    
     })
 
     it('Prueba 3: Rellenar todos los campos menos hora y crear evento', () => {

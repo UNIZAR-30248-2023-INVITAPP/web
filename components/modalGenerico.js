@@ -17,9 +17,10 @@ export default function ModalGenerico({id, show, titulo, cuerpo, onHide, onElimi
                 <Modal.Title>{titulo}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                {showSpinner ? (
-                    <Spinner show={showSpinner.toString()} />
-                ) : (
+                {showSpinner && (
+                    <Spinner />
+                )}
+                { !showSpinner && (
                     <div>{cuerpo}</div>
                 )}
             </Modal.Body>

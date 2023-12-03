@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Layout from "@/components/layout";
 import Evento from "../components/evento";
-import { Modal, Button } from "react-bootstrap";
+import { Modal, Button,Toast } from "react-bootstrap";
 import {
 	doc,
 	updateDoc,
@@ -27,6 +27,9 @@ function EventosPage() {
 	const [showConfirmModal, setShowConfirmModal] = useState(false);
 
 	const [showSpinner, setShowSpinner] = useState(false);
+
+	const [showToast, setShowToast] = useState(false);
+
 
 	// Cuando se vaya a eliminar un evento, se añadirán en esta lista
 	const [usuariosPendientesCorreo, setUsuariosPendientesCorreo] = useState(
@@ -202,7 +205,6 @@ function EventosPage() {
                     setEventos(nuevosEventos);
 
                     console.log(usuariosPendientesCorreo)
-                    // TODO: Descomentar la línea de debajo para que se envíen los correos electrónicos
                     if (usuariosPendientesCorreo.length > 0) { // Solo se manda peticion de correo si hay invitados en el evento
                         await sendPostRequestToMailService(usuariosPendientesCorreo);
                     }
@@ -210,10 +212,14 @@ function EventosPage() {
             } catch(error){
                 console.log("Error: ", error)
             } finally {
+				handleHideConfirmacionModal()
+				setShowToast(true)
+				setTimeout(() => {
+					setShowToast(false);
+					setShowSpinner(false)
+				  }, 3000);
                 setEventToDeleteId(null); // Limpia el evento a eliminar
                 setUsuariosPendientesCorreo([])
-                setShowConfirmModal(false);
-                setShowSpinner(false)
                 setEliminandoEvento(false)
             }
         }
@@ -398,6 +404,7 @@ function EventosPage() {
 
 		// Almacenar los datos en Cloud Firestore
 		try {
+			setShowSpinner(true)
 			const docRef = await addDoc(collection(db, "Eventos"), {
 				nombre: nuevoEvento.nombre,
 				fecha: nuevoEvento.fecha,
@@ -423,10 +430,15 @@ function EventosPage() {
             // Esto quiza cambiarlo
 			//setEventos([...eventos, nuevoEventoConId]);
             // Agregar el cambio de  evento al estado de eventos
+			
 			await fetchEventos();
 			handleCloseCrear(); // Cerrar el modal después de guardar
 			setErrorFecha(null);
 			setError(null);
+			setTimeout(() => {
+				setShowSpinner(false);
+			  }, 500);
+			
 		} catch (e) {
 			console.error("Error adding document: ", e);
 			return;
@@ -685,7 +697,15 @@ function EventosPage() {
 								/>
 							}
 							onHide={handleCloseCrear}
+							showSpinner={showSpinner}
 						/>
+
+						<Toast className='position-fixed bottom-0 end-0 p-3 m-2' show={showToast} onClose={() => setShowToast(false)} delay={3000} autohide>
+							<Toast.Header>
+							<strong className="me-auto">Evento eliminado</strong>
+							</Toast.Header>
+							<Toast.Body>El evento se ha eliminado correctamente</Toast.Body>
+						</Toast>
 
 						{/* Carrusel donde aparecen todos los eventos */}
 						<div className="p-3 d-flex flex-column p-md-5 mt-3 rounded bg-light gap-2">

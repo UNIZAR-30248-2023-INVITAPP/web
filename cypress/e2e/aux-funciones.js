@@ -58,7 +58,7 @@ export const eliminarEvento = async (docId) => {
 export const eliminarEventoDom = (evento) => {
     // Eliminar el evento
     const etiqueta = cy.get('h5').contains(evento)
-    const botones = etiqueta.parent().siblings()
+    const botones = etiqueta.parent().parent().siblings()
     botones.find('.btn-danger').click()
     cy.get('#modalConfirmarEliminarEventoSimple')  // Selecciona el modal por su ID
     .find('Button')  // Encuentra todos los elementos tipo botón dentro del modal

@@ -1,14 +1,12 @@
 import React from 'react'
 
-const Spinner = ({ show }) => {
+const Spinner = () => {
     return ( 
-        <>
-            {show && 
-                (<div class="spinner-border"  role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>)
-            }  
-        </>   
+        <div className='d-flex justify-content-center align-items-center'>
+            <div class="spinner-border"  role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>   
      )
 }
  
