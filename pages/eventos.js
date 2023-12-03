@@ -478,6 +478,43 @@ function EventosPage() {
 		}
 	};
 
+	const eventosOdenadosFiltrados = () => {
+		const eventosFiltrados = (eventos
+			.filter((evento) => {
+				if (filtroEventosFuturos){
+					return evento.fechaOriginal >= new Date()
+				}
+				else{ 
+					return evento.fechaOriginal < new Date()
+				}
+			})
+			.filter((evento) =>
+				evento.nombre
+					.trim()
+					.toLowerCase()
+					.includes(
+						busqueda
+							.trim()
+							.toLocaleLowerCase()
+					)
+			))
+		if (ordenarPorFecha) return eventosFiltrados
+			.sort((a, b) =>  (new Date(a.fechaOriginal) - new Date(b.fechaOriginal)))
+		else if (ordenarPorNombre) return eventosFiltrados
+			.sort(((a,b) => a.nombre.localeCompare(b.nombre)))
+		else return eventosFiltrados
+		return (
+			eventosFiltrados
+				.sort((a, b) => {if (ordenarPorFecha) return (new Date(a.fechaOriginal) - new Date(b.fechaOriginal))
+								// else if (ordenarPorNombre) return ((a, b) => a.nombre.trim().toLowerCase().localeCompare(b.nombre.trim().toLowerCase()))
+								else if (ordenarPorNombre) return ((a,b) => a.nombre.localeCompare(b.nombre))
+								else return 0
+							})
+		)
+	}
+
+	console.log(eventosOdenadosFiltrados())
+
 	// El hook useEffect se utiliza para hacer la peticion a Cloud Firestore y mostrar
 	// los datos de los eventos cuando se realiza la renderización del componente
 	useEffect(() => {
@@ -667,31 +704,12 @@ function EventosPage() {
                             {ordenarPorNombre && "ordenarPorNombre"} */}
                             {/* Carrusel de eventos */}
 							<ul className="list-group">
-								{eventos
-                                    .filter((evento) => {
-                                        if (filtroEventosFuturos){
-                                            return evento.fechaOriginal >= new Date()
-                                        }
-                                        else{ 
-                                            return evento.fechaOriginal < new Date()
-                                        }
-                                    })
-									.filter((evento) =>
-										evento.nombre
-											.trim()
-											.toLowerCase()
-											.includes(
-												busqueda
-													.trim()
-													.toLocaleLowerCase()
-											)
-									)
-									.sort((a, b) => {if (ordenarPorFecha) return (new Date(a.fechaOriginal) - new Date(b.fechaOriginal))
-													// else if (ordenarPorNombre) return ((a, b) => a.nombre.trim().toLowerCase().localeCompare(b.nombre.trim().toLowerCase()))
-													else if (ordenarPorNombre) return ((a,b) => a.nombre.localeCompare(b.nombre))
-													else return 0
-												})
-									.map((evento, index) => (
+								{
+									eventosOdenadosFiltrados().length == 0
+									?
+									<h3 className="fw-bold text-center">No hay eventos {filtroEventosFuturos? "futuros" : "pasados"}</h3>
+									:
+									eventosOdenadosFiltrados().map((evento, index) => (
 										<Evento
 											key={evento.id}
 											{...evento}
@@ -714,7 +732,8 @@ function EventosPage() {
 											setUsuariosPendientesCorreo={establecerPropiedadesCorreo}
 											quitarUsuariosPendientesCorreo={eliminarCorreosLista}
 										/>
-									))}
+									))
+									}
 							</ul>
 						</div>
 					</div>
