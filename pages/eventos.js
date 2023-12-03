@@ -745,6 +745,9 @@ function EventosPage() {
 												setShowModalModificar(true);
 											}}
 											onEliminar={() => handleEliminarEvento(evento.id)}
+											onEstadisticas={() =>
+												handleEstadisticas()
+											}
 											showBoton = {showBotonMultiple} 
 											onSelectEvento={ () => handleSelectEvento(evento.id)}
 											Seleccionado = { eventosSeleccionados.includes(evento.id) ? true : false}
