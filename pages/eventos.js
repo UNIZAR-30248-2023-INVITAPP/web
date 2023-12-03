@@ -15,6 +15,7 @@ import ModalGenerico from "@/components/modalGenerico";
 import BodyModal from "@/components/bodyModal";
 import Spinner from "@/components/Spinner"
 import moment from "moment";
+import { useRouter } from "next/router";
 
 // Componente que se corresponde con la página que se muestra de inicio, donde aparece la lista de los eventos
 function EventosPage() {
@@ -25,10 +26,12 @@ function EventosPage() {
 	// Modal de confirmación a la hora de borrar un evento
 	const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-	const [showSpinner,setShowSpinner] = useState(false)
+	const [showSpinner, setShowSpinner] = useState(false);
 
 	// Cuando se vaya a eliminar un evento, se añadirán en esta lista
-	const [usuariosPendientesCorreo,setUsuariosPendientesCorreo] = useState([])
+	const [usuariosPendientesCorreo, setUsuariosPendientesCorreo] = useState(
+		[]
+	);
 
 	const [showConfirmBorradoMultiple, setShowConfirmBorradoMultiple] = useState(false)
 	const [eventToDeleteId, setEventToDeleteId] = useState(null);
@@ -37,10 +40,10 @@ function EventosPage() {
 	const [eventos, setEventos] = useState([]);
 
 	// Variable para mostrar el botón de eliminación múltiple
-	const [showBotonMultiple,setShowBotonMultiple] = useState(false)
+	const [showBotonMultiple, setShowBotonMultiple] = useState(false);
 
 	// Estado para registrar aquellos eventos que se han seleccionado
-	const [eventosSeleccionados, setEventosSeleccionados] = useState([])
+	const [eventosSeleccionados, setEventosSeleccionados] = useState([]);
 
 	// Para mostrar el mensaje de error a la hora de crear el evento
 	const [error, setError] = useState(null);
@@ -52,6 +55,8 @@ function EventosPage() {
 
     const [ordenarPorNombre, setOrdenarPorNombre] = useState(true)
     const [ordenarPorFecha, setOrdenarPorFecha] = useState(false)
+	// Uso del componente router para redirección entre páginas
+	const router = useRouter();
 
 	// State para crear un nuevo evento
 	const [nuevoEvento, setNuevoEvento] = useState({
@@ -65,7 +70,7 @@ function EventosPage() {
 
 	const [eventoCambiar, setEventoCambiar] = useState({});
 
-    const [eliminandoEvento, setEliminandoEvento] = useState(false);
+	const [eliminandoEvento, setEliminandoEvento] = useState(false);
 
 	// Esta función se encarga de recuperar eventos desde una base de datos Firebase,
 	// formatear los datos obtenidos y almacenarlos en un arreglo de eventos.
@@ -118,19 +123,20 @@ function EventosPage() {
 
 	// Función empleada para eliminar/añadir un evento a la lista de eventos seleccionados
 	const handleSelectEvento = (id) => {
-		
 		// Verificar si el evento ya está seleccionad
 		const isSelected = eventosSeleccionados.includes(id);
 		if (isSelected) {
-		  // Si ya está seleccionado, quitarlo de la lista de seleccionados
-		  setEventosSeleccionados(eventosSeleccionados.filter(idFirebase => idFirebase !== id));
+			// Si ya está seleccionado, quitarlo de la lista de seleccionados
+			setEventosSeleccionados(
+				eventosSeleccionados.filter((idFirebase) => idFirebase !== id)
+			);
 		} else {
-		  // Si no está seleccionado, agregarlo a la lista de seleccionados
-		  setEventosSeleccionados([...eventosSeleccionados, id]);
-		  // TODO: añadir a usuariosCorreoPendientes el id
+			// Si no está seleccionado, agregarlo a la lista de seleccionados
+			setEventosSeleccionados([...eventosSeleccionados, id]);
+			// TODO: añadir a usuariosCorreoPendientes el id
 		}
-		return isSelected
-	  };
+		return isSelected;
+	};
 
 	useEffect(() => {
 		 // Mostrar el boton de borrado múltiple en función del número de eventos seleccionados
@@ -157,30 +163,30 @@ function EventosPage() {
 	// 	return bodyJson
 	//  }
 
-	 const sendPostRequestToMailService = async (json) => {
+	const sendPostRequestToMailService = async (json) => {
 		try {
 			const requestOptions = {
-			  method: 'POST', 
-			  headers: {
-				'Content-Type': 'application/json'
-			  },
-			  body: JSON.stringify(json)
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(json),
 			};
-		
-			const response = await fetch('/api/sendMail', requestOptions);
-		
+
+			const response = await fetch("/api/sendMail", requestOptions);
+
 			if (!response.ok) {
-			  // Manejar errores de red o servidor
-			  throw new Error('Error al enviar la solicitud');
+				// Manejar errores de red o servidor
+				throw new Error("Error al enviar la solicitud");
 			}
-		
+
 			const data = await response.json();
 			console.log(data.message); // Mensaje de confirmación del servidor
-		  } catch (error) {
-			console.error('Error al enviar los correos desde React:', error);
+		} catch (error) {
+			console.error("Error al enviar los correos desde React:", error);
 			// Manejar el error de manera apropiada para tu aplicación
-		  }
-	 }
+		}
+	};
 
 	// Función para eliminar definitivamente el evento cuando aparece el modal de confirmación
 	// Además en esta función es donde se gestiona el envío de correos electrónicos a los invitados
@@ -213,28 +219,30 @@ function EventosPage() {
         }
 	};
 
-	// Almacenar los eventos que se van a mantener, y enviar la peticion 
+	// Almacenar los eventos que se van a mantener, y enviar la peticion
 	// Firebase para eliminar todos los eventos que se han seleccionado
 	const handleEliminarEventoMultiple = async () => {
 		try {
-			const nuevosEventos = eventos.filter((evento) => !eventosSeleccionados.includes(evento.id));
-		
-			await Promise.all(
-			  eventosSeleccionados.map(async (idFirebase) => {
-				await deleteDoc(doc(db, "Eventos", idFirebase));
-			  })
+			const nuevosEventos = eventos.filter(
+				(evento) => !eventosSeleccionados.includes(evento.id)
 			);
 
-			await sendPostRequestToMailService(usuariosPendientesCorreo)
-		
+			await Promise.all(
+				eventosSeleccionados.map(async (idFirebase) => {
+					await deleteDoc(doc(db, "Eventos", idFirebase));
+				})
+			);
+
+			await sendPostRequestToMailService(usuariosPendientesCorreo);
+
 			setEventos(nuevosEventos);
 			setEventosSeleccionados([]);
-			setUsuariosPendientesCorreo([])
+			setUsuariosPendientesCorreo([]);
 			setShowConfirmBorradoMultiple(false);
-		  } catch (error) {
+		} catch (error) {
 			console.error("Error al eliminar eventos múltiples:", error);
-		  }
-	}
+		}
+	};
 
 	// Almacena en el estado el índice del evento a borrar y muestra el modal de confirmación
 	const handleEliminarEvento = (id) => {
@@ -242,28 +250,34 @@ function EventosPage() {
 		setShowConfirmModal(true);
 	};
 
-	const establecerPropiedadesCorreo = (invitados,nombre,fecha,id) => {
-		const correosConPropiedades = invitados.map(invitado => {
+	const establecerPropiedadesCorreo = (invitados, nombre, fecha, id) => {
+		const correosConPropiedades = invitados.map((invitado) => {
 			return {
-			  email: invitado.email,
-			  nombre: nombre, // Nombre del evento al que está invitado el usuario "email"
-			  fecha: fecha,  // Fecha del evento
-			  idEvento: id	// Id del evento
-			}
-	  	})
-		setUsuariosPendientesCorreo([...usuariosPendientesCorreo,...correosConPropiedades])
-	}
+				email: invitado.email,
+				nombre: nombre, // Nombre del evento al que está invitado el usuario "email"
+				fecha: fecha, // Fecha del evento
+				idEvento: id, // Id del evento
+			};
+		});
+		setUsuariosPendientesCorreo([
+			...usuariosPendientesCorreo,
+			...correosConPropiedades,
+		]);
+	};
 
 	// Funcion que elimina los correos electronicos de la lista de correos cuando se des-selecciona un evento
 	const eliminarCorreosLista = (id) => {
-		const eventosFiltradosSinId =  usuariosPendientesCorreo.filter(objeto => objeto.idEvento !== id);
-		setUsuariosPendientesCorreo(eventosFiltradosSinId)
+		const eventosFiltradosSinId = usuariosPendientesCorreo.filter(
+			(objeto) => objeto.idEvento !== id
+		);
+		setUsuariosPendientesCorreo(eventosFiltradosSinId);
 	};
-	
-	
 
 	// Muestra el modal de crear evento
 	const handleShow = () => setShowModalCrear(true);
+
+	// Maneja el pulsar boton eventos
+	const handleEstadisticas = () => router.push("/estadisticas");
 
 	// Función para cerrar el modal de crear evento.
 	// Se cierra el modal y se limpian los campos corresponientes a un nuevo evento
@@ -279,7 +293,6 @@ function EventosPage() {
 		});
 		setError("");
 	};
-
 
 	// Función que se utiliza para verificar si la fecha introducida es posterior a la actual
 	const validarFecha = (fecha) => {
@@ -339,9 +352,9 @@ function EventosPage() {
 	};
 
 	const handleHideConfirmacionModal = () => {
-		setShowConfirmModal(false)
-		setUsuariosPendientesCorreo([])
-	}
+		setShowConfirmModal(false);
+		setUsuariosPendientesCorreo([]);
+	};
 
 	// Funcion que se ejecuta al crear evento en el modal de "crear evento"
 	const handleCrearEvento = async (e) => {
@@ -538,7 +551,7 @@ function EventosPage() {
 							>
 								<input
 									value={busqueda}
-									id='searchBar'
+									id="searchBar"
 									onChange={(e) =>
 										setBusqueda(e.target.value)
 									}
@@ -557,7 +570,7 @@ function EventosPage() {
 						</div>
 
 						{/* Modal de confirmación borrado múltiple de eventos */}
-						<ModalGenerico 
+						<ModalGenerico
 							id="modalConfirmacionEliminarEventoMultiple"
 							show={showConfirmBorradoMultiple}
 							titulo="Borrar los eventos seleccionados"
@@ -568,13 +581,13 @@ function EventosPage() {
 						/>
 						{/* ------------------------------------------------------- */}
 
-
 						{/* Modal de modificar eventos */}
 						<ModalGenerico
 							id="modalModificar"
 							show={showModalModificar}
 							titulo="Modificar un evento"
-							cuerpo={<BodyModal 
+							cuerpo={
+								<BodyModal
 									nombreEvento={eventoCambiar.nombre}
 									onChangeNombre={(e) =>
 										setEventoCambiar({
@@ -592,29 +605,32 @@ function EventosPage() {
 										setEventoCambiar({
 											...eventoCambiar,
 											hora: e.target.value,
-										})}
+										})
+									}
 									ubicacionEvento={eventoCambiar.ubicacion}
 									onChangeUbicacion={(e) =>
 										setEventoCambiar({
 											...eventoCambiar,
 											ubicacion: e.target.value,
-										})}
+										})
+									}
 									error={error}
 									onClickEvento={handleModificarEvento}
 									errorFecha={errorFecha}
 									buttonName="Modificar Evento"
-									/>}
+								/>
+							}
 							onHide={() => {
 								setShowModalModificar(false);
 								setErrorFecha("");
 								setError(null);
 							}}
 						/>
-						{ /* ----------------------------------------------- */}
+						{/* ----------------------------------------------- */}
 
-						{/* Modal de confirmación de eliminación de evento simple */ }
+						{/* Modal de confirmación de eliminación de evento simple */}
 						<ModalGenerico
-							id="modalConfirmarEliminarEventoSimple" 
+							id="modalConfirmarEliminarEventoSimple"
 							show={showConfirmModal}
 							titulo="Confirmar eliminación"
 							cuerpo={`¿Estás seguro de que deseas eliminar este evento?\n
@@ -625,47 +641,51 @@ function EventosPage() {
 							onEliminar={confirmarEliminacionEvento}
 							showSpinner={showSpinner}
 						/>
-						{ /* ----------------------------------------------- */}
+						{/* ----------------------------------------------- */}
 
-
-						{ /* Modal de crear evento */ }    
+						{/* Modal de crear evento */}
 						<ModalGenerico
 							id="modalCrearEvento"
 							show={showModalCrear}
 							titulo="Crear un nuevo evento"
-							cuerpo={<BodyModal 
-										nombreEvento={nuevoEvento.nombre}
-										onChangeNombre={(e) =>
-											setNuevoEvento({
-												...nuevoEvento,
-												nombre: e.target.value,
-											})}
-										fechaEvento={nuevoEvento.fecha}
-										onChangeFecha={(e) =>
-											setNuevoEvento({
-												...nuevoEvento,
-												fecha: e.target.value,
-											})}
-										horaEvento={nuevoEvento.hora}
-										onChangeHora={(e) =>
-											setNuevoEvento({
-												...nuevoEvento,
-												hora: e.target.value,
-											})}
-										ubicacionEvento={nuevoEvento.ubicacion}
-										onChangeUbicacion={(e) =>
-											setNuevoEvento({
-												...nuevoEvento,
-												ubicacion: e.target.value,
-											})}
-										error={error}
-										onClickEvento={handleCrearEvento}
-										errorFecha={errorFecha}
-										buttonName="Crear Evento"
-									/>}
-						    onHide={handleCloseCrear}
+							cuerpo={
+								<BodyModal
+									nombreEvento={nuevoEvento.nombre}
+									onChangeNombre={(e) =>
+										setNuevoEvento({
+											...nuevoEvento,
+											nombre: e.target.value,
+										})
+									}
+									fechaEvento={nuevoEvento.fecha}
+									onChangeFecha={(e) =>
+										setNuevoEvento({
+											...nuevoEvento,
+											fecha: e.target.value,
+										})
+									}
+									horaEvento={nuevoEvento.hora}
+									onChangeHora={(e) =>
+										setNuevoEvento({
+											...nuevoEvento,
+											hora: e.target.value,
+										})
+									}
+									ubicacionEvento={nuevoEvento.ubicacion}
+									onChangeUbicacion={(e) =>
+										setNuevoEvento({
+											...nuevoEvento,
+											ubicacion: e.target.value,
+										})
+									}
+									error={error}
+									onClickEvento={handleCrearEvento}
+									errorFecha={errorFecha}
+									buttonName="Crear Evento"
+								/>
+							}
+							onHide={handleCloseCrear}
 						/>
-
 
 						{/* Carrusel donde aparecen todos los eventos */}
 						<div className="p-3 d-flex flex-column p-md-5 mt-3 rounded bg-light gap-2">
@@ -692,17 +712,16 @@ function EventosPage() {
 								<Button
 									id="boton-borrado-multiple"
 									className="mx-auto d-block mb-3"
-									variant = "danger"
-									size = "lg"
-									onClick={() => setShowConfirmBorradoMultiple(true)}
-									
+									variant="danger"
+									size="lg"
+									onClick={() =>
+										setShowConfirmBorradoMultiple(true)
+									}
 								>
 									Eliminar los eventos seleccionados
 								</Button>
 							) : null }
-                            {/* {ordenarPorFecha && "ordenarPorFecha"}
-                            {ordenarPorNombre && "ordenarPorNombre"} */}
-                            {/* Carrusel de eventos */}
+              {/* Carrusel de eventos */}
 							<ul className="list-group">
 								{
 									eventosOdenadosFiltrados().length == 0
