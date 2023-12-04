@@ -20,12 +20,10 @@ import { useRouter } from "next/router";
 function EventosPage() {
 	// Modal que aparece al crear un evento
 	const [showModalCrear, setShowModalCrear] = useState(false);
-	// Modal que muestra éxito de añadir un evento
-	const [showExitoCrearEvento, setShowExitoCrearEvento] = useState(false)
+	
 	// Modal para modificar un determinado evento
 	const [showModalModificar, setShowModalModificar] = useState(false);
-	// Modal que muestra éxito de modificar un evento
-	const [showExitoModificarEvento, setShowExitoModificarEvento] = useState(false)
+	
 	// Modal de confirmación a la hora de borrar un evento
 	const [showConfirmModal, setShowConfirmModal] = useState(false);
 
@@ -677,15 +675,6 @@ function EventosPage() {
 						/>
 						{/* ----------------------------------------------- */}
 
-						{/* Modal de mensaje de exito al modificar un evento */}
-						<Toast className='position-fixed bottom-0 end-0 p-3 m-2' show={showExitoModificarEvento} onClose={() => setShowExitoModificarEvento(false)} delay={3000} autohide>
-							<Toast.Header>
-							<strong className="me-auto">Evento modificado</strong>
-							</Toast.Header>
-							<Toast.Body>El evento se ha modificado correctamente</Toast.Body>
-						</Toast>
-						{/* ----------------------------------------------- */}
-
 						{/* Modal de confirmación de eliminación de evento simple */}
 						<ModalGenerico
 							id="modalConfirmarEliminarEventoSimple"
@@ -742,13 +731,7 @@ function EventosPage() {
 							onHide={handleCloseCrear}
 							showSpinner={showSpinner}
 						/>
-						{/* Modal de mensaje de exito al crear el evento */}
-						<Toast className='position-fixed bottom-0 end-0 p-3 m-2' show={showExitoCrearEvento} onClose={() => setShowExitoCrearEvento(false)} delay={3000} autohide>
-							<Toast.Header>
-							<strong className="me-auto">Evento creado</strong>
-							</Toast.Header>
-							<Toast.Body>El evento se ha creado correctamente</Toast.Body>
-						</Toast>
+						
 
 						<Toast className='position-fixed bottom-0 end-0 p-3 m-2' show={showToast} onClose={() => {
 							setMensajeToast({
