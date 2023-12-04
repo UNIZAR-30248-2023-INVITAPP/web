@@ -21,10 +21,12 @@ import { useRouter } from "next/router";
 function EventosPage() {
 	// Modal que aparece al crear un evento
 	const [showModalCrear, setShowModalCrear] = useState(false);
-	// Modal que aparece al crear un evento
+	// Modal que muestra éxito de añadir un evento
 	const [showExitoCrearEvento, setShowExitoCrearEvento] = useState(false)
 	// Modal para modificar un determinado evento
 	const [showModalModificar, setShowModalModificar] = useState(false);
+	// Modal que muestra éxito de modificar un evento
+	const [showExitoModificarEvento, setShowExitoModificarEvento] = useState(false)
 	// Modal de confirmación a la hora de borrar un evento
 	const [showConfirmModal, setShowConfirmModal] = useState(false);
 
@@ -40,6 +42,7 @@ function EventosPage() {
 
 	const [showConfirmBorradoMultiple, setShowConfirmBorradoMultiple] = useState(false)
 	const [eventToDeleteId, setEventToDeleteId] = useState(null);
+	const [eventToDeleteNombre, setEventToDeleteNombre] = useState(null);
 	const [eventToUpdateIndex, setEventToUpdateIndex] = useState(null);
 	// Estado para almacenar el conjunto de los eventos
 	const [eventos, setEventos] = useState([]);
@@ -221,6 +224,7 @@ function EventosPage() {
 					setShowSpinner(false)
 				  }, 3000);
                 setEventToDeleteId(null); // Limpia el evento a eliminar
+				setEventToDeleteNombre(null); // Limpia el nombre del evento a eliminar
                 setUsuariosPendientesCorreo([])
                 setEliminandoEvento(false)
             }
@@ -253,8 +257,9 @@ function EventosPage() {
 	};
 
 	// Almacena en el estado el índice del evento a borrar y muestra el modal de confirmación
-	const handleEliminarEvento = (id) => {
+	const handleEliminarEvento = (id, nombre) => {
 		setEventToDeleteId(id);
+		setEventToDeleteNombre(nombre);
 		setShowConfirmModal(true);
 	};
 
@@ -501,6 +506,8 @@ function EventosPage() {
 			setEventToUpdateIndex(null);
 			setErrorFecha(null);
 			setError(null);
+			//Mostrar mensaje de exito de modificar un evento
+			setShowExitoModificarEvento(true);
 		} catch (e) {
 			console.error("Error adding document: ", e);
 			return;
@@ -644,15 +651,21 @@ function EventosPage() {
 						/>
 						{/* ----------------------------------------------- */}
 
+						{/* Modal de mensaje de exito al modificar un evento */}
+						<Toast className='position-fixed bottom-0 end-0 p-3 m-2' show={showExitoModificarEvento} onClose={() => setShowExitoModificarEvento(false)} delay={3000} autohide>
+							<Toast.Header>
+							<strong className="me-auto">Evento modificado</strong>
+							</Toast.Header>
+							<Toast.Body>El evento se ha modificado correctamente</Toast.Body>
+						</Toast>
+						{/* ----------------------------------------------- */}
+
 						{/* Modal de confirmación de eliminación de evento simple */}
 						<ModalGenerico
 							id="modalConfirmarEliminarEventoSimple"
 							show={showConfirmModal}
 							titulo="Confirmar eliminación"
-							cuerpo={`¿Estás seguro de que deseas eliminar este evento?\n
-									 Se enviarán correos
-									 electrónicos a todos los invitados avisando de la cancelación del evento.\n
-									 `}
+							cuerpo={"¿Estás seguro de que deseas eliminar el evento \"" + eventToDeleteNombre + "\"?\n Se enviarán correos electrónicos a todos los invitados avisando de la cancelación del evento."}
 							onHide={() => handleHideConfirmacionModal()}
 							onEliminar={confirmarEliminacionEvento}
 							showSpinner={showSpinner}
@@ -775,7 +788,7 @@ function EventosPage() {
 												});
 												setShowModalModificar(true);
 											}}
-											onEliminar={() => handleEliminarEvento(evento.id)}
+											onEliminar={() => handleEliminarEvento(evento.id, evento.nombre)}
 											onEstadisticas={() =>
 												handleEstadisticas()
 											}
