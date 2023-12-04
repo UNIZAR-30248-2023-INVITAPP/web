@@ -348,15 +348,15 @@ function Evento({
 								className="mb-3"
 								controlId="formEmail"
 							>
-								<Form.Label>Email</Form.Label>
+								<Form.Label>Correo eletrónico</Form.Label>
 								<Form.Control
 									type="email"
-									placeholder="Introduzca email"
+									placeholder="Introduzca correo electrónico"
 									required
 									isInvalid={emailInvalido}
 								/>
 								<Form.Control.Feedback type="invalid">
-									Introduzca un email válido
+									Introduzca un correo electrónico válido
 								</Form.Control.Feedback>
 							</Form.Group>
 							{invitadoExistente && (

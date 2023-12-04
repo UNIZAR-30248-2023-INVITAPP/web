@@ -41,6 +41,8 @@ function EventosPage() {
 	);
 
 	const [showConfirmBorradoMultiple, setShowConfirmBorradoMultiple] = useState(false)
+	//Mensaje de éxito al borrar varios eventos
+	const [showExitoBorradoEventos, setShowExitoBorradoEventos] = useState(false)
 	const [eventToDeleteId, setEventToDeleteId] = useState(null);
 	const [eventToDeleteNombre, setEventToDeleteNombre] = useState(null);
 	const [eventToUpdateIndex, setEventToUpdateIndex] = useState(null);
@@ -251,6 +253,8 @@ function EventosPage() {
 			setEventosSeleccionados([]);
 			setUsuariosPendientesCorreo([]);
 			setShowConfirmBorradoMultiple(false);
+			//Mostramos el mensaje de exito de eliminar varios eventos
+			setShowExitoBorradoEventos(true);
 		} catch (error) {
 			console.error("Error al eliminar eventos múltiples:", error);
 		}
@@ -729,6 +733,13 @@ function EventosPage() {
 							<strong className="me-auto">Evento eliminado</strong>
 							</Toast.Header>
 							<Toast.Body>El evento se ha eliminado correctamente</Toast.Body>
+						</Toast>
+
+						<Toast className='position-fixed bottom-0 end-0 p-3 m-2' show={showExitoBorradoEventos} onClose={() => setShowExitoBorradoEventos(false)} delay={3000} autohide>
+							<Toast.Header>
+							<strong className="me-auto">Eventos eliminados</strong>
+							</Toast.Header>
+							<Toast.Body>Los eventos se han eliminado correctamente</Toast.Body>
 						</Toast>
 
 						{/* Carrusel donde aparecen todos los eventos */}
