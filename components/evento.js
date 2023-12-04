@@ -47,6 +47,8 @@ function Evento({
 	const [showExitoAgnadirInvitado, setShowExitoAgnadirInvitado] = useState(false)
 	//UseState de mostrar mensaje de exito al eliminar un invitado
 	const [showExitoEliminarInvitado, setShowExitoEliminarInvitado] = useState(false)
+	//UseState de mostrar mensaje de exito al eliminar un invitado
+	const [showErrorAgnadirInvitado, setShowErrorAgnadirInvitado] = useState(false)
 
 	//useEffect(()=>{setInvitadosAEliminar(invitadosAEliminar.add("12345678A"))},[])
 	//const [showToastEliminarInvitado, setShowToastEliminarInvitado] =
@@ -88,6 +90,7 @@ function Evento({
 		setNombrelInvalido(false);
 		setDNIInvalido(false);
 		setEmailInvalido(false);
+		setShowErrorAgnadirInvitado(false);
 		event.preventDefault();
 		const nombre = event.target.formNombre.value;
 		const DNI = event.target.formDNI.value;
@@ -298,6 +301,7 @@ function Evento({
 					setEmailInvalido(false);
 					setInvitadoExistente(false);
 					setShowInvitados(false);
+					setShowErrorAgnadirInvitado(false);//Quitamos mensaje
 				}}
 				centered
 			>
@@ -319,6 +323,7 @@ function Evento({
 									placeholder="Introduzca nombre"
 									required
 									isInvalid={nombreInvalido}
+									onInvalid={() => setShowErrorAgnadirInvitado(true)}
 								/>
 								<Form.Control.Feedback type="invalid">
 									El nombre no puede estar vacio
@@ -336,6 +341,7 @@ function Evento({
 									placeholder="Introduzca DNI/NIE"
 									required
 									isInvalid={DNIInvalido}
+									onInvalid={() => setShowErrorAgnadirInvitado(true)}
 								/>
 								<Form.Control.Feedback type="invalid">
 									DNI o NIE invalido
@@ -354,6 +360,7 @@ function Evento({
 									placeholder="Introduzca correo electrónico"
 									required
 									isInvalid={emailInvalido}
+									onInvalid={() => setShowErrorAgnadirInvitado(true)}
 								/>
 								<Form.Control.Feedback type="invalid">
 									Introduzca un correo electrónico válido
@@ -362,6 +369,11 @@ function Evento({
 							{invitadoExistente && (
 								<p className="text-center text-danger">
 									Ya existe un invitado con ese DNI
+								</p>
+							)}
+							{ showErrorAgnadirInvitado && !nombreInvalido && !DNIInvalido && !emailInvalido && (
+								<p className="text-center text-danger">
+									Todos los campos son obligatorios
 								</p>
 							)}
 							<div className="d-grid gap-2">
@@ -384,7 +396,7 @@ function Evento({
 				id="modalExitoAgnadirInvitado"
 				show={showExitoAgnadirInvitado}
 				titulo="Invitado añadido"
-				cuerpo="El invitado se ha añadido con éxito en el evento"
+				cuerpo="El invitado se ha añadido correctamente"
 				onHide={() => {setShowExitoAgnadirInvitado(false); setShowInvitados(true);}}
 			/>
 			{/* ------------------------------------------------------- */}
@@ -394,7 +406,7 @@ function Evento({
 				id="modalExitoAgnadirInvitado"
 				show={showExitoEliminarInvitado}
 				titulo="Invitado eliminado"
-				cuerpo="El invitado se ha eliminado con éxito del evento"
+				cuerpo="El invitado se ha eliminado correctamente"
 				onHide={() => {setShowExitoEliminarInvitado(false); setShowInvitados(true);}}
 			/>
 			{/* ------------------------------------------------------- */}
