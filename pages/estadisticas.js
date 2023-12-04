@@ -1,88 +1,165 @@
 import Stats from "@/components/stats";
 import Layout from "@/components/layout";
-import { useState } from "react";
-import { Button, ButtonGroup, ListGroup } from "react-bootstrap";
+import { useState, useEffect } from "react";
+import { Button, ToggleButton, ButtonGroup, ListGroup } from "react-bootstrap";
 
 function Estadisticas() {
-	const [sexo, setSexo] = useState(false);
-	const [edad, setEdad] = useState(false);
-	const [horaLlegada, setHoraLlegada] = useState(false);
-	const [asistencia, setAsistencia] = useState(false);
+	// Variable para simular la carga de datos
+	const [isLoading, setLoading] = useState(false);
+	const [isSexoLoading, setSexoLoading] = useState(false);
+	const [isEdadLoading, setEdadLoading] = useState(false);
+	const [isAsistenciaLoading, setAsistenciaLoading] = useState(false);
+	const [isHoraLlegadaLoading, setHoraLlegadaLoading] = useState(false);
+
+	// Variables para controlar los botones que han sido pulsados
+	const [sexoChecked, setSexoChecked] = useState(false);
+	const [edadChecked, setEdadChecked] = useState(false);
+	const [asistenciaChecked, setAsistenciaChecked] = useState(false);
+	const [horaLlegadaChecked, setHoraLlegadaChecked] = useState(false);
+
+	// Función para simular la carga de datos
+	useEffect(() => {
+		function simularCarga() {
+			return new Promise((resolve) => setTimeout(resolve, 1000));
+		}
+
+		if (isLoading) {
+			simularCarga().then(() => {
+				setLoading(false);
+				setSexoLoading(false);
+				setEdadLoading(false);
+				setAsistenciaLoading(false);
+				setHoraLlegadaLoading(false);
+			});
+		}
+	}, [isLoading]);
+
+	// Control de la pulsación de botones
+	const handleClickOnSexo = () => {
+		if (!sexoChecked) {
+			setLoading(true);
+			setSexoLoading(true);
+			setSexoChecked(!sexoChecked);
+		} else {
+			setSexoChecked(!sexoChecked);
+		}
+	};
+
+	const handleClickOnEdad = () => {
+		if (!edadChecked) {
+			setLoading(true);
+			setEdadLoading(true);
+			setEdadChecked(!edadChecked);
+		} else {
+			setEdadChecked(!edadChecked);
+		}
+	};
+
+	const handleClickOnAsistencia = () => {
+		if (!asistenciaChecked) {
+			setLoading(true);
+			setAsistenciaLoading(true);
+			setAsistenciaChecked(!asistenciaChecked);
+		} else {
+			setAsistenciaChecked(!asistenciaChecked);
+		}
+	};
+
+	const handleClickOnHoraLlegada = () => {
+		if (!horaLlegadaChecked) {
+			setLoading(true);
+			setHoraLlegadaLoading(true);
+			setHoraLlegadaChecked(!horaLlegadaChecked);
+		} else {
+			setHoraLlegadaChecked(!horaLlegadaChecked);
+		}
+	};
+
 	var counter = 0;
-	if (sexo) {
+	if (sexoChecked) {
 		counter++;
 	} else {
 		counter--;
 	}
-	if (edad) {
+	if (edadChecked) {
 		counter++;
 	} else {
 		counter--;
 	}
-	if (horaLlegada) {
+	if (horaLlegadaChecked) {
 		counter++;
 	} else {
 		counter--;
 	}
-	if (asistencia) {
+	if (asistenciaChecked) {
 		counter++;
 	} else {
 		counter--;
 	}
+
 	return (
 		<>
 			<Layout></Layout>
 			<h1 className="fw-bold text-center">Estadísticas de x evento</h1>
-			<ButtonGroup horizontal className="mb-20">
-				<input
-					id="btn-sexo"
-					type="checkbox"
-					className="text-center btn-check"
-					action
-					onClick={() => setSexo(!sexo)}
-				/>
-				<label className="btn btn-outline-primary" for="btn-sexo">
-					Sexo
-				</label>
-				<input
-					id="btn-edad"
-					type="checkbox"
-					className="text-center btn-check"
-					action
-					onClick={() => setEdad(!edad)}
-				/>
-				<label className="btn btn-outline-primary" for="btn-edad">
-					Edad
-				</label>
-				<input
-					id="btn-asistencia"
-					type="checkbox"
-					className="text-center btn-check"
-					action
-					onClick={() => setAsistencia(!asistencia)}
-				/>
-				<label className="btn btn-outline-primary" for="btn-asistencia">
-					Asistencia
-				</label>
-				<input
-					id="btn-hora-llegada"
-					type="checkbox"
-					className="text-center btn-check"
-					action
-					onClick={() => setHoraLlegada(!horaLlegada)}
-				/>
-				<label
-					className="btn btn-outline-primary"
-					for="btn-hora-llegada"
-				>
-					Hora de llegada
-				</label>
-			</ButtonGroup>
+			<div class="d-flex justify-content-center pb-30">
+				<ButtonGroup horizontal size="lg">
+					<ToggleButton
+						id="toggle-check"
+						type="checkbox"
+						variant="outline-primary"
+						checked={sexoChecked ? true : false}
+						disabled={isSexoLoading}
+						onClick={!isSexoLoading ? handleClickOnSexo : null}
+					>
+						{isSexoLoading ? "Cargando..." : "Sexo"}
+					</ToggleButton>
+					<ToggleButton
+						id="toggle-check"
+						type="checkbox"
+						variant="outline-primary"
+						checked={edadChecked ? true : false}
+						disabled={isEdadLoading}
+						onClick={!isEdadLoading ? handleClickOnEdad : null}
+					>
+						{isEdadLoading ? "Cargando..." : "Edad"}
+					</ToggleButton>
+					<ToggleButton
+						id="toggle-check"
+						type="checkbox"
+						variant="outline-primary"
+						checked={asistenciaChecked ? true : false}
+						disabled={isAsistenciaLoading}
+						onClick={
+							!isAsistenciaLoading
+								? handleClickOnAsistencia
+								: null
+						}
+					>
+						{isAsistenciaLoading ? "Cargando..." : "Asistencia"}
+					</ToggleButton>
+					<ToggleButton
+						id="toggle-check"
+						type="checkbox"
+						variant="outline-primary"
+						checked={horaLlegadaChecked ? true : false}
+						disabled={isHoraLlegadaLoading}
+						onClick={
+							!isHoraLlegadaLoading
+								? handleClickOnHoraLlegada
+								: null
+						}
+					>
+						{isHoraLlegadaLoading
+							? "Cargando..."
+							: "Hora de llegada"}
+					</ToggleButton>
+				</ButtonGroup>
+			</div>
 			<Stats
-				sexo={sexo}
-				edad={edad}
-				horaLlegada={horaLlegada}
-				asistencia={asistencia}
+				sexo={sexoChecked}
+				edad={edadChecked}
+				asistencia={asistenciaChecked}
+				horaLlegada={horaLlegadaChecked}
 				counter={counter}
 			></Stats>
 		</>

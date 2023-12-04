@@ -1,15 +1,22 @@
-import { Button } from "react-bootstrap";
-import { auth } from "@/firebase";
-import { Chart } from "react-google-charts";
 import MostrarGraficaConjunta from "./mostrarGraficaConjunta";
 import MostrarGrafica from "./mostrarGrafica";
 
 const Stats = ({ sexo, edad, asistencia, horaLlegada, counter }) => {
 	// UTILIZAR PROP CONTADOR MÁS ADELANTA (!!)
 	if (!sexo && !edad && !asistencia && !horaLlegada) {
-		return <p>Debes seleccionar dos variables</p>;
+		return (
+			<div class="d-flex justify-content-center">
+				<h2 className="mt-8">
+					Selecciona al menos una de las variables
+				</h2>
+			</div>
+		);
 	} else if (counter > 1) {
-		return <p>Debes seleccionar solo dos variables</p>;
+		return (
+			<div class="d-flex justify-content-center">
+				<h2 className="mt-8">Debes seleccionar solo dos variables</h2>;
+			</div>
+		);
 	} else {
 		if (sexo) {
 			if (edad) {
