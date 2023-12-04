@@ -735,6 +735,7 @@ function EventosPage() {
 							<Toast.Body>El evento se ha eliminado correctamente</Toast.Body>
 						</Toast>
 
+						{/* Modal de mensaje de exito al eliminar varios eventos */}
 						<Toast className='position-fixed bottom-0 end-0 p-3 m-2' show={showExitoBorradoEventos} onClose={() => setShowExitoBorradoEventos(false)} delay={3000} autohide>
 							<Toast.Header>
 							<strong className="me-auto">Eventos eliminados</strong>
