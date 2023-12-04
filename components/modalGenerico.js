@@ -18,7 +18,9 @@ export default function ModalGenerico({id, show, titulo, cuerpo, onHide, onElimi
             </Modal.Header>
             <Modal.Body>
                 {showSpinner && (
-                    <Spinner />
+                    <div className='text-center p-3'>
+                        <Spinner />
+                    </div>        
                 )}
                 { !showSpinner && (
                     <div>{cuerpo}</div>

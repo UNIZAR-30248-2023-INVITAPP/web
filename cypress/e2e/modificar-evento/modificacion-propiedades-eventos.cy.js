@@ -17,7 +17,7 @@ describe('En esta prueba se modifican el nombre, fecha, hora y ubicacion de un e
     it('Prueba 2: Modificar el campo nombre del evento y comprobar que se ha cambiado', () => {
 
         const etiqueta = cy.get('h5').contains(nombreEvento)
-        const botones = etiqueta.parent().siblings()
+        const botones = etiqueta.parent().parent().siblings()
         botones.find('.btn-warning').click()
       
         // Comprobar que se abre el modal de Crear Evento
@@ -39,7 +39,7 @@ describe('En esta prueba se modifican el nombre, fecha, hora y ubicacion de un e
     it('Prueba 3: Modificar la fecha y que se vea actualizada', () => {
         
         const etiqueta = cy.get('h5').contains(nombreEventoModificado)
-        const botones = etiqueta.parent().siblings()
+        const botones = etiqueta.parent().parent().siblings()
         botones.find('.btn-warning').click()
 
         // Comprobar que se abre el modal de Modificar Evento
@@ -61,7 +61,7 @@ describe('En esta prueba se modifican el nombre, fecha, hora y ubicacion de un e
 
     it('Prueba 4: Modificar la hora y comprobar que se ha cambiado', () => {
       const etiqueta = cy.get('h5').contains(nombreEventoModificado)
-      const botones = etiqueta.parent().siblings()
+      const botones = etiqueta.parent().parent().siblings()
       botones.find('.btn-warning').click()
 
       // Comprobar que se abre el modal de Modificar Evento
@@ -84,7 +84,7 @@ describe('En esta prueba se modifican el nombre, fecha, hora y ubicacion de un e
 
   it('Prueba 5: Modificar la ubicacion y que se vea actualizada', () => {
     const etiqueta = cy.get('h5').contains(nombreEventoModificado)
-    const botones = etiqueta.parent().siblings()
+    const botones = etiqueta.parent().parent().siblings()
     botones.find('.btn-warning').click()
 
     // Comprobar que se abre el modal de Modificar Evento

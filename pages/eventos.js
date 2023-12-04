@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Layout from "@/components/layout";
 import Evento from "../components/evento";
-import { Modal, Button,Toast } from "react-bootstrap";
+import { Modal, Button, Toast, Spinner } from "react-bootstrap";
 import {
 	doc,
 	updateDoc,
@@ -13,7 +13,6 @@ import {
 import db from "../firebase";
 import ModalGenerico from "@/components/modalGenerico";
 import BodyModal from "@/components/bodyModal";
-import Spinner from "@/components/Spinner"
 import moment from "moment";
 import { useRouter } from "next/router";
 
@@ -28,7 +27,13 @@ function EventosPage() {
 
 	const [showSpinner, setShowSpinner] = useState(false);
 
+
 	const [showToast, setShowToast] = useState(false);
+	const [mensajeToast, setMensajeToast] = useState({
+		headerToast: '',
+		bodyToast: ''
+	})
+
 
 
 	// Cuando se vaya a eliminar un evento, se añadirán en esta lista
@@ -153,18 +158,6 @@ function EventosPage() {
         //if (ordenarPorNombre) setEventos(eventos.sort((a, b) => a.nombre.trim().toLowerCase().localeCompare(b.nombre.trim().toLowerCase())));    
     }, [ordenarPorFecha, ordenarPorNombre])
 
-     
-	 
-	 // Esta funcion crea el JSON necesario para enviar en el request al servicio web que envía los correos electrónicos
-	//  const crearJsonRequestCorreo = () => {
-	// 	const emailsReceptores = usuariosPendientesCorreo.map((usuario) => usuario.email)
-	// 	const bodyJson = {
-	// 		nombreEvento: nombreEventoAeliminar,
-	// 		fechaEvento: fechaEventoAeliminar,
-	// 		emails: emailsReceptores
-	// 	}
-	// 	return bodyJson
-	//  }
 
 	const sendPostRequestToMailService = async (json) => {
 		try {
@@ -214,10 +207,13 @@ function EventosPage() {
             } finally {
 				handleHideConfirmacionModal()
 				setShowToast(true)
+				setMensajeToast({
+					headerToast: 'Evento eliminado',
+					bodyToast: 'El evento se ha eliminado correctamente'
+				})
 				setTimeout(() => {
-					setShowToast(false);
 					setShowSpinner(false)
-				  }, 3000);
+				  }, 2000);
                 setEventToDeleteId(null); // Limpia el evento a eliminar
                 setUsuariosPendientesCorreo([])
                 setEliminandoEvento(false)
@@ -229,6 +225,7 @@ function EventosPage() {
 	// Firebase para eliminar todos los eventos que se han seleccionado
 	const handleEliminarEventoMultiple = async () => {
 		try {
+			setShowSpinner(true)
 			const nuevosEventos = eventos.filter(
 				(evento) => !eventosSeleccionados.includes(evento.id)
 			);
@@ -245,6 +242,14 @@ function EventosPage() {
 			setEventosSeleccionados([]);
 			setUsuariosPendientesCorreo([]);
 			setShowConfirmBorradoMultiple(false);
+			setMensajeToast({
+				headerToast: 'Eventos eliminados',
+				bodyToast: 'Los eventos que has seleccionado se han eliminado correctamente'
+			})
+			setShowToast(true)
+			setTimeout(() => {
+				setShowSpinner(false)
+			})
 		} catch (error) {
 			console.error("Error al eliminar eventos múltiples:", error);
 		}
@@ -285,20 +290,7 @@ function EventosPage() {
 	// Maneja el pulsar boton eventos
 	const handleEstadisticas = () => router.push("/estadisticas");
 
-	// Función para cerrar el modal de crear evento.
-	// Se cierra el modal y se limpian los campos corresponientes a un nuevo evento
-	const handleCloseCrear = () => {
-		setShowModalCrear(false);
-		// Limpiamos los campos del formulario cuando se cierra el modal
-		setNuevoEvento({
-			nombre: "",
-			fecha: "",
-			hora: "",
-			ubicacion: "",
-			invitados: [],
-		});
-		setError("");
-	};
+	
 
 	// Función que se utiliza para verificar si la fecha introducida es posterior a la actual
 	const validarFecha = (fecha) => {
@@ -360,6 +352,22 @@ function EventosPage() {
 	const handleHideConfirmacionModal = () => {
 		setShowConfirmModal(false);
 		setUsuariosPendientesCorreo([]);
+	};
+
+	// Función para cerrar el modal de crear evento.
+	// Se cierra el modal y se limpian los campos corresponientes a un nuevo evento
+	const handleCloseCrear = () => {
+		setShowModalCrear(false);
+		// Limpiamos los campos del formulario cuando se cierra el modal
+		setNuevoEvento({
+			nombre: "",
+			fecha: "",
+			hora: "",
+			ubicacion: "",
+			invitados: [],
+		});
+		setError("")
+		setErrorFecha(null)
 	};
 
 	// Funcion que se ejecuta al crear evento en el modal de "crear evento"
@@ -432,12 +440,17 @@ function EventosPage() {
             // Agregar el cambio de  evento al estado de eventos
 			
 			await fetchEventos();
+			setMensajeToast({
+				headerToast: 'Evento creado',
+				bodyToast: `El evento "${nuevoEvento.nombre}" se ha creado correctamente`
+
+			})
 			handleCloseCrear(); // Cerrar el modal después de guardar
-			setErrorFecha(null);
-			setError(null);
+			setShowToast(true)
 			setTimeout(() => {
 				setShowSpinner(false);
-			  }, 500);
+			  }, 2000);
+
 			
 		} catch (e) {
 			console.error("Error adding document: ", e);
@@ -484,7 +497,10 @@ function EventosPage() {
 			return;
 		}
 		//Guardar datos en Firestore
+
+		
 		try {
+			setShowSpinner(true)
 			const res = await updateDoc(doc(db, "Eventos", eventoCambiar.id), {
 				nombre: eventoCambiar.nombre,
 				fecha: eventoCambiar.fecha,
@@ -494,6 +510,14 @@ function EventosPage() {
 			// Agregar el cambio de  evento al estado de eventos
 			await fetchEventos();
 			setShowModalModificar(false); // Cerrar el modal después de guardar
+			setShowToast(true)
+			setMensajeToast({
+				headerToast: 'Evento Modificado',
+				bodyToast: `El evento "${eventoCambiar.nombre}" se ha modificado correctamente`
+			})
+			setTimeout(() => {
+				setShowSpinner(false)
+			}, 2000)
 			setEventToUpdateIndex(null);
 			setErrorFecha(null);
 			setError(null);
@@ -590,6 +614,7 @@ function EventosPage() {
 									electrónico avisando a todos los asistentes a los eventos que vas a eliminar."
 							onHide={() => setShowConfirmBorradoMultiple(false)}
 							onEliminar={() => handleEliminarEventoMultiple()}
+							showSpinner={showSpinner}
 						/>
 						{/* ------------------------------------------------------- */}
 
@@ -637,6 +662,7 @@ function EventosPage() {
 								setErrorFecha("");
 								setError(null);
 							}}
+							showSpinner={showSpinner}
 						/>
 						{/* ----------------------------------------------- */}
 
@@ -700,11 +726,19 @@ function EventosPage() {
 							showSpinner={showSpinner}
 						/>
 
-						<Toast className='position-fixed bottom-0 end-0 p-3 m-2' show={showToast} onClose={() => setShowToast(false)} delay={3000} autohide>
+						<Toast className='position-fixed bottom-0 end-0 p-3 m-2' show={showToast} onClose={() => {
+							setMensajeToast({
+								headerToast: '',
+								bodyToast: ''
+							})
+							setShowToast(false)
+							
+						}} delay={3000} autohide>
 							<Toast.Header>
-							<strong className="me-auto">Evento eliminado</strong>
+								<strong className="me-auto">{mensajeToast.headerToast}</strong>
 							</Toast.Header>
-							<Toast.Body>El evento se ha eliminado correctamente</Toast.Body>
+							<Toast.Body>{mensajeToast.bodyToast}</Toast.Body>
+				
 						</Toast>
 
 						{/* Carrusel donde aparecen todos los eventos */}
