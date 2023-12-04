@@ -250,7 +250,6 @@ function EventosPage() {
 			setEventosSeleccionados([]);
 			setUsuariosPendientesCorreo([]);
 			setShowConfirmBorradoMultiple(false);
-<<<<<<< HEAD
 			setMensajeToast({
 				headerToast: 'Eventos eliminados',
 				bodyToast: 'Los eventos que has seleccionado se han eliminado correctamente'
@@ -259,10 +258,6 @@ function EventosPage() {
 			setTimeout(() => {
 				setShowSpinner(false)
 			})
-=======
-			//Mostramos el mensaje de exito de eliminar varios eventos
-			setShowExitoBorradoEventos(true);
->>>>>>> 96ce227634231c470b0de6a6623e3c5c3bdda64f
 		} catch (error) {
 			console.error("Error al eliminar eventos múltiples:", error);
 		}
@@ -463,14 +458,8 @@ function EventosPage() {
 			setShowToast(true)
 			setTimeout(() => {
 				setShowSpinner(false);
-<<<<<<< HEAD
 			  }, 2000);
 
-=======
-			  }, 500);
-
-			setShowExitoCrearEvento(true);//Mostramos el mensaje de exito
->>>>>>> 96ce227634231c470b0de6a6623e3c5c3bdda64f
 			
 		} catch (e) {
 			console.error("Error adding document: ", e);
