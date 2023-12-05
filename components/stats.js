@@ -1,9 +1,11 @@
 import MostrarGraficaConjunta from "./mostrarGraficaConjunta";
 import MostrarGrafica from "./mostrarGrafica";
 
+//const datosEjemplo = [["Pepe Lopez", "M", "22", "Si", "0:30"], ["Jose Martinez", "M", "19", "No", ""],["Maria Sanchez", "F", "24", "Si", "1:30"], ["Ana Ortiz", "F", "21", "No", ""]]
+
 const Stats = ({ sexo, edad, asistencia, horaLlegada, counter }) => {
 	// UTILIZAR PROP CONTADOR MÁS ADELANTA (!!)
-	if (!sexo && !edad && !asistencia && !horaLlegada) {
+	if (counter==0) {
 		return (
 			<div class="d-flex justify-content-center">
 				<h2 className="mt-8">
@@ -11,10 +13,10 @@ const Stats = ({ sexo, edad, asistencia, horaLlegada, counter }) => {
 				</h2>
 			</div>
 		);
-	} else if (counter > 1) {
+	} else if (counter > 2) {
 		return (
 			<div class="d-flex justify-content-center">
-				<h2 className="mt-8">Debes seleccionar solo dos variables</h2>;
+				<h2 className="mt-8">Debes seleccionar solo dos variables</h2>
 			</div>
 		);
 	} else {

@@ -282,8 +282,6 @@ function EventosPage() {
 	// Muestra el modal de crear evento
 	const handleShow = () => setShowModalCrear(true);
 
-	// Maneja el pulsar boton eventos
-	const handleEstadisticas = () => router.push("/estadisticas");
 
 	// Función para cerrar el modal de crear evento.
 	// Se cierra el modal y se limpian los campos corresponientes a un nuevo evento
@@ -766,7 +764,7 @@ function EventosPage() {
 											}}
 											onEliminar={() => handleEliminarEvento(evento.id)}
 											onEstadisticas={() =>
-												handleEstadisticas()
+												router.push("/estadisticas/" + evento.id)
 											}
 											showBoton = {showBotonMultiple} 
 											onSelectEvento={ () => handleSelectEvento(evento.id)}
