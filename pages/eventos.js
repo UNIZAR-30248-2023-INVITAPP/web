@@ -197,7 +197,12 @@ function EventosPage() {
                 if (eventToDeleteId !== null) {
                     const nuevosEventos = [...eventos].filter((e) => e.id != eventToDeleteId);
                     //nuevosEventos.splice(eventToDeleteId, 1);
+					const eventoEliminar = eventos.find((e) => e.id == eventToDeleteId)
+					await (eventoEliminar.invitados.forEach(async (docId) => {
+						await deleteDoc(doc(db, "Eventos/" + id + "/Invitados/" + docId))
+					}));
                     await deleteDoc(doc(db, "Eventos", eventToDeleteId));
+					
                     setEventos(nuevosEventos);
 
                     console.log(usuariosPendientesCorreo)
