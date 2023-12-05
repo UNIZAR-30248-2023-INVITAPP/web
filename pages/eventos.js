@@ -197,10 +197,13 @@ function EventosPage() {
                 if (eventToDeleteId !== null) {
                     const nuevosEventos = [...eventos].filter((e) => e.id != eventToDeleteId);
                     //nuevosEventos.splice(eventToDeleteId, 1);
-					const eventoEliminar = eventos.find((e) => e.id == eventToDeleteId)
-					await (eventoEliminar.invitados.forEach(async (docId) => {
-						await deleteDoc(doc(db, "Eventos/" + id + "/Invitados/" + docId))
+					// Eliminar todos los documentos de la subcoleccion invitados
+					const invitadosFirebase = await getDocs(collection(db, "Eventos/" + eventToDeleteId + "/Invitados"))
+					const invitadosEventoEliminar = invitadosFirebase.docs.map((i) => i.id)
+					await (invitadosEventoEliminar.forEach(async (docId) => {
+						await deleteDoc(doc(db, "Eventos/" + eventToDeleteId + "/Invitados/" + docId))
 					}));
+					// Despues eliminar documento de eventos
                     await deleteDoc(doc(db, "Eventos", eventToDeleteId));
 					
                     setEventos(nuevosEventos);
@@ -241,6 +244,15 @@ function EventosPage() {
 
 			await Promise.all(
 				eventosSeleccionados.map(async (idFirebase) => {
+					const eventoEliminar = eventos.find((e) => e.id == idFirebase)
+					console.log(eventoEliminar)
+					// Eliminar todos los documentos de la subcoleccion invitados
+					const invitadosFirebase = await getDocs(collection(db, "Eventos/" + idFirebase + "/Invitados"))
+					const invitadosEventoEliminar = invitadosFirebase.docs.map((i) => i.id)
+					await (invitadosEventoEliminar.forEach(async (docId) => {
+						await deleteDoc(doc(db, "Eventos/" + idFirebase + "/Invitados/" + docId))
+					}));
+					// Despues eliminar documento de eventos
 					await deleteDoc(doc(db, "Eventos", idFirebase));
 				})
 			);
