@@ -25,6 +25,7 @@ describe('En esta prueba se modifican las propiedades con las mismas que otro ya
         cy.get('li') // Selecciona todos los elementos <li> que representan eventos
         .contains('h5', nombreEvento2) // Busca el elemento <h5> con el texto "Evento de Prueba 2"
         .parent() // Selecciona el padre del elemento h5
+        .parent()
         .next() // Selecciona el siguiente elemento (que sería el div hermano del padre del h5)
         .within(() => {
             cy.get('button:contains("Modificar")') // Busca el botón con el texto "Editar"
@@ -50,6 +51,8 @@ describe('En esta prueba se modifican las propiedades con las mismas que otro ya
         // Rellenar hora
         // Pinchar el botón de modificar evento
         cy.get('button.btn-dark').contains('Modificar Evento').click()
+
+        cy.wait(500)
 
         // Verificar que aparece el error
         cy.contains('Ya existe un evento con esas propiedades').should('exist')

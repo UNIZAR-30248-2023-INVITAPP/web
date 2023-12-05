@@ -43,6 +43,13 @@ function Evento({
 	const [indexInvitadoEliminar, setIndexInvitadoEliminar] = useState(null);
 	const [invitadosAEliminar, setInvitadosAEliminar] = useState([])
 	const [showConfirmBorradoMultiple, setShowConfirmBorradoMultiple] = useState(false)
+	//UseState de mostrar mensaje de exito al crear un invitado
+	const [showExitoAgnadirInvitado, setShowExitoAgnadirInvitado] = useState(false)
+	//UseState de mostrar mensaje de exito al eliminar un invitado
+	const [showExitoEliminarInvitado, setShowExitoEliminarInvitado] = useState(false)
+	//UseState de mostrar mensaje de exito al eliminar un invitado
+	const [showErrorAgnadirInvitado, setShowErrorAgnadirInvitado] = useState(false)
+
 	//useEffect(()=>{setInvitadosAEliminar(invitadosAEliminar.add("12345678A"))},[])
 	//const [showToastEliminarInvitado, setShowToastEliminarInvitado] =
 	//	useState(false);
@@ -83,6 +90,7 @@ function Evento({
 		setNombrelInvalido(false);
 		setDNIInvalido(false);
 		setEmailInvalido(false);
+		setShowErrorAgnadirInvitado(false);
 		event.preventDefault();
 		const nombre = event.target.formNombre.value;
 		const DNI = event.target.formDNI.value;
@@ -125,6 +133,9 @@ function Evento({
 			event.target.formDNI.value = null;
 			event.target.formEmail.value = null;
 			setInvitadoExistente(false);
+			//Establcecemos mensaje de exito de crear invitado
+			setShowInvitados(false);
+			setShowExitoAgnadirInvitado(true);
 		} catch (e) {
 			console.error("Error adding document: ", e);
 		}
@@ -166,12 +177,14 @@ function Evento({
 			// Actualizo mis invitados
 			setInvitados([...nuevosInvitados]);
 			//
+			//Mostrar mensaje de exito al eliminar
+			setShowExitoEliminarInvitado(true);
+
 		} catch (e) {
 			console.error("Error adding document: ", e);
 		}
 		setIndexInvitadoEliminar(null);
 		setShowConfirmacionEliminar(false);
-		setShowInvitados(true);
 		// setShowToastEliminarInvitado(true);
 	};
 
@@ -288,6 +301,7 @@ function Evento({
 					setEmailInvalido(false);
 					setInvitadoExistente(false);
 					setShowInvitados(false);
+					setShowErrorAgnadirInvitado(false);//Quitamos mensaje
 				}}
 				centered
 			>
@@ -309,6 +323,7 @@ function Evento({
 									placeholder="Introduzca nombre"
 									required
 									isInvalid={nombreInvalido}
+									onInvalid={() => setShowErrorAgnadirInvitado(true)}
 								/>
 								<Form.Control.Feedback type="invalid">
 									El nombre no puede estar vacio
@@ -326,6 +341,7 @@ function Evento({
 									placeholder="Introduzca DNI/NIE"
 									required
 									isInvalid={DNIInvalido}
+									onInvalid={() => setShowErrorAgnadirInvitado(true)}
 								/>
 								<Form.Control.Feedback type="invalid">
 									DNI o NIE invalido
@@ -338,20 +354,26 @@ function Evento({
 								className="mb-3"
 								controlId="formEmail"
 							>
-								<Form.Label>Email</Form.Label>
+								<Form.Label>Correo eletrónico</Form.Label>
 								<Form.Control
 									type="email"
-									placeholder="Introduzca email"
+									placeholder="Introduzca correo electrónico"
 									required
 									isInvalid={emailInvalido}
+									onInvalid={() => setShowErrorAgnadirInvitado(true)}
 								/>
 								<Form.Control.Feedback type="invalid">
-									Introduzca un email válido
+									Introduzca un correo electrónico válido
 								</Form.Control.Feedback>
 							</Form.Group>
 							{invitadoExistente && (
 								<p className="text-center text-danger">
 									Ya existe un invitado con ese DNI
+								</p>
+							)}
+							{ showErrorAgnadirInvitado && !nombreInvalido && !DNIInvalido && !emailInvalido && (
+								<p className="text-center text-danger">
+									Todos los campos son obligatorios
 								</p>
 							)}
 							<div className="d-grid gap-2">
@@ -368,6 +390,27 @@ function Evento({
 					{listaInvitados()}
 				</Modal.Body>
 			</Modal>
+
+			{/* Modal de mensaje de exito al añadir invitado */}
+			<ModalGenerico
+				id="modalExitoAgnadirInvitado"
+				show={showExitoAgnadirInvitado}
+				titulo="Invitado añadido"
+				cuerpo="El invitado se ha añadido correctamente"
+				onHide={() => {setShowExitoAgnadirInvitado(false); setShowInvitados(true);}}
+			/>
+			{/* ------------------------------------------------------- */}
+
+			{/* Modal de mensaje de exito al eliminar invitado */}
+			<ModalGenerico
+				id="modalExitoAgnadirInvitado"
+				show={showExitoEliminarInvitado}
+				titulo="Invitado eliminado"
+				cuerpo="El invitado se ha eliminado correctamente"
+				onHide={() => {setShowExitoEliminarInvitado(false); setShowInvitados(true);}}
+			/>
+			{/* ------------------------------------------------------- */}
+
 
 			{/* Modal del sorteo*/}
 			<Modal
