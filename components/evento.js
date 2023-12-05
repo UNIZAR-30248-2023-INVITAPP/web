@@ -11,7 +11,7 @@ import {
 	ToastContainer,
 } from "react-bootstrap";
 import db from "../firebase";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, collection, updateDoc, addDoc, deleteDoc } from "firebase/firestore";
 import Ruleta from "./ruleta";
 import Toast from "react-bootstrap/Toast";
 import ModalGenerico from "./modalGenerico";
@@ -23,6 +23,7 @@ function Evento({
 	hora,
 	ubicacion,
 	invitados,
+	invitadosNuevo,
 	onEliminar,
 	onCambio,
 	onEstadisticas,
@@ -31,7 +32,8 @@ function Evento({
 	setUsuariosPendientesCorreo,
 	quitarUsuariosPendientesCorreo,
 }) {
-	const [invitadosArray, setInvitados] = useState(invitados);
+	//const [invitadosArray, setInvitados] = useState(invitados);
+	const [invitadosArray, setInvitados] = useState(invitadosNuevo);
 	const [emailInvalido, setEmailInvalido] = useState(false);
 	const [nombreInvalido, setNombrelInvalido] = useState(false);
 	const [DNIInvalido, setDNIInvalido] = useState(false);
@@ -119,10 +121,17 @@ function Evento({
 					},
 				],
 			});
+			const docRef = await addDoc(collection(db, "Eventos/" + id + "/Invitados"), 
+			{
+				nombre: nombre,
+				email: email,
+				DNI: DNI.toUpperCase(),
+			})
 			// Actualizo mis invitados
 			setInvitados([
 				...invitadosArray,
 				{
+					docId: docRef.id,
 					nombre: nombre,
 					email: email,
 					DNI: DNI.toUpperCase(),
@@ -171,9 +180,11 @@ function Evento({
 		const nuevosInvitados = [...invitadosArray];
 		nuevosInvitados.splice(indexInvitadoEliminar, 1);
 		try {
+			// TODO: eliminar esto
 			const res = await updateDoc(doc(db, "Eventos", id), {
 				invitados: [...nuevosInvitados],
 			});
+			await deleteDoc(doc(db, "Eventos/" + id + "/Invitados/" + invitadosArray[indexInvitadoEliminar].docId))
 			// Actualizo mis invitados
 			setInvitados([...nuevosInvitados]);
 			//
@@ -272,11 +283,17 @@ function Evento({
 	const handleEliminarInvitadoMultiple = async () => {
 		if (invitadosAEliminar.length == 0) return;
 		const nuevosInvitados = [...invitadosArray].filter((i) => !invitadosAEliminar.includes(i.DNI))
+		const docsRefsEliminar = [...invitadosArray].filter((i) => invitadosAEliminar.includes(i.DNI)).map((i) => i.docId)
+		console.log(docsRefsEliminar)
 		console.log(nuevosInvitados)
 		try {
+			// TODO: eliminar
 			const res = await updateDoc(doc(db, "Eventos", id), {
 				invitados: [...nuevosInvitados],
 			});
+			await (docsRefsEliminar.forEach(async (docId) => {
+				await deleteDoc(doc(db, "Eventos/" + id + "/Invitados/" + docId))
+			}));
 			// Actualizo mis invitados
 			setInvitados([...nuevosInvitados]);
 			//
@@ -494,8 +511,8 @@ function Evento({
 					</Toast.Body>
 				</Toast>
 			</ToastContainer> */}
-            <li className="mb-4 list-group-item border border-2 rounded col-12 col-lg-8 mx-auto">
-                <div className="d-flex flex-column py-2 flex-md-row gap-3 justify-content-between ">
+            <li className="mb-4 list-group-item border border-2 rounded col-12 col-lg-11 mx-auto">
+                <div className="d-flex flex-column py-2 flex-lg-row gap-3 justify-content-between ">
                         <input
                             type="checkbox"
                             id={`checkbox-${id}`}
@@ -519,9 +536,9 @@ function Evento({
                         </div>
                     </div>
 
-                    <div className="d-flex flex-column flex-md-row flex-md-row gap-2 justify-content-between">
+                    <div className="d-flex flex-column flex-lg-row gap-2 justify-content-between">
                         {/* Botón de ver invitados a la derecha */}
-                        <div className="d-grid my-auto d-md-inline gap-2">
+                        <div className="d-grid my-auto d-lg-inline gap-2">
                             <button
                                 className="btn btn-primary" // Estilo de botón primario
                                 onClick={() => {
@@ -534,7 +551,7 @@ function Evento({
                         </div>
 
                         {/* Botón de ver sorteos  */}
-                        <div className="d-grid my-auto d-md-inline gap-2">
+                        <div className="d-grid my-auto d-lg-inline gap-2">
                             <button
                                 className="btn btn-secondary" // Estilo de botón primario
                                 onClick={() => {
@@ -547,7 +564,7 @@ function Evento({
                         </div>
 
                         {/* Botón de modificar a la derecha */}
-                        <div className="d-grid my-auto d-md-inline gap-2">
+                        <div className="d-grid my-auto d-lg-inline gap-2">
                             <button
                                 className="btn btn-block btn-warning" // Estilo de botón de modificación
                                 onClick={onCambio} // Manejador para modificar el evento por índice
@@ -558,7 +575,7 @@ function Evento({
                         </div>
 
 						{/* Botón de eliminación a la derecha */}
-                        <div className="d-grid my-auto d-md-inline gap-2">
+                        <div className="d-grid my-auto d-lg-inline gap-2">
                             <button
                                 className={`btn btn-danger ${Seleccionado ? 'disabled' : ''}`} // Estilo de botón de eliminación
                                 onClick={handleEliminarEvento} // Manejador para eliminar el evento por índice
@@ -569,7 +586,7 @@ function Evento({
                         </div>
                         
                         {/* Botón de eliminación a la derecha */}
-                        <div className="d-grid my-auto d-md-inline gap-2">
+                        <div className="d-grid my-auto d-lg-inline gap-2">
                             <button
                               className="btn btn-block btn-info" // Estilo de botón de estadísticas
                               onClick={onEstadisticas} // Manejador para abrir el modal correspondiente a las estadísticas

@@ -91,7 +91,20 @@ function EventosPage() {
 	const fetchEventos = async () => {
 		const eventosFirebase = await getDocs(collection(db, "Eventos"));
 		//console.log(eventosFirebase);
-		const eventosArray = eventosFirebase.docs.map((evento, index) => {
+		const eventosArray = await Promise.all (eventosFirebase.docs.map(async (evento, index) => {
+			const invitadosFirebase = await getDocs(collection(db, "Eventos/" + evento.id + "/Invitados"))
+			console.log(evento.id)
+			console.log(invitadosFirebase)
+			const invitadosEventoPrueba = invitadosFirebase.docs.map((i) => {
+				return {
+					docId: i.id,
+					nombre: i._document.data.value.mapValue.fields.nombre.stringValue,
+					DNI: i._document.data.value.mapValue.fields.DNI.stringValue,
+					email: i._document.data.value.mapValue.fields.email.stringValue
+				}
+			})
+			console.log(invitadosEventoPrueba)
+			// TODO: eliminar cambiar invitados por invitadosNuevo
 			return {
 				id: evento.id,
 				fecha: evento._document.data.value.mapValue.fields.fecha
@@ -115,8 +128,9 @@ function EventosPage() {
 							};
 						}
 					) ?? [],
+				invitadosNuevo: invitadosEventoPrueba
 			};
-		});
+		}));
 
 		// eventosArray.sort((a, b) => a.nombre.localeCompare(b.nombre));
         //eventosArray.sort((a, b) => new Date(a.fechaOriginal) - new Date(b.fechaOriginal));    
@@ -131,6 +145,7 @@ function EventosPage() {
             eventoCopia.fechaOriginal = fechaDate;
 			return eventoCopia;
 		});
+		console.log(eventosFechaDate)
 		setEventos(eventosFechaDate);
 	};
 
@@ -571,8 +586,6 @@ function EventosPage() {
 		)
 	}
 
-	console.log(eventosOdenadosFiltrados())
-
 	// El hook useEffect se utiliza para hacer la peticion a Cloud Firestore y mostrar
 	// los datos de los eventos cuando se realiza la renderización del componente
 	useEffect(() => {
@@ -585,12 +598,12 @@ function EventosPage() {
 				{/* Contenido de la página */}
 				<div className="container mt-4">
 					<div className="mx-4 mx-md-5">
-						<div className="d-flex flex-column flex-md-row justify-content-between">
+						<div className="d-flex flex-column flex-lg-row justify-content-between">
 							<h1 className="fw-bold text-center m-2">
 								Mis Eventos
 							</h1>
 							<form
-								className="d-flex mx-0 py-2 mx-md-5 p-md-2 flex-grow-1 text-center"
+								className="d-flex mx-0 py-2 mx-lg-5 p-lg-2 flex-grow-1 text-center"
 								role="search"
 								id="form"
 							>
