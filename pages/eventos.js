@@ -77,7 +77,6 @@ function EventosPage() {
 		fecha: "",
 		hora: "",
 		ubicacion: "",
-		invitados: [],
 		id: "",
 	});
 
@@ -93,8 +92,6 @@ function EventosPage() {
 		//console.log(eventosFirebase);
 		const eventosArray = await Promise.all (eventosFirebase.docs.map(async (evento, index) => {
 			const invitadosFirebase = await getDocs(collection(db, "Eventos/" + evento.id + "/Invitados"))
-			console.log(evento.id)
-			console.log(invitadosFirebase)
 			const invitadosEventoPrueba = invitadosFirebase.docs.map((i) => {
 				return {
 					docId: i.id,
@@ -103,8 +100,6 @@ function EventosPage() {
 					email: i._document.data.value.mapValue.fields.email.stringValue
 				}
 			})
-			console.log(invitadosEventoPrueba)
-			// TODO: eliminar cambiar invitados por invitadosNuevo
 			return {
 				id: evento.id,
 				fecha: evento._document.data.value.mapValue.fields.fecha
@@ -116,19 +111,7 @@ function EventosPage() {
 				ubicacion:
 					evento._document.data.value.mapValue.fields.ubicacion
 						.stringValue,
-				invitados:
-					evento._document.data.value.mapValue.fields.invitados.arrayValue.values?.map(
-						(invitado) => {
-							return {
-								nombre: invitado.mapValue.fields.nombre
-									.stringValue,
-								DNI: invitado.mapValue.fields.DNI.stringValue,
-								email: invitado.mapValue.fields.email
-									.stringValue,
-							};
-						}
-					) ?? [],
-				invitadosNuevo: invitadosEventoPrueba
+				invitados: invitadosEventoPrueba
 			};
 		}));
 
@@ -386,7 +369,6 @@ function EventosPage() {
 			fecha: "",
 			hora: "",
 			ubicacion: "",
-			invitados: [],
 		});
 		setError("")
 		setErrorFecha(null)
@@ -440,7 +422,6 @@ function EventosPage() {
 				fecha: nuevoEvento.fecha,
 				hora: nuevoEvento.hora,
 				ubicacion: nuevoEvento.ubicacion,
-				invitados: nuevoEvento.invitados,
 			});
 			//console.log("Document written with ID: ", docRef.id);
 

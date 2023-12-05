@@ -23,7 +23,6 @@ function Evento({
 	hora,
 	ubicacion,
 	invitados,
-	invitadosNuevo,
 	onEliminar,
 	onCambio,
 	onEstadisticas,
@@ -33,7 +32,7 @@ function Evento({
 	quitarUsuariosPendientesCorreo,
 }) {
 	//const [invitadosArray, setInvitados] = useState(invitados);
-	const [invitadosArray, setInvitados] = useState(invitadosNuevo);
+	const [invitadosArray, setInvitados] = useState(invitados);
 	const [emailInvalido, setEmailInvalido] = useState(false);
 	const [nombreInvalido, setNombrelInvalido] = useState(false);
 	const [DNIInvalido, setDNIInvalido] = useState(false);
@@ -111,16 +110,6 @@ function Evento({
 		}
 		// Añado el invitado a firebase
 		try {
-			const res = await updateDoc(doc(db, "Eventos", id), {
-				invitados: [
-					...invitadosArray,
-					{
-						nombre: nombre,
-						email: email,
-						DNI: DNI.toUpperCase(),
-					},
-				],
-			});
 			const docRef = await addDoc(collection(db, "Eventos/" + id + "/Invitados"), 
 			{
 				nombre: nombre,
@@ -180,10 +169,6 @@ function Evento({
 		const nuevosInvitados = [...invitadosArray];
 		nuevosInvitados.splice(indexInvitadoEliminar, 1);
 		try {
-			// TODO: eliminar esto
-			const res = await updateDoc(doc(db, "Eventos", id), {
-				invitados: [...nuevosInvitados],
-			});
 			await deleteDoc(doc(db, "Eventos/" + id + "/Invitados/" + invitadosArray[indexInvitadoEliminar].docId))
 			// Actualizo mis invitados
 			setInvitados([...nuevosInvitados]);
@@ -287,10 +272,6 @@ function Evento({
 		console.log(docsRefsEliminar)
 		console.log(nuevosInvitados)
 		try {
-			// TODO: eliminar
-			const res = await updateDoc(doc(db, "Eventos", id), {
-				invitados: [...nuevosInvitados],
-			});
 			await (docsRefsEliminar.forEach(async (docId) => {
 				await deleteDoc(doc(db, "Eventos/" + id + "/Invitados/" + docId))
 			}));
