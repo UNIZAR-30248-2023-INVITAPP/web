@@ -51,6 +51,9 @@ function Evento({
 	//UseState de mostrar mensaje de exito al eliminar un invitado
 	const [showErrorAgnadirInvitado, setShowErrorAgnadirInvitado] = useState(false)
 
+	const [modificandoInvitado, setModificandoInvitado] = useState(false)
+	const [indexInvitadoModificar, setIndexInvitadoModificar] = useState(null);
+
 	//useEffect(()=>{setInvitadosAEliminar(invitadosAEliminar.add("12345678A"))},[])
 	//const [showToastEliminarInvitado, setShowToastEliminarInvitado] =
 	//	useState(false);
@@ -103,29 +106,58 @@ function Evento({
 			setDNIInvalido(true);
 			return;
 		}
-		// Compruebo si existe un invitado con ese DNI
-		if (invitadosArray.find((i) => i.DNI === DNI) != undefined) {
-			setInvitadoExistente(true);
-			return;
+		// Si estoy modificando invitado
+		if (modificandoInvitado){
+			// Compruebo si existe un invitado con ese DNI diferente a si mismo
+			const i = invitadosArray.findIndex((i) => i.DNI === DNI)
+			if (i != indexInvitadoModificar && i != -1){
+				setInvitadoExistente(true);
+				return;
+			}
+		}
+		// Si estoy creando invitado
+		else {
+			// Compruebo si existe un invitado con ese DNI
+			if (invitadosArray.find((i) => i.DNI === DNI) != undefined) {
+				setInvitadoExistente(true);
+				return;
+			}
 		}
 		// Añado el invitado a firebase
 		try {
-			const docRef = await addDoc(collection(db, "Eventos/" + id + "/Invitados"), 
-			{
-				nombre: nombre,
-				email: email,
-				DNI: DNI.toUpperCase(),
-			})
-			// Actualizo mis invitados
-			setInvitados([
-				...invitadosArray,
+			// Si estoy modificando invitado
+			if (modificandoInvitado){
+				await updateDoc(doc(db, "Eventos/" + id + "/Invitados/" + invitadosArray.at(indexInvitadoModificar).docId), 
 				{
-					docId: docRef.id,
 					nombre: nombre,
 					email: email,
 					DNI: DNI.toUpperCase(),
-				},
-			]);
+				})
+				const nuevosInvitados = [...invitadosArray]
+				nuevosInvitados[indexInvitadoModificar].nombre = nombre
+				nuevosInvitados[indexInvitadoModificar].email = email
+				nuevosInvitados[indexInvitadoModificar].DNI = DNI.toUpperCase()
+				setInvitados([...nuevosInvitados])
+			}
+			// Si estoy creando invitado
+			else {
+				const docRef = await addDoc(collection(db, "Eventos/" + id + "/Invitados"), 
+				{
+					nombre: nombre,
+					email: email,
+					DNI: DNI.toUpperCase(),
+				})
+				// Actualizo mis invitados
+				setInvitados([
+					...invitadosArray,
+					{
+						docId: docRef.id,
+						nombre: nombre,
+						email: email,
+						DNI: DNI.toUpperCase(),
+					},
+				]);
+			}
 			//
 			event.target.formNombre.value = null;
 			event.target.formDNI.value = null;
@@ -133,6 +165,7 @@ function Evento({
 			setInvitadoExistente(false);
 			//Establcecemos mensaje de exito de crear invitado
 			setShowInvitados(false);
+			setModificandoInvitado(false);
 			setShowExitoAgnadirInvitado(true);
 		} catch (e) {
 			console.error("Error adding document: ", e);
@@ -151,6 +184,11 @@ function Evento({
 		onEliminar();
 		setUsuariosPendientesCorreo(invitadosArray, nombre, fecha, id);
 	};
+
+	const handleModificarInvitado = (index) => {
+		setIndexInvitadoModificar(index)
+		setModificandoInvitado(true)
+	}
 
 	const handleSelectEvento = () => {
 		const eventIsSelected = onSelectEvento();
@@ -244,9 +282,7 @@ function Evento({
 											<div className="d-grid my-auto d-md-inline gap-2">
 												<button
 														className="my-2 btn btn-warning" 
-														onClick={()=>{
-															
-														}} 
+														onClick={() => {handleModificarInvitado(index)}} 
 													>
 													{" "}
 													Modificar
@@ -306,7 +342,11 @@ function Evento({
 				id={`modalListaInvitados-${id}`}
 				className="modal-lg pt-2 px-2 pt-md-0 px-md-0"
 				show={showInvitados}
-				onEnter={()=>{setInvitadosAEliminar([])}}
+				onEnter={()=>{
+					setModificandoInvitado(false)
+					setIndexInvitadoModificar(null);
+					setInvitadosAEliminar([]);
+				}}
 				onHide={() => {
 					setNombrelInvalido(false);
 					setDNIInvalido(false);
@@ -314,6 +354,10 @@ function Evento({
 					setInvitadoExistente(false);
 					setShowInvitados(false);
 					setShowErrorAgnadirInvitado(false);//Quitamos mensaje
+					setTimeout(() => {
+						setModificandoInvitado(false)
+						setIndexInvitadoModificar(null)
+					}, 200);
 				}}
 				centered
 			>
@@ -321,7 +365,14 @@ function Evento({
 					<Modal.Title>Lista de invitados</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					<Form onSubmit={handleSubmitAnadirInvitado}>
+					<Form onSubmit={handleSubmitAnadirInvitado}
+						onReset={(e) =>{
+							setModificandoInvitado(false)
+							setIndexInvitadoModificar(null)
+							e.target.formNombre.value =  "";
+							e.target.formDNI.value = "";
+							e.target.formEmail.value = "";
+						}}>
 						<Row className="mb-3">
 							<Form.Group
 								as={Col}
@@ -333,6 +384,7 @@ function Evento({
 								<Form.Control
 									type="text"
 									placeholder="Introduzca nombre"
+									defaultValue={modificandoInvitado ? invitadosArray?.at(indexInvitadoModificar)?.nombre : ""}
 									required
 									isInvalid={nombreInvalido}
 									onInvalid={() => setShowErrorAgnadirInvitado(true)}
@@ -351,6 +403,7 @@ function Evento({
 								<Form.Control
 									type="text"
 									placeholder="Introduzca DNI/NIE"
+									defaultValue={modificandoInvitado ? invitadosArray?.at(indexInvitadoModificar)?.DNI : ""}
 									required
 									isInvalid={DNIInvalido}
 									onInvalid={() => setShowErrorAgnadirInvitado(true)}
@@ -370,6 +423,7 @@ function Evento({
 								<Form.Control
 									type="email"
 									placeholder="Introduzca correo electrónico"
+									defaultValue={modificandoInvitado ? invitadosArray?.at(indexInvitadoModificar)?.email : ""}
 									required
 									isInvalid={emailInvalido}
 									onInvalid={() => setShowErrorAgnadirInvitado(true)}
@@ -390,11 +444,19 @@ function Evento({
 							)}
 							<div className="d-grid gap-2">
 								<Button
-									className="btn btn-dark btn-block"
+									className = {`btn btn-block ${modificandoInvitado ? "btn-success" : "btn-dark"}`}
 									type="submit"
 								>
-									Añadir
+									{modificandoInvitado ? "Guardar" : "Añadir"}
 								</Button>
+								{modificandoInvitado &&
+									<Button
+									className = "btn btn-block btn-danger"
+									type="reset"
+									>
+										Cancelar
+									</Button>
+								}
 							</div>
 						</Row>
 					</Form>
