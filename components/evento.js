@@ -165,7 +165,6 @@ function Evento({
 			setInvitadoExistente(false);
 			//Establcecemos mensaje de exito de crear invitado
 			setShowInvitados(false);
-			setModificandoInvitado(false);
 			setShowExitoAgnadirInvitado(true);
 		} catch (e) {
 			console.error("Error adding document: ", e);
@@ -469,9 +468,14 @@ function Evento({
 			<ModalGenerico
 				id="modalExitoAgnadirInvitado"
 				show={showExitoAgnadirInvitado}
-				titulo="Invitado añadido"
-				cuerpo="El invitado se ha añadido correctamente"
-				onHide={() => {setShowExitoAgnadirInvitado(false); setShowInvitados(true);}}
+				titulo={"Invitado " + (modificandoInvitado ? "modificado" : "añadido")}
+				cuerpo={"El invitado se ha " + (modificandoInvitado ? "modificado" : "añadido") + " correctamente"}
+				onHide={() => {
+					setModificandoInvitado(false)
+					setIndexInvitadoModificar(null)
+					setShowExitoAgnadirInvitado(false);
+					setShowInvitados(true);
+				}}
 			/>
 			{/* ------------------------------------------------------- */}
 
