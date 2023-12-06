@@ -4,10 +4,9 @@ import MostrarGrafica from "./mostrarGrafica";
 //const datosEjemplo = [["Pepe Lopez", "M", "22", "Si", "0:30"], ["Jose Martinez", "M", "19", "No", ""],["Maria Sanchez", "F", "24", "Si", "1:30"], ["Ana Ortiz", "F", "21", "No", ""]]
 
 const Stats = ({ sexo, edad, asistencia, horaLlegada, counter }) => {
-	// UTILIZAR PROP CONTADOR MÁS ADELANTA (!!)
 	if (counter==0) {
 		return (
-			<div class="d-flex justify-content-center">
+			<div class="d-flex justify-content-center py-4">
 				<h2 className="mt-8">
 					Selecciona al menos una de las variables
 				</h2>
@@ -15,7 +14,7 @@ const Stats = ({ sexo, edad, asistencia, horaLlegada, counter }) => {
 		);
 	} else if (counter > 2) {
 		return (
-			<div class="d-flex justify-content-center">
+			<div class="d-flex justify-content-center py-4">
 				<h2 className="mt-8">Debes seleccionar solo dos variables</h2>
 			</div>
 		);
@@ -43,14 +42,12 @@ const Stats = ({ sexo, edad, asistencia, horaLlegada, counter }) => {
 					/*Opciones para los gráficos*/
 				}
 				const options = {
-					title: "Invitados del evento por sexo y edad",
 					chartArea: { width: "100%" },
 				};
 				{
 					/*Opciones para el gráfico de barras horizontal*/
 				}
 				const options_horizontal = {
-					title: "Invitados del evento por sexo y edad",
 					chartArea: { width: "100%" },
 					hAxis: {
 						title: "Edad",
@@ -65,7 +62,6 @@ const Stats = ({ sexo, edad, asistencia, horaLlegada, counter }) => {
 					/*Opciones para el gráfico de barras apiladas*/
 				}
 				const options_stacked = {
-					title: "Invitados del evento por sexo y edad",
 					chartArea: { width: "100%" },
 					isStacked: true,
 					hAxis: {
@@ -78,12 +74,14 @@ const Stats = ({ sexo, edad, asistencia, horaLlegada, counter }) => {
 				};
 				// Gráficos para las variables conjuntas sexo y edad
 				return (
-					<MostrarGraficaConjunta
-						data={data}
-						options={options}
-						options_horizontal={options_horizontal}
-						options_stacked={options_stacked}
-					/>
+					<>
+						<MostrarGraficaConjunta
+							data={data}
+							options={options}
+							options_horizontal={options_horizontal}
+							options_stacked={options_stacked}
+						/>
+					</>
 				);
 			} else if (asistencia) {
 				{
@@ -107,14 +105,12 @@ const Stats = ({ sexo, edad, asistencia, horaLlegada, counter }) => {
 					/*Opciones para los gráficos*/
 				}
 				const options = {
-					title: "Invitados del evento por sexo y edad",
 					chartArea: { width: "100%" },
 				};
 				{
 					/*Opciones para el gráfico de barras horizontal*/
 				}
 				const options_horizontal = {
-					title: "Invitados del evento por sexo y edad",
 					chartArea: { width: "100%" },
 					hAxis: {
 						title: "Edad",
@@ -129,7 +125,6 @@ const Stats = ({ sexo, edad, asistencia, horaLlegada, counter }) => {
 					/*Opciones para el gráfico de barras apiladas*/
 				}
 				const options_stacked = {
-					title: "Invitados del evento por sexo y edad",
 					chartArea: { width: "100%" },
 					isStacked: true,
 					hAxis: {
@@ -142,12 +137,14 @@ const Stats = ({ sexo, edad, asistencia, horaLlegada, counter }) => {
 				};
 				// Gráficos para las variables conjuntas sexo y asistencia
 				return (
-					<MostrarGraficaConjunta
-						data={data}
-						options={options}
-						options_horizontal={options_horizontal}
-						options_stacked={options_stacked}
-					/>
+					<>
+						<MostrarGraficaConjunta
+							data={data}
+							options={options}
+							options_horizontal={options_horizontal}
+							options_stacked={options_stacked}
+						/>
+					</>
 				);
 			} else if (horaLlegada) {
 				{
@@ -171,14 +168,12 @@ const Stats = ({ sexo, edad, asistencia, horaLlegada, counter }) => {
 					/*Opciones para los gráficos*/
 				}
 				const options = {
-					title: "Invitados del evento por sexo y edad",
 					chartArea: { width: "100%" },
 				};
 				{
 					/*Opciones para el gráfico de barras horizontal*/
 				}
 				const options_horizontal = {
-					title: "Invitados del evento por sexo y edad",
 					chartArea: { width: "100%" },
 					hAxis: {
 						title: "Edad",
@@ -193,7 +188,6 @@ const Stats = ({ sexo, edad, asistencia, horaLlegada, counter }) => {
 					/*Opciones para el gráfico de barras apiladas*/
 				}
 				const options_stacked = {
-					title: "Invitados del evento por sexo y edad",
 					chartArea: { width: "100%" },
 					isStacked: true,
 					hAxis: {
@@ -206,12 +200,14 @@ const Stats = ({ sexo, edad, asistencia, horaLlegada, counter }) => {
 				};
 				// Gráficos para las variables conjuntas sexo y asistencia
 				return (
-					<MostrarGraficaConjunta
-						data={data}
-						options={options}
-						options_horizontal={options_horizontal}
-						options_stacked={options_stacked}
-					/>
+					<>
+						<MostrarGraficaConjunta
+							data={data}
+							options={options}
+							options_horizontal={options_horizontal}
+							options_stacked={options_stacked}
+						/>
+					</>
 				);
 			} else {
 				// Si sólo está seleccionada la variable sexo
@@ -222,7 +218,6 @@ const Stats = ({ sexo, edad, asistencia, horaLlegada, counter }) => {
 				];
 
 				const options = {
-					title: "Invitados del evento por sexo",
 					chartArea: { width: "50%" },
 				};
 
@@ -256,14 +251,12 @@ const Stats = ({ sexo, edad, asistencia, horaLlegada, counter }) => {
 					/*Opciones para los gráficos*/
 				}
 				const options = {
-					title: "Invitados del evento por edad y asistencia",
 					chartArea: { width: "100%" },
 				};
 				{
 					/*Opciones para el gráfico de barras horizontal*/
 				}
 				const options_horizontal = {
-					title: "Invitados del evento por edad y asistencia",
 					chartArea: { width: "100%" },
 					hAxis: {
 						title: "Edad",
@@ -278,7 +271,6 @@ const Stats = ({ sexo, edad, asistencia, horaLlegada, counter }) => {
 					/*Opciones para el gráfico de barras apiladas*/
 				}
 				const options_stacked = {
-					title: "Invitados del evento por edad y asistencia",
 					chartArea: { width: "100%" },
 					isStacked: true,
 					hAxis: {
@@ -320,14 +312,12 @@ const Stats = ({ sexo, edad, asistencia, horaLlegada, counter }) => {
 					/*Opciones para los gráficos*/
 				}
 				const options = {
-					title: "Invitados del evento por edad y hora de llegada",
 					chartArea: { width: "100%" },
 				};
 				{
 					/*Opciones para el gráfico de barras horizontal*/
 				}
 				const options_horizontal = {
-					title: "Invitados del evento por edad y hora de llegada",
 					chartArea: { width: "100%" },
 					hAxis: {
 						title: "Edad",
@@ -342,7 +332,6 @@ const Stats = ({ sexo, edad, asistencia, horaLlegada, counter }) => {
 					/*Opciones para el gráfico de barras apiladas*/
 				}
 				const options_stacked = {
-					title: "Invitados del evento por edad y hora de llegada",
 					chartArea: { width: "100%" },
 					isStacked: true,
 					hAxis: {
@@ -379,7 +368,6 @@ const Stats = ({ sexo, edad, asistencia, horaLlegada, counter }) => {
 				];
 
 				const options = {
-					title: "Invitados del evento por edad",
 					chartArea: { width: "50%" },
 				};
 
@@ -413,14 +401,12 @@ const Stats = ({ sexo, edad, asistencia, horaLlegada, counter }) => {
 					/*Opciones para los gráficos*/
 				}
 				const options = {
-					title: "Invitados del evento por asistencia y hora de llegada",
 					chartArea: { width: "100%" },
 				};
 				{
 					/*Opciones para el gráfico de barras horizontal*/
 				}
 				const options_horizontal = {
-					title: "Invitados del evento por asistencia y hora de llegada",
 					chartArea: { width: "100%" },
 					hAxis: {
 						title: "Edad",
@@ -435,7 +421,6 @@ const Stats = ({ sexo, edad, asistencia, horaLlegada, counter }) => {
 					/*Opciones para el gráfico de barras apiladas*/
 				}
 				const options_stacked = {
-					title: "Invitados del evento por asistencia y hora de llegada",
 					chartArea: { width: "100%" },
 					isStacked: true,
 					hAxis: {
@@ -472,7 +457,6 @@ const Stats = ({ sexo, edad, asistencia, horaLlegada, counter }) => {
 				];
 
 				const options = {
-					title: "Invitados del evento por asistencia",
 					chartArea: { width: "50%" },
 				};
 
@@ -500,7 +484,6 @@ const Stats = ({ sexo, edad, asistencia, horaLlegada, counter }) => {
 			];
 
 			const options = {
-				title: "Invitados del evento por asistencia",
 				chartArea: { width: "50%" },
 			};
 

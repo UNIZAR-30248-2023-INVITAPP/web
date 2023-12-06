@@ -78,10 +78,9 @@ function Estadisticas() {
 	};
 
 	return (
-		<>
-			<Layout></Layout>
-			<h1 className="fw-bold text-center">Estadísticas de {router.query.id} evento</h1>
-			<div class="d-flex justify-content-center pb-30">
+		<Layout>
+			<h1 className="fw-bold text-center py-4">Estadísticas de {router.query.id} evento</h1>
+			<div class="d-flex justify-content-center">
 				<ButtonGroup horizontal size="lg">
 					<ToggleButton
 						id="toggle-check"
@@ -130,12 +129,12 @@ function Estadisticas() {
 								asistencia={asistenciaChecked}
 								horaLlegada={horaLlegadaChecked}
 								counter={counter}></Stats> : 
-								<div class="d-flex justify-content-center pb-30">
+								<div class="d-flex justify-content-center py-4">
 									<Spinner></Spinner>
 								</div>
 				}
 								
-		</>
+		</Layout>
 	);
 }
 

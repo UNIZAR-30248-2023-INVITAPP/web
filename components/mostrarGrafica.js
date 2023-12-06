@@ -1,4 +1,5 @@
-import { Accordion } from "react-bootstrap";
+import { useState, useEffect } from "react";
+import { Accordion, ButtonGroup, Spinner, ToggleButton } from "react-bootstrap";
 import { Chart } from "react-google-charts";
 
 const MostrarGrafica = ({
@@ -7,95 +8,158 @@ const MostrarGrafica = ({
 	options_horizontal,
 	options_stacked,
 }) => {
+	const [isLoading, setLoading] = useState(false);
+
+	// Variables para controlar los botones que han sido pulsados
+	const [verticalChecked, setVerticalChecked] = useState(true);
+	const [horizontalChecked, setHorizontalChecked] = useState(false);
+	const [apiladasChecked, setApiladasChecked] = useState(false);
+
+	// Función para simular la carga de datos
+	useEffect(() => {
+		function simularCarga() {
+			return new Promise((resolve) => setTimeout(resolve, 1000));
+		}
+
+		if (isLoading) {
+			simularCarga().then(() => {
+				setLoading(false);
+			});
+		}
+	}, [isLoading]);
+
+	// Control de la pulsación de botones
+	const handleClickOnVertical = () => {
+		if (!verticalChecked) {
+			setLoading(true);
+			setHorizontalChecked(false);
+			setApiladasChecked(false);
+			setVerticalChecked(!verticalChecked);
+			options=options;
+		} else {
+			setVerticalChecked(!verticalChecked);
+		}
+	};
+
+	const handleClickOnHorizontal = () => {
+		if (!horizontalChecked) {
+			setLoading(true);
+			setHorizontalChecked(!horizontalChecked);
+			setVerticalChecked(false);
+			setApiladasChecked(false);
+			options=options_horizontal;
+		} else {
+			setHorizontalChecked(!horizontalChecked);
+		}
+	};
+
+	const handleClickOnApiladas = () => {
+		if (!apiladasChecked) {
+			setLoading(true);
+			setApiladasChecked(!apiladasChecked);
+			setHorizontalChecked(false);
+			setVerticalChecked(false);
+			options=options_stacked
+		} else {
+			setApiladasChecked(!apiladasChecked);
+		}
+	};
 	return (
-		<Accordion className="mt-70">
-			<Accordion.Item eventKey="0">
-				<Accordion.Header>Diagrama de barras vertical</Accordion.Header>
-				<Accordion.Body>
-					<Chart
-						chartType="Bar"
-						width="100%"
-						height="500px"
-						data={data}
-						options={options}
-					/>
-				</Accordion.Body>
-			</Accordion.Item>
-			<Accordion.Item eventKey="1">
-				<Accordion.Header>
-					Diagrama de barras horizontal
-				</Accordion.Header>
-				<Accordion.Body>
-					<Chart
-						chartType="Bar"
-						width="100%"
-						height="500px"
-						data={data}
-						options={options_horizontal}
-					/>
-				</Accordion.Body>
-			</Accordion.Item>
-			<Accordion.Item eventKey="2">
-				<Accordion.Header>Diagrama de barras apiladas</Accordion.Header>
-				<Accordion.Body>
-					<Chart
-						chartType="BarChart"
-						width="100%"
-						height="500px"
-						data={data}
-						options={options_stacked}
-					/>
-				</Accordion.Body>
-			</Accordion.Item>
-			<Accordion.Item eventKey="3">
-				<Accordion.Header>Diagrama de línea</Accordion.Header>
-				<Accordion.Body>
-					<Chart
-						chartType="Line"
-						width="100%"
-						height="500px"
-						data={data}
-						options={options}
-					/>
-				</Accordion.Body>
-			</Accordion.Item>
-			<Accordion.Item eventKey="4">
-				<Accordion.Header>Diagrama de dispersión</Accordion.Header>
-				<Accordion.Body>
-					<Chart
-						chartType="ScatterChart"
-						width="100%"
-						height="500px"
-						data={data}
-						options={options}
-					/>
-				</Accordion.Body>
-			</Accordion.Item>
-			<Accordion.Item eventKey="5">
-				<Accordion.Header>Diagrama en área</Accordion.Header>
-				<Accordion.Body>
-					<Chart
-						chartType="AreaChart"
-						width="100%"
-						height="500px"
-						data={data}
-						options={options}
-					/>
-				</Accordion.Body>
-			</Accordion.Item>
-			<Accordion.Item eventKey="6">
-				<Accordion.Header>Diagrama circular</Accordion.Header>
-				<Accordion.Body>
-					<Chart
-						chartType="PieChart"
-						width="80%"
-						height="500px"
-						data={data}
-						options={options}
-					/>
-				</Accordion.Body>
-			</Accordion.Item>
-		</Accordion>
+		<>
+		<hr/>
+		<h2>Diagrama de barras</h2>
+		<div class="d-flex justify-content-center">
+			<ButtonGroup horizontal size="lg">
+				<ToggleButton
+					id="toggle-check"
+					type="checkbox"
+					variant="outline-primary"
+					checked={verticalChecked ? true : false}
+					disabled={isLoading}
+					onClick={!isLoading ? handleClickOnVertical : null}
+				>
+					Vertical
+				</ToggleButton>
+				<ToggleButton
+					id="toggle-check"
+					type="checkbox"
+					variant="outline-primary"
+					checked={horizontalChecked ? true : false}
+					disabled={isLoading}
+					onClick={!isLoading ? handleClickOnHorizontal : null}
+				>
+					Horizontal
+				</ToggleButton>
+				<ToggleButton
+					id="toggle-check"
+					type="checkbox"
+					variant="outline-primary"
+					checked={apiladasChecked ? true : false}
+					disabled={isLoading}
+					onClick={!isLoading ? handleClickOnApiladas : null}
+				>
+					Apiladas
+				</ToggleButton>
+			</ButtonGroup>
+		</div>
+		{isLoading ? <div class="d-flex justify-content-center py-3">
+									<Spinner></Spinner>
+								</div> : 
+								<div class="d-flex justify-content-center py-1">
+									<Chart
+									chartType= {apiladasChecked ? "BarChart" : "Bar"}
+									width="80em"
+									height="300px"
+									data={data}
+									options={verticalChecked ? options : horizontalChecked ? options_horizontal : apiladasChecked ? options_stacked : null}
+									/>
+								</div>
+		}
+		<hr/>
+		<h2>Diagrama de líneas</h2>
+		<div class="d-flex justify-content-center py-1">
+			<Chart
+				chartType="Line"
+				width="80em"
+				height="500px"
+				data={data}
+				options={options}
+			/>
+		</div>
+		<hr/>
+		<h2>Diagrama de dispersión</h2>
+		<div class="d-flex justify-content-center py-1">
+			<Chart
+				chartType="ScatterChart"
+				width="80em"
+				height="500px"
+				data={data}
+				options={options}
+			/>
+		</div>
+		<hr/>
+		<h2>Diagrama de área</h2>
+		<div class="d-flex justify-content-center py-1">
+			<Chart
+				chartType="AreaChart"
+				width="80em"
+				height="500px"
+				data={data}
+				options={options}
+			/>
+		</div>
+		<hr/>
+		<h2>Diagrama circular</h2>
+		<div class="d-flex justify-content-center py-1">
+			<Chart
+				chartType="PieChart"
+				width="80em"
+				height="500px"
+				data={data}
+				options={options}
+			/>
+		</div>
+		</>
 		// INCLUIR DIAGRAMAS CON LA MEDIA?? (!!)
 		// ...
 	);
