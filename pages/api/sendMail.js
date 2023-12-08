@@ -35,8 +35,8 @@ export default async function handler(req, res) {
         host: "smtp.gmail.com",
         port: 587,
         auth: {
-          user: 'jsanclementev@gmail.com',
-          pass: 'vhed sfpy kmul ixid' // Contraseña de aplicación generada
+          user: 'invitapp.unizar@gmail.com',
+          pass: 'evkz cizc kvla ocie'
         }
       });
 
@@ -44,7 +44,7 @@ export default async function handler(req, res) {
         const ganadores = req.body
         for (const ganador of ganadores) {
           const mailOptions = {
-            from: 'jsanclementev@gmail.com',
+            from: 'invitapp.unizar@gmail.com',
             to: ganador.email,
             subject: `InvitApp - Premio obtenido para el evento "${ganador.nombreEvento}"`,
             text: `Enhorabuena! Has ganado "${ganador.premio}" para el evento ${ganador.nombreEvento}. Que lo disfrutes!`,

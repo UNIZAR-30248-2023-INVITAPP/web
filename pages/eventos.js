@@ -9,6 +9,7 @@ import {
 	collection,
 	addDoc,
 	getDocs,
+	getDoc,
 } from "firebase/firestore";
 import db from "../firebase";
 import ModalGenerico from "@/components/modalGenerico";
@@ -209,7 +210,7 @@ function EventosPage() {
                     setEventos(nuevosEventos);
 
                     console.log(usuariosPendientesCorreo)
-                    if (usuariosPendientesCorreo.length > 0) { // Solo se manda peticion de correo si hay invitados en el evento
+                    if (usuariosPendientesCorreo.length > 0 && filtroEventosFuturos) { // Solo se manda peticion de correo si hay invitados en el evento
                         await sendPostRequestToMailService(usuariosPendientesCorreo);
                     }
                 }
@@ -257,7 +258,7 @@ function EventosPage() {
 				})
 			);
 
-			await sendPostRequestToMailService(usuariosPendientesCorreo);
+			if (filtroEventosFuturos) await sendPostRequestToMailService(usuariosPendientesCorreo);
 
 			setEventos(nuevosEventos);
 			setEventosSeleccionados([]);
@@ -628,8 +629,11 @@ function EventosPage() {
 							id="modalConfirmacionEliminarEventoMultiple"
 							show={showConfirmBorradoMultiple}
 							titulo="Borrar los eventos seleccionados"
-							cuerpo="¿Está seguro de que desea eliminar los eventos seleccionados? Se enviará un correo
-									electrónico avisando a todos los asistentes a los eventos que vas a eliminar."
+							cuerpo = {
+								<div>¿Estás seguro de que desea eliminar los eventos seleccionados?
+									<br/>
+									{filtroEventosFuturos ? "Se enviarán correos electrónicos a todos los asistendes a los eventos que vas a eliminar." : ""}
+								</div>}
 							onHide={() => setShowConfirmBorradoMultiple(false)}
 							onEliminar={() => handleEliminarEventoMultiple()}
 							showSpinner={showSpinner}
@@ -689,7 +693,11 @@ function EventosPage() {
 							id="modalConfirmarEliminarEventoSimple"
 							show={showConfirmModal}
 							titulo="Confirmar eliminación"
-							cuerpo={"¿Estás seguro de que deseas eliminar el evento \"" + eventToDeleteNombre + "\"?\n Se enviarán correos electrónicos a todos los invitados avisando de la cancelación del evento."}
+							cuerpo={
+								<div>¿Estás seguro de que desea eliminar el evento "{eventToDeleteNombre}"?
+									<br/>
+									{filtroEventosFuturos ? "Se enviarán correos electrónicos a todos los invitados avisando de la cancelación del evento." : ""}
+								</div>}
 							onHide={() => handleHideConfirmacionModal()}
 							onEliminar={confirmarEliminacionEvento}
 							showSpinner={showSpinner}
@@ -831,6 +839,7 @@ function EventosPage() {
 											Seleccionado = { eventosSeleccionados.includes(evento.id) ? true : false}
 											setUsuariosPendientesCorreo={establecerPropiedadesCorreo}
 											quitarUsuariosPendientesCorreo={eliminarCorreosLista}
+											futuro={filtroEventosFuturos}
 										/>
 									))
 									}

@@ -30,6 +30,7 @@ function Evento({
 	onSelectEvento,
 	setUsuariosPendientesCorreo,
 	quitarUsuariosPendientesCorreo,
+	futuro
 }) {
 	//const [invitadosArray, setInvitados] = useState(invitados);
 	const [invitadosArray, setInvitados] = useState(invitados);
@@ -228,19 +229,19 @@ function Evento({
 		if (invitadosArray?.length > 0) {
 			return (
 				<div className="d-flex flex-column gap-3">
-					<Button disabled={(invitadosAEliminar.length == 0)} className="btn btn-danger btn-block" 
+					{futuro && <Button disabled={(invitadosAEliminar.length == 0)} className="btn btn-danger btn-block" 
 					onClick={()=>{
 						setShowInvitados(false);
 						setShowConfirmBorradoMultiple(true)}
 						}>
-						Eliminar invitados seleccionados</Button>
+						Eliminar invitados seleccionados</Button>}
 					<ListGroup>
 						{invitadosArray.map((invitado, index) => {
 							return (
 								<ListGroup.Item key={invitado.DNI}>
 									<div className="d-flex flex-column flex-md-row gap-2 justify-content-between ">
 										<div className="d-flex flex-column gap-2 flex-md-row justify-content-between align-items-center">
-											<input
+											{futuro && <input
 												type="checkbox"
 												className="form-check-input border-2"
 												onChange={() => {
@@ -253,7 +254,7 @@ function Evento({
 														setInvitadosAEliminar([...invitadosAEliminar, invitado.DNI])
 													}
 												}} // Manejador para marcar/desmarcar invitado
-											/>
+											/>}
 											
 											<div>
 												<span className="fw-bold d-block mt-1">
@@ -276,6 +277,7 @@ function Evento({
 												</span>
 											</div>
 										</div>
+										{futuro && 
 										<div className="d-flex flex-column flex-md-row flex-md-row gap-2 justify-content-between ">
 											{/* Botón de modificar a la derecha */}
 											<div className="d-grid my-auto d-md-inline gap-2">
@@ -298,7 +300,7 @@ function Evento({
 													Eliminar
 												</button>
 											</div>
-										</div>
+										</div>}
 									</div>
 								</ListGroup.Item>
 							);
@@ -339,7 +341,7 @@ function Evento({
 			{/* Modal de listado de invitados */}
 			<Modal
 				id={`modalListaInvitados-${id}`}
-				className="modal-lg pt-2 px-2 pt-md-0 px-md-0"
+				className = {`${futuro ? "modal-lg" : "modal-md"} pt-2 px-2 pt-md-0 px-md-0`}
 				show={showInvitados}
 				onEnter={()=>{
 					setModificandoInvitado(false)
@@ -368,102 +370,106 @@ function Evento({
 					<Modal.Title>Lista de invitados</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					<Form onSubmit={handleSubmitAnadirInvitado}
-						onReset={(e) =>{
-							setModificandoInvitado(false)
-							setIndexInvitadoModificar(null)
-							e.target.formNombre.value =  "";
-							e.target.formDNI.value = "";
-							e.target.formEmail.value = "";
-						}}>
-						<Row className="mb-3">
-							<Form.Group
-								as={Col}
-								md="7"
-								className="mb-3"
-								controlId="formNombre"
-							>
-								<Form.Label>Nombre completo</Form.Label>
-								<Form.Control
-									type="text"
-									placeholder="Introduzca nombre"
-									defaultValue={modificandoInvitado ? invitadosArray?.at(indexInvitadoModificar)?.nombre : ""}
-									required
-									isInvalid={nombreInvalido}
-									onInvalid={() => setShowErrorAgnadirInvitado(true)}
-								/>
-								<Form.Control.Feedback type="invalid">
-									El nombre no puede estar vacio
-								</Form.Control.Feedback>
-							</Form.Group>
-							<Form.Group
-								as={Col}
-								md="5"
-								className="mb-3"
-								controlId="formDNI"
-							>
-								<Form.Label>DNI/NIE</Form.Label>
-								<Form.Control
-									type="text"
-									placeholder="Introduzca DNI/NIE"
-									defaultValue={modificandoInvitado ? invitadosArray?.at(indexInvitadoModificar)?.DNI : ""}
-									required
-									isInvalid={DNIInvalido}
-									onInvalid={() => setShowErrorAgnadirInvitado(true)}
-								/>
-								<Form.Control.Feedback type="invalid">
-									DNI o NIE invalido
-								</Form.Control.Feedback>
-							</Form.Group>
-
-							<Form.Group
-								as={Col}
-								md="12"
-								className="mb-3"
-								controlId="formEmail"
-							>
-								<Form.Label>Correo eletrónico</Form.Label>
-								<Form.Control
-									type="email"
-									placeholder="Introduzca correo electrónico"
-									defaultValue={modificandoInvitado ? invitadosArray?.at(indexInvitadoModificar)?.email : ""}
-									required
-									isInvalid={emailInvalido}
-									onInvalid={() => setShowErrorAgnadirInvitado(true)}
-								/>
-								<Form.Control.Feedback type="invalid">
-									Introduzca un correo electrónico válido
-								</Form.Control.Feedback>
-							</Form.Group>
-							{invitadoExistente && (
-								<p className="text-center text-danger">
-									Ya existe un invitado con ese DNI
-								</p>
-							)}
-							{ showErrorAgnadirInvitado && !nombreInvalido && !DNIInvalido && !emailInvalido && (
-								<p className="text-center text-danger">
-									Todos los campos son obligatorios
-								</p>
-							)}
-							<div className="d-grid gap-2">
-								<Button
-									className = {`btn btn-block ${modificandoInvitado ? "btn-success" : "btn-dark"}`}
-									type="submit"
+					{futuro && 
+					<>
+						<Form onSubmit={handleSubmitAnadirInvitado}
+							onReset={(e) =>{
+								setModificandoInvitado(false)
+								setIndexInvitadoModificar(null)
+								e.target.formNombre.value =  "";
+								e.target.formDNI.value = "";
+								e.target.formEmail.value = "";
+							}}>
+							<Row className="mb-3">
+								<Form.Group
+									as={Col}
+									md="7"
+									className="mb-3"
+									controlId="formNombre"
 								>
-									{modificandoInvitado ? "Guardar" : "Añadir"}
-								</Button>
-								{modificandoInvitado &&
+									<Form.Label>Nombre completo</Form.Label>
+									<Form.Control
+										type="text"
+										placeholder="Introduzca nombre"
+										defaultValue={modificandoInvitado ? invitadosArray?.at(indexInvitadoModificar)?.nombre : ""}
+										required
+										isInvalid={nombreInvalido}
+										onInvalid={() => setShowErrorAgnadirInvitado(true)}
+									/>
+									<Form.Control.Feedback type="invalid">
+										El nombre no puede estar vacio
+									</Form.Control.Feedback>
+								</Form.Group>
+								<Form.Group
+									as={Col}
+									md="5"
+									className="mb-3"
+									controlId="formDNI"
+								>
+									<Form.Label>DNI/NIE</Form.Label>
+									<Form.Control
+										type="text"
+										placeholder="Introduzca DNI/NIE"
+										defaultValue={modificandoInvitado ? invitadosArray?.at(indexInvitadoModificar)?.DNI : ""}
+										required
+										isInvalid={DNIInvalido}
+										onInvalid={() => setShowErrorAgnadirInvitado(true)}
+									/>
+									<Form.Control.Feedback type="invalid">
+										DNI o NIE invalido
+									</Form.Control.Feedback>
+								</Form.Group>
+
+								<Form.Group
+									as={Col}
+									md="12"
+									className="mb-3"
+									controlId="formEmail"
+								>
+									<Form.Label>Correo eletrónico</Form.Label>
+									<Form.Control
+										type="email"
+										placeholder="Introduzca correo electrónico"
+										defaultValue={modificandoInvitado ? invitadosArray?.at(indexInvitadoModificar)?.email : ""}
+										required
+										isInvalid={emailInvalido}
+										onInvalid={() => setShowErrorAgnadirInvitado(true)}
+									/>
+									<Form.Control.Feedback type="invalid">
+										Introduzca un correo electrónico válido
+									</Form.Control.Feedback>
+								</Form.Group>
+								{invitadoExistente && (
+									<p className="text-center text-danger">
+										Ya existe un invitado con ese DNI
+									</p>
+								)}
+								{ showErrorAgnadirInvitado && !nombreInvalido && !DNIInvalido && !emailInvalido && (
+									<p className="text-center text-danger">
+										Todos los campos son obligatorios
+									</p>
+								)}
+								<div className="d-grid gap-2">
 									<Button
-									className = "btn btn-block btn-danger"
-									type="reset"
+										className = {`btn btn-block ${modificandoInvitado ? "btn-success" : "btn-dark"}`}
+										type="submit"
 									>
-										Cancelar
+										{modificandoInvitado ? "Guardar" : "Añadir"}
 									</Button>
-								}
-							</div>
-						</Row>
-					</Form>
-					<hr className="hr" />
+									{modificandoInvitado &&
+										<Button
+										className = "btn btn-block btn-danger"
+										type="reset"
+										>
+											Cancelar
+										</Button>
+									}
+								</div>
+							</Row>
+						</Form>
+						<hr className="hr" />
+					</>
+					}
 					{listaInvitados()}
 				</Modal.Body>
 			</Modal>
@@ -578,28 +584,30 @@ function Evento({
 			</ToastContainer> */}
             <li className="mb-4 list-group-item border border-2 rounded col-12 col-lg-11 mx-auto">
                 <div className="d-flex flex-column py-2 flex-lg-row gap-3 justify-content-between ">
-                        <input
-                            type="checkbox"
-                            id={`checkbox-${id}`}
-                            className="form-check border-2"
-                            onChange={handleSelectEvento} // Manejador para marcar/desmarcar evento
-                            checked={Seleccionado}
-                        />
-                    <div className="d-flex flex-column justify-content-between align-items-center">
-                        <div>
-                            <h5 className="fw-bold">{nombre}</h5>
-                            <span className="fw-bold d-block mt-1">
-                                Fecha: <span className="fw-light">{fecha}</span>
-                            </span>
-                            <span className="fw-bold d-block mt-1">
-                                Hora: <span className="fw-light">{hora}</span>
-                            </span>
-                            <span className="fw-bold d-block mt-1">
-                                Ubicación:{" "}
-                                <span className="fw-light">{ubicacion}</span>
-                            </span>
-                        </div>
-                    </div>
+					<div className="d-flex flex-column gap-4 flex-md-row justify-content-between align-items-center">
+						<input
+							type="checkbox"
+							id={`checkbox-${id}`}
+							className="form-check border-2"
+							onChange={handleSelectEvento} // Manejador para marcar/desmarcar evento
+							checked={Seleccionado}
+						/>
+						<div className="d-flex flex-column justify-content-between align-items-center">
+							<div>
+								<h5 className="fw-bold">{nombre}</h5>
+								<span className="fw-bold d-block mt-1">
+									Fecha: <span className="fw-light">{fecha}</span>
+								</span>
+								<span className="fw-bold d-block mt-1">
+									Hora: <span className="fw-light">{hora}</span>
+								</span>
+								<span className="fw-bold d-block mt-1">
+									Ubicación:{" "}
+									<span className="fw-light">{ubicacion}</span>
+								</span>
+							</div>
+						</div>
+					</div>
 
                     <div className="d-flex flex-column flex-lg-row gap-2 justify-content-between">
                         {/* Botón de ver invitados a la derecha */}
@@ -616,7 +624,7 @@ function Evento({
                         </div>
 
                         {/* Botón de ver sorteos  */}
-                        <div className="d-grid my-auto d-lg-inline gap-2">
+                        {futuro && <div className="d-grid my-auto d-lg-inline gap-2">
                             <button
                                 className="btn btn-secondary" // Estilo de botón primario
                                 onClick={() => {
@@ -626,10 +634,10 @@ function Evento({
                                 {" "}
                                 Sorteo
                             </button>
-                        </div>
+                        </div>}
 
                         {/* Botón de modificar a la derecha */}
-                        <div className="d-grid my-auto d-lg-inline gap-2">
+                        {futuro && <div className="d-grid my-auto d-lg-inline gap-2">
                             <button
                                 className="btn btn-block btn-warning" // Estilo de botón de modificación
                                 onClick={onCambio} // Manejador para modificar el evento por índice
@@ -637,7 +645,7 @@ function Evento({
                                 {" "}
                                 Modificar
                             </button>
-                        </div>
+                        </div>}
 
 						{/* Botón de eliminación a la derecha */}
                         <div className="d-grid my-auto d-lg-inline gap-2">
