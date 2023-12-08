@@ -97,7 +97,7 @@ function Evento({
 		setShowErrorAgnadirInvitado(false);
 		event.preventDefault();
 		const nombre = event.target.formNombre.value;
-		const DNI = event.target.formDNI.value;
+		const DNI = event.target.formDNI.value.toUpperCase();
 		const email = event.target.formEmail.value;
 		// Valido el dni
 		if (validarDNI(DNI) === true) {
@@ -136,7 +136,7 @@ function Evento({
 				const nuevosInvitados = [...invitadosArray]
 				nuevosInvitados[indexInvitadoModificar].nombre = nombre
 				nuevosInvitados[indexInvitadoModificar].email = email
-				nuevosInvitados[indexInvitadoModificar].DNI = DNI.toUpperCase()
+				nuevosInvitados[indexInvitadoModificar].DNI = DNI
 				setInvitados([...nuevosInvitados])
 			}
 			// Si estoy creando invitado
@@ -145,7 +145,7 @@ function Evento({
 				{
 					nombre: nombre,
 					email: email,
-					DNI: DNI.toUpperCase(),
+					DNI: DNI,
 				})
 				// Actualizo mis invitados
 				setInvitados([
@@ -154,7 +154,7 @@ function Evento({
 						docId: docRef.id,
 						nombre: nombre,
 						email: email,
-						DNI: DNI.toUpperCase(),
+						DNI: DNI,
 					},
 				]);
 			}
@@ -345,6 +345,10 @@ function Evento({
 					setModificandoInvitado(false)
 					setIndexInvitadoModificar(null);
 					setInvitadosAEliminar([]);
+					setNombrelInvalido(false);
+					setDNIInvalido(false);
+					setEmailInvalido(false);
+					setInvitadoExistente(false);
 				}}
 				onHide={() => {
 					setNombrelInvalido(false);
