@@ -240,23 +240,6 @@ function Ruleta({ listaInvitados, nombreEvento }) {
                                     </div>
                                 );
                             })}
-                            {mensajeCorreoEnviado && (
-                                <>
-                                    <p className="text-success">{mensajeCorreoEnviado}</p>
-                                </>
-                            )}
-                            {spinnerCorreo && (
-                                        <Spinner animation="border" variant="primary" />
-                            )}
-                            {!spinnerCorreo && !mensajeCorreoEnviado && (
-                                <Button
-                                className="btn btn-dark"
-                                onClick={handleClickBotonCorreo}
-                                >
-                                    {`Enviar correo ${ganadores.length === 1 ? 'al ganador' : 'a los ganadores'}`}
-                                </Button>
-                            )}
-                            
                         </>
                     )}
                 </div>
@@ -284,6 +267,23 @@ function Ruleta({ listaInvitados, nombreEvento }) {
                         </Button>
                     </div>
                 </Form>
+                {mensajeCorreoEnviado && (
+                    <p className="text-center text-success">{mensajeCorreoEnviado}</p>
+                )}
+                {spinnerCorreo && (
+                    <div className="text-center">
+                        <Spinner  animation="border" variant="primary" />
+                    </div>
+                )}
+                {!spinnerCorreo && !mensajeCorreoEnviado && (
+                    <Button
+                    disabled={ganadores.length == 0}
+                    className="btn btn-dark"
+                    onClick={handleClickBotonCorreo}
+                    >
+                        {`Enviar correo ${ganadores.length === 1 ? 'al ganador' : 'a los ganadores'}`}
+                    </Button>
+                )}
                 {/* <Button variant="dark">Enviar email a los ganadores</Button> */}
             </div>
         </div>
