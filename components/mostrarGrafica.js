@@ -68,7 +68,7 @@ const MostrarGrafica = ({
 		<>
 		<hr/>
 		<h2>Diagrama de barras</h2>
-		<div class="d-flex justify-content-center">
+		<div className="d-flex justify-content-center">
 			<ButtonGroup horizontal size="lg">
 				<ToggleButton
 					id="toggle-check"
@@ -102,10 +102,10 @@ const MostrarGrafica = ({
 				</ToggleButton>
 			</ButtonGroup>
 		</div>
-		{isLoading ? <div class="d-flex justify-content-center py-3">
+		{isLoading ? <div className="d-flex justify-content-center py-3">
 									<Spinner></Spinner>
 								</div> : 
-								<div class="d-flex justify-content-center py-1">
+								<div className="d-flex justify-content-center py-1">
 									<Chart
 									chartType= {apiladasChecked ? "BarChart" : "Bar"}
 									width="80em"
@@ -116,41 +116,8 @@ const MostrarGrafica = ({
 								</div>
 		}
 		<hr/>
-		<h2>Diagrama de líneas</h2>
-		<div class="d-flex justify-content-center py-1">
-			<Chart
-				chartType="Line"
-				width="80em"
-				height="500px"
-				data={data}
-				options={options}
-			/>
-		</div>
-		<hr/>
-		<h2>Diagrama de dispersión</h2>
-		<div class="d-flex justify-content-center py-1">
-			<Chart
-				chartType="ScatterChart"
-				width="80em"
-				height="500px"
-				data={data}
-				options={options}
-			/>
-		</div>
-		<hr/>
-		<h2>Diagrama de área</h2>
-		<div class="d-flex justify-content-center py-1">
-			<Chart
-				chartType="AreaChart"
-				width="80em"
-				height="500px"
-				data={data}
-				options={options}
-			/>
-		</div>
-		<hr/>
 		<h2>Diagrama circular</h2>
-		<div class="d-flex justify-content-center py-1">
+		<div className="d-flex justify-content-center py-1">
 			<Chart
 				chartType="PieChart"
 				width="80em"
