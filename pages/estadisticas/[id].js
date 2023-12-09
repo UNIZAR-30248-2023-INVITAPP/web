@@ -3,7 +3,8 @@ import Layout from "@/components/layout";
 import { useState, useEffect } from "react";
 import { ToggleButton, ButtonGroup, Spinner } from "react-bootstrap";
 import { useRouter } from "next/router";
-import { getDoc } from "firebase/firestore";
+import { doc, getDoc, getDocs, collection } from "firebase/firestore";
+import db from "../../firebase";
 
 function Estadisticas() {
 	const router = useRouter()
@@ -19,6 +20,21 @@ function Estadisticas() {
 	// Variable contador para gestionar las estadísticas
 	const [counter, setCounter] = useState(0);
 
+	// Gestión de invitados
+	const [invitados, setInvitados] = useState([]);
+
+	//...
+	const [nombreEvento, setNombreEvento] = useState("");
+	const [fechaEvento, setFechaEvento] = useState("");
+
+	// TEMPORAL
+	const [num, setNum] = useState(0);
+
+	const randomNumberInRange = (min, max) => { 
+        return Math.floor(Math.random()  
+                * (max - min + 1)) + min; 
+    }; 
+
 	// Función para simular la carga de datos
 	useEffect(() => {
 		function simularCarga() {
@@ -31,6 +47,34 @@ function Estadisticas() {
 			});
 		}
 	}, [isLoading]);
+
+	useEffect(() => {
+		const fetchData = async() => {
+			//...
+			const evento = await getDoc(doc(db, "Eventos/" + router.query.id));
+            const nombre = evento._document.data.value.mapValue.fields.nombre.stringValue;
+            const fechaDate = new Date(evento._document.data.value.mapValue.fields.fecha.stringValue);
+            const fecha = fechaDate.toLocaleDateString("es-ES", { year: "numeric", month: "long", day: "numeric" });
+			setNombreEvento(nombre);
+			setFechaEvento(fecha);
+			//...
+			const invitadosFirebase = await getDocs(collection(db, "Eventos/" + router.query.id + "/Invitados"))
+			const invitadosEventoPrueba = invitadosFirebase.docs.map((i) => {
+				setNum(randomNumberInRange(18, 25));
+				return {
+					nombre: i._document.data.value.mapValue.fields.nombre.stringValue,
+					DNI: i._document.data.value.mapValue.fields.DNI.stringValue,
+					email: i._document.data.value.mapValue.fields.email.stringValue,
+					sexo: "M",
+					edad: {num},
+					asistencia: true,
+					horaLlegada: "0:30"
+				}
+			})
+			setInvitados([...invitadosEventoPrueba]);
+		}
+		fetchData();
+	}, [])
 
 	// Control de la pulsación de botones
 	const handleClickOnSexo = () => {
@@ -77,11 +121,13 @@ function Estadisticas() {
 		}
 	};
 
+	
+
 	return (
 		<Layout>
-			<h1 className="fw-bold text-center py-4">Estadísticas de {router.query.id} evento</h1>
-			<div class="d-flex justify-content-center">
-				<ButtonGroup horizontal size="lg">
+			<h1 className="fw-bold text-center py-4">Estadísticas de {nombreEvento} del {fechaEvento}</h1>
+			<div className="d-flex justify-content-center">
+				<ButtonGroup horizontal="true" size="lg">
 					<ToggleButton
 						id="toggle-check"
 						type="checkbox"
@@ -128,8 +174,10 @@ function Estadisticas() {
 								edad={edadChecked}
 								asistencia={asistenciaChecked}
 								horaLlegada={horaLlegadaChecked}
-								counter={counter}></Stats> : 
-								<div class="d-flex justify-content-center py-4">
+								counter={counter}
+								invitados={invitados}
+								></Stats> : 
+								<div className="d-flex justify-content-center py-4">
 									<Spinner></Spinner>
 								</div>
 				}

@@ -75,7 +75,7 @@ const MostrarGraficaConjunta = ({
 		<>
 		<hr/>
 		<h2>Diagrama de barras</h2>
-		<div class="d-flex justify-content-center">
+		<div className="d-flex justify-content-center">
 			<ButtonGroup horizontal size="lg">
 				<ToggleButton
 					id="toggle-check"
@@ -109,10 +109,10 @@ const MostrarGraficaConjunta = ({
 				</ToggleButton>
 			</ButtonGroup>
 		</div>
-		{isLoading ? <div class="d-flex justify-content-center py-3">
+		{isLoading ? <div className="d-flex justify-content-center py-3">
 									<Spinner></Spinner>
 								</div> : algoSeleccionado ?
-								<div class="d-flex justify-content-center py-1">
+								<div className="d-flex justify-content-center py-1">
 									<Chart
 									chartType= {apiladasChecked ? "BarChart" : "Bar"}
 									width="80em"
@@ -122,38 +122,16 @@ const MostrarGraficaConjunta = ({
 									/>
 								</div>
 								:
-								<div class="d-flex justify-content-center py-2">
+								<div className="d-flex justify-content-center py-2">
 									<h2>Debes seleccionar una de las opciones</h2>
 								</div>
 
 		}
 		<hr/>
 		<h2>Diagrama de líneas</h2>
-		<div class="d-flex justify-content-center py-1">
+		<div className="d-flex justify-content-center py-1">
 			<Chart
 				chartType="Line"
-				width="80em"
-				height="500px"
-				data={data}
-				options={options}
-			/>
-		</div>
-		<hr/>
-		<h2>Diagrama de dispersión</h2>
-		<div class="d-flex justify-content-center py-1">
-			<Chart
-				chartType="ScatterChart"
-				width="80em"
-				height="500px"
-				data={data}
-				options={options}
-			/>
-		</div>
-		<hr/>
-		<h2>Diagrama de área</h2>
-		<div class="d-flex justify-content-center py-1">
-			<Chart
-				chartType="AreaChart"
 				width="80em"
 				height="500px"
 				data={data}
