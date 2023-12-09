@@ -438,6 +438,7 @@ function EventosPage() {
 				fecha: nuevoEvento.fecha,
 				hora: nuevoEvento.hora,
 				ubicacion: nuevoEvento.ubicacion,
+				organizador: localStorage.getItem("email"),
 			});
 			//console.log("Document written with ID: ", docRef.id);
 
