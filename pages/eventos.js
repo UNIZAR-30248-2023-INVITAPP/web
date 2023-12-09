@@ -750,30 +750,6 @@ function EventosPage() {
 							showSpinner={showSpinner}
 						/>
 						
-
-						<Toast className='position-fixed bottom-0 end-0 p-3 m-2' show={showToast} onClose={() => {
-							setMensajeToast({
-								headerToast: '',
-								bodyToast: ''
-							})
-							setShowToast(false)
-							
-						}} delay={3000} autohide>
-							<Toast.Header>
-								<strong className="me-auto">{mensajeToast.headerToast}</strong>
-							</Toast.Header>
-							<Toast.Body>{mensajeToast.bodyToast}</Toast.Body>
-				
-						</Toast>
-
-						{/* Modal de mensaje de exito al eliminar varios eventos */}
-						<Toast className='position-fixed bottom-0 end-0 p-3 m-2' show={showExitoBorradoEventos} onClose={() => setShowExitoBorradoEventos(false)} delay={3000} autohide>
-							<Toast.Header>
-							<strong className="me-auto">Eventos eliminados</strong>
-							</Toast.Header>
-							<Toast.Body>Los eventos se han eliminado correctamente</Toast.Body>
-						</Toast>
-
 						{/* Carrusel donde aparecen todos los eventos */}
 						<div className="p-3 d-flex flex-column p-md-5 mt-3 rounded bg-light gap-2">
 							{/* Botones para filtrado por estado eventos [pasado, futuro] */}
@@ -846,6 +822,31 @@ function EventosPage() {
 									}
 							</ul>
 						</div>
+
+						{/* Modal de mensaje de exito al crear, modificar y eliminar varios eventos */}
+						<Toast className='position-fixed bottom-0 end-0 p-3 m-2' show={showToast} onClose={() => {
+							setMensajeToast({
+								headerToast: '',
+								bodyToast: ''
+							})
+							setShowToast(false)
+							
+						}} delay={3000} autohide>
+							<Toast.Header>
+								<strong className="me-auto">{mensajeToast.headerToast}</strong>
+							</Toast.Header>
+							<Toast.Body>{mensajeToast.bodyToast}</Toast.Body>
+				
+						</Toast>
+
+						{/* Modal de mensaje de exito al eliminar varios eventos */}
+						<Toast className='position-fixed bottom-0 end-0 p-3 m-2' show={showExitoBorradoEventos} onClose={() => setShowExitoBorradoEventos(false)} delay={3000} autohide>
+							<Toast.Header>
+							<strong className="me-auto">Eventos eliminados</strong>
+							</Toast.Header>
+							<Toast.Body>Los eventos se han eliminado correctamente</Toast.Body>
+						</Toast>
+
 					</div>
 				</div>
 			</Layout>
