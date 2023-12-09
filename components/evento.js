@@ -100,9 +100,10 @@ function Evento({
 		const nombre = event.target.formNombre.value;
 		const DNI = event.target.formDNI.value.toUpperCase();
 		const email = event.target.formEmail.value;
+		const genero = event.target.formGenero.value;
 		// Valido el dni
 		if (validarDNI(DNI) === true) {
-			console.log({ nombre, DNI, email });
+			console.log({ nombre, DNI, email, genero});
 		} else {
 			setDNIInvalido(true);
 			return;
@@ -133,11 +134,13 @@ function Evento({
 					nombre: nombre,
 					email: email,
 					DNI: DNI.toUpperCase(),
+					genero: genero,
 				})
 				const nuevosInvitados = [...invitadosArray]
 				nuevosInvitados[indexInvitadoModificar].nombre = nombre
 				nuevosInvitados[indexInvitadoModificar].email = email
 				nuevosInvitados[indexInvitadoModificar].DNI = DNI
+				nuevosInvitados[indexInvitadoModificar].genero = genero
 				setInvitados([...nuevosInvitados])
 			}
 			// Si estoy creando invitado
@@ -147,6 +150,7 @@ function Evento({
 					nombre: nombre,
 					email: email,
 					DNI: DNI,
+					genero: genero,
 				})
 				// Actualizo mis invitados
 				setInvitados([
@@ -156,6 +160,7 @@ function Evento({
 						nombre: nombre,
 						email: email,
 						DNI: DNI,
+						genero: genero,
 					},
 				]);
 			}
@@ -163,6 +168,7 @@ function Evento({
 			event.target.formNombre.value = null;
 			event.target.formDNI.value = null;
 			event.target.formEmail.value = null;
+			event.target.formGenero.value = null;
 			setInvitadoExistente(false);
 			//Establcecemos mensaje de exito de crear invitado
 			setShowInvitados(false);
@@ -275,6 +281,12 @@ function Evento({
 														{invitado.DNI}
 													</span>
 												</span>
+												<span className="fw-bold d-block mt-1">
+													Género:{" "}
+													<span className="fw-light">
+														{invitado.genero}
+													</span>
+												</span>
 											</div>
 										</div>
 										{futuro && 
@@ -379,6 +391,7 @@ function Evento({
 								e.target.formNombre.value =  "";
 								e.target.formDNI.value = "";
 								e.target.formEmail.value = "";
+								e.target.formGenero.value = "";
 							}}>
 							<Row className="mb-3">
 								<Form.Group
@@ -422,7 +435,7 @@ function Evento({
 
 								<Form.Group
 									as={Col}
-									md="12"
+									md="7"
 									className="mb-3"
 									controlId="formEmail"
 								>
@@ -439,6 +452,23 @@ function Evento({
 										Introduzca un correo electrónico válido
 									</Form.Control.Feedback>
 								</Form.Group>
+
+								<Form.Group 
+									as={Col}
+									md="5"
+									className="mb-3"	
+								>
+									<Form.Label>Género</Form.Label>
+									<Form.Select id="formGenero">
+									<option value={modificandoInvitado ? invitadosArray?.at(indexInvitadoModificar)?.genero : "Otro"}>
+											{modificandoInvitado ? "Género introducido: " + invitadosArray?.at(indexInvitadoModificar)?.genero : "Introduzca género(Por defeto: Otro)"}
+										</option>
+										<option value={"Masculino"}>Masculino</option>
+										<option value="Femenino">Femenino</option>
+										<option value="Otro">Otro</option>
+									</Form.Select>
+								</Form.Group>
+
 								{invitadoExistente && (
 									<p className="text-center text-danger">
 										Ya existe un invitado con ese DNI
