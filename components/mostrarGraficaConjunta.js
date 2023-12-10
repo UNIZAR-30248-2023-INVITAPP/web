@@ -123,24 +123,11 @@ const MostrarGraficaConjunta = ({
 								</div>
 								:
 								<div className="d-flex justify-content-center py-2">
-									<h2>Debes seleccionar una de las opciones</h2>
+									<h3>Debes seleccionar una de las variables</h3>
 								</div>
 
 		}
-		<hr/>
-		<h2>Diagrama de líneas</h2>
-		<div className="d-flex justify-content-center py-1">
-			<Chart
-				chartType="Line"
-				width="80em"
-				height="500px"
-				data={data}
-				options={options}
-			/>
-		</div>
 		</>
-		// INCLUIR DIAGRAMAS CON LA MEDIA?? (!!)
-		// ...
 	);
 };
 

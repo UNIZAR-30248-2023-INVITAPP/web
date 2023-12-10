@@ -60,15 +60,14 @@ function Estadisticas() {
 			//...
 			const invitadosFirebase = await getDocs(collection(db, "Eventos/" + router.query.id + "/Invitados"))
 			const invitadosEventoPrueba = invitadosFirebase.docs.map((i) => {
-				setNum(randomNumberInRange(18, 25));
 				return {
 					nombre: i._document.data.value.mapValue.fields.nombre.stringValue,
 					DNI: i._document.data.value.mapValue.fields.DNI.stringValue,
 					email: i._document.data.value.mapValue.fields.email.stringValue,
-					sexo: "M",
-					edad: {num},
-					asistencia: true,
-					horaLlegada: "0:30"
+					sexo: i._document.data.value.mapValue.fields.genero.stringValue,
+					edad: randomNumberInRange(18, 24),
+					asistencia: (randomNumberInRange(18, 25) < 22) ? true : false,
+					horaLlegada: "3414214342"
 				}
 			})
 			setInvitados([...invitadosEventoPrueba]);
@@ -170,10 +169,10 @@ function Estadisticas() {
 					</ToggleButton>
 				</ButtonGroup>
 			</div>
-				{!isLoading ? <Stats sexo={sexoChecked}
-								edad={edadChecked}
-								asistencia={asistenciaChecked}
-								horaLlegada={horaLlegadaChecked}
+				{!isLoading ? <Stats sexoChecked={sexoChecked}
+								edadChecked={edadChecked}
+								asistenciaChecked={asistenciaChecked}
+								horaLlegadaChecked={horaLlegadaChecked}
 								counter={counter}
 								invitados={invitados}
 								></Stats> : 
