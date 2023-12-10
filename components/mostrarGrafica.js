@@ -7,13 +7,14 @@ const MostrarGrafica = ({
 	options,
 	options_horizontal,
 	options_stacked,
+	edadChecked,
+	horaLlegadaChecked
 }) => {
 	const [isLoading, setLoading] = useState(false);
 
 	// Variables para controlar los botones que han sido pulsados
 	const [verticalChecked, setVerticalChecked] = useState(true);
 	const [horizontalChecked, setHorizontalChecked] = useState(false);
-	const [apiladasChecked, setApiladasChecked] = useState(false);
 
 	// Función para simular la carga de datos
 	useEffect(() => {
@@ -28,40 +29,26 @@ const MostrarGrafica = ({
 		}
 	}, [isLoading]);
 
-	// Control de la pulsación de botones
+	// Control de la pulsación del botón vertical
 	const handleClickOnVertical = () => {
 		if (!verticalChecked) {
 			setLoading(true);
 			setHorizontalChecked(false);
-			setApiladasChecked(false);
 			setVerticalChecked(!verticalChecked);
 			options=options;
 		} else {
 			setVerticalChecked(!verticalChecked);
 		}
 	};
-
+	// Control de la pulsación del botón horizontal
 	const handleClickOnHorizontal = () => {
 		if (!horizontalChecked) {
 			setLoading(true);
 			setHorizontalChecked(!horizontalChecked);
 			setVerticalChecked(false);
-			setApiladasChecked(false);
 			options=options_horizontal;
 		} else {
 			setHorizontalChecked(!horizontalChecked);
-		}
-	};
-
-	const handleClickOnApiladas = () => {
-		if (!apiladasChecked) {
-			setLoading(true);
-			setApiladasChecked(!apiladasChecked);
-			setHorizontalChecked(false);
-			setVerticalChecked(false);
-			options=options_stacked
-		} else {
-			setApiladasChecked(!apiladasChecked);
 		}
 	};
 	return (
@@ -90,42 +77,42 @@ const MostrarGrafica = ({
 				>
 					Horizontal
 				</ToggleButton>
-				<ToggleButton
-					id="toggle-check"
-					type="checkbox"
-					variant="outline-primary"
-					checked={apiladasChecked ? true : false}
-					disabled={isLoading}
-					onClick={!isLoading ? handleClickOnApiladas : null}
-				>
-					Apiladas
-				</ToggleButton>
 			</ButtonGroup>
 		</div>
-		{isLoading ? <div className="d-flex justify-content-center py-3">
+		{!verticalChecked && !horizontalChecked ? 
+		<div className="d-flex justify-content-center py-3">
+			<h3>Debes seleccionar una variable</h3>
+		</div>
+		:
+		isLoading ? <div className="d-flex justify-content-center py-3">
 									<Spinner></Spinner>
 								</div> : 
 								<div className="d-flex justify-content-center py-1">
 									<Chart
-									chartType= {apiladasChecked ? "BarChart" : "Bar"}
+									chartType= {horizontalChecked ? "BarChart" : "Bar"}
 									width="80em"
 									height="300px"
 									data={data}
-									options={verticalChecked ? options : horizontalChecked ? options_horizontal : apiladasChecked ? options_stacked : null}
+									options={verticalChecked ? options : horizontalChecked ? options_stacked : null}
 									/>
 								</div>
 		}
-		<hr/>
-		<h2>Diagrama circular</h2>
-		<div className="d-flex justify-content-center py-1">
-			<Chart
-				chartType="PieChart"
-				width="80em"
-				height="500px"
-				data={data}
-				options={options}
-			/>
-		</div>
+		{edadChecked || horaLlegadaChecked ? null
+		:
+		<>
+			<hr/>
+			<h2>Diagrama circular</h2>
+			<div className="d-flex justify-content-center py-1">
+				<Chart
+					chartType="PieChart"
+					width="80em"
+					height="500px"
+					data={data}
+					options={options}
+				/>
+			</div>
+		</>
+		}
 		</>
 		// INCLUIR DIAGRAMAS CON LA MEDIA?? (!!)
 		// ...
