@@ -151,6 +151,7 @@ function Evento({
 					email: email,
 					DNI: DNI,
 					genero: genero,
+					asistido: false,
 				})
 				// Actualizo mis invitados
 				setInvitados([
