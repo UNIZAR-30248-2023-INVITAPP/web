@@ -193,6 +193,8 @@ function Evento({
 	};
 
 	const handleModificarInvitado = (index) => {
+		const section = document.querySelector(`#modalListaInvitados-${id}`);
+  		section.scrollIntoView( { behavior: 'smooth', block: 'start' } );
 		setIndexInvitadoModificar(index)
 		setModificandoInvitado(true)
 	}
@@ -462,7 +464,7 @@ function Evento({
 									<Form.Label>Género</Form.Label>
 									<Form.Select id="formGenero">
 									<option value={modificandoInvitado ? invitadosArray?.at(indexInvitadoModificar)?.genero : "Otro"}>
-											{modificandoInvitado ? "Género introducido: " + invitadosArray?.at(indexInvitadoModificar)?.genero : "Introduzca género(Por defeto: Otro)"}
+											{modificandoInvitado ? "Género introducido: " + invitadosArray?.at(indexInvitadoModificar)?.genero : "Introduzca género (Defecto: Otro)"}
 										</option>
 										<option value={"Masculino"}>Masculino</option>
 										<option value="Femenino">Femenino</option>

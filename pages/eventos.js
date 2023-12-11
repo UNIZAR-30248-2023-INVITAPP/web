@@ -98,7 +98,8 @@ function EventosPage() {
 					docId: i.id,
 					nombre: i._document.data.value.mapValue.fields.nombre.stringValue,
 					DNI: i._document.data.value.mapValue.fields.DNI.stringValue,
-					email: i._document.data.value.mapValue.fields.email.stringValue
+					email: i._document.data.value.mapValue.fields.email.stringValue,
+					genero: i._document.data.value.mapValue.fields.genero?.stringValue
 				}
 			})
 			return {
