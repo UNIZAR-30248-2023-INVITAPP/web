@@ -697,7 +697,7 @@ function Evento({
                               className="btn btn-block btn-info" // Estilo de botón de estadísticas
                               onClick={onEstadisticas} // Manejador para abrir el modal correspondiente a las estadísticas
                             >
-                              Estadisticas
+                              Estadísticas
                             </button>
                         </div>
 					</div>
