@@ -7,12 +7,13 @@ import { doc, getDoc, getDocs, collection } from "firebase/firestore";
 import db from "../../firebase";
 
 function Estadisticas() {
+	// Variable redirección por Router
 	const router = useRouter()
 	// Variable para simular la carga de datos
 	const [isLoading, setLoading] = useState(false);
 
 	// Variables para controlar los botones que han sido pulsados
-	const [sexoChecked, setSexoChecked] = useState(false);
+	const [generoChecked, setGeneroChecked] = useState(false);
 	const [edadChecked, setEdadChecked] = useState(false);
 	const [asistenciaChecked, setAsistenciaChecked] = useState(false);
 	const [horaLlegadaChecked, setHoraLlegadaChecked] = useState(false);
@@ -23,7 +24,7 @@ function Estadisticas() {
 	// Gestión de invitados
 	const [invitados, setInvitados] = useState([]);
 
-	//...
+	// Variables para recuperar el nombre y fecha del evento pulsado
 	const [nombreEvento, setNombreEvento] = useState("");
 	const [fechaEvento, setFechaEvento] = useState("");
 
@@ -48,41 +49,54 @@ function Estadisticas() {
 		}
 	}, [isLoading]);
 
-	useEffect(() => {
-		const fetchData = async() => {
-			//...
-			const evento = await getDoc(doc(db, "Eventos/" + router.query.id));
-            const nombre = evento._document.data.value.mapValue.fields.nombre.stringValue;
-            const fechaDate = new Date(evento._document.data.value.mapValue.fields.fecha.stringValue);
-            const fecha = fechaDate.toLocaleDateString("es-ES", { year: "numeric", month: "long", day: "numeric" });
-			setNombreEvento(nombre);
-			setFechaEvento(fecha);
-			//...
-			const invitadosFirebase = await getDocs(collection(db, "Eventos/" + router.query.id + "/Invitados"))
-			const invitadosEventoPrueba = invitadosFirebase.docs.map((i) => {
+	
+	const fetchData = async() => {
+		const evento = await getDoc(doc(db, "Eventos/" + router.query.id));
+		const nombre = evento._document.data.value.mapValue.fields.nombre.stringValue;
+		const fechaDate = new Date(evento._document.data.value.mapValue.fields.fecha.stringValue);
+		const fecha = fechaDate.toLocaleDateString("es-ES", { year: "numeric", month: "long", day: "numeric" });
+		setNombreEvento(nombre);
+		setFechaEvento(fecha);
+		//...
+		const invitadosFirebase = await getDocs(collection(db, "Eventos/" + router.query.id + "/Invitados"))
+		const invitadosEventoPrueba = invitadosFirebase.docs.map((i) => {
+			if(i._document.data.value.mapValue.fields.asistido.booleanValue){
 				return {
 					nombre: i._document.data.value.mapValue.fields.nombre.stringValue,
 					DNI: i._document.data.value.mapValue.fields.DNI.stringValue,
 					email: i._document.data.value.mapValue.fields.email.stringValue,
-					sexo: i._document.data.value.mapValue.fields.genero.stringValue,
-					edad: randomNumberInRange(18, 24),
-					asistencia: (randomNumberInRange(18, 25) < 22) ? true : false,
-					horaLlegada: "3414214342"
+					genero: i._document.data.value.mapValue.fields.genero.stringValue,
+					edad: randomNumberInRange(18, 24), // ACABARÁ SIENDO -> i._document.data.value.mapValue.fields.loquesea.timestampValue, 
+					asistencia: i._document.data.value.mapValue.fields.asistido.booleanValue,
+					horaLlegada: i._document.data.value.mapValue.fields.hora_asistido.timestampValue
 				}
-			})
-			setInvitados([...invitadosEventoPrueba]);
-		}
+			}
+			else{
+				return {
+					nombre: i._document.data.value.mapValue.fields.nombre.stringValue,
+					DNI: i._document.data.value.mapValue.fields.DNI.stringValue,
+					email: i._document.data.value.mapValue.fields.email.stringValue,
+					genero: i._document.data.value.mapValue.fields.genero.stringValue,
+					edad: randomNumberInRange(18, 24),
+					asistencia: i._document.data.value.mapValue.fields.asistido.booleanValue,
+				}
+			}
+		})
+		setInvitados([...invitadosEventoPrueba]);
+	}
+
+	useEffect(() => {
 		fetchData();
 	}, [])
 
 	// Control de la pulsación de botones
-	const handleClickOnSexo = () => {
-		if (!sexoChecked) {
+	const handleClickOnGenero = () => {
+		if (!generoChecked) {
 			setLoading(true);
-			setSexoChecked(!sexoChecked);
+			setGeneroChecked(!generoChecked);
 			setCounter(counter+1);
 		} else {
-			setSexoChecked(!sexoChecked);
+			setGeneroChecked(!generoChecked);
 			setCounter(counter-1);
 		}
 	};
@@ -126,23 +140,30 @@ function Estadisticas() {
 		<Layout>
 			<h1 className="fw-bold text-center py-4">Estadísticas de {nombreEvento} del {fechaEvento}</h1>
 			<div className="d-flex justify-content-center">
+				<button
+					className="my-2 btn btn-outline-dark btn-lg" 
+					variant="outline-primary"
+					onClick={() => fetchData()}
+				>Actualizar</button>
+			</div>
+			<div className="d-flex justify-content-center">
 				<ButtonGroup horizontal="true" size="lg">
 					<ToggleButton
 						id="toggle-check"
 						type="checkbox"
 						variant="outline-primary"
-						checked={sexoChecked ? true : false}
+						checked={generoChecked ? true : false}
 						disabled={isLoading}
-						onClick={!isLoading ? handleClickOnSexo : null}
+						onClick={!isLoading ? handleClickOnGenero : null}
 					>
-						Sexo
+						Genero
 					</ToggleButton>
 					<ToggleButton
 						id="toggle-check"
 						type="checkbox"
 						variant="outline-primary"
 						checked={edadChecked ? true : false}
-						disabled={isLoading}
+						disabled={isLoading || horaLlegadaChecked}
 						onClick={!isLoading ? handleClickOnEdad : null}
 					>
 						Edad
@@ -162,14 +183,14 @@ function Estadisticas() {
 						type="checkbox"
 						variant="outline-primary"
 						checked={horaLlegadaChecked ? true : false}
-						disabled={isLoading}
+						disabled={isLoading || edadChecked}
 						onClick={!isLoading ? handleClickOnHoraLlegada : null}
 					>
 						Hora de llegada
 					</ToggleButton>
 				</ButtonGroup>
 			</div>
-				{!isLoading ? <Stats sexoChecked={sexoChecked}
+				{!isLoading ? <Stats generoChecked={generoChecked}
 								edadChecked={edadChecked}
 								asistenciaChecked={asistenciaChecked}
 								horaLlegadaChecked={horaLlegadaChecked}
