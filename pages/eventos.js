@@ -10,12 +10,15 @@ import {
 	addDoc,
 	getDocs,
 	getDoc,
+	where,
+	query
 } from "firebase/firestore";
 import db from "../firebase";
 import ModalGenerico from "@/components/modalGenerico";
 import BodyModal from "@/components/bodyModal";
 import moment from "moment";
 import { useRouter } from "next/router";
+import { isLogged } from "@/functions/isLogged";
 
 // Componente que se corresponde con la página que se muestra de inicio, donde aparece la lista de los eventos
 function EventosPage() {
@@ -89,7 +92,10 @@ function EventosPage() {
 	// formatear los datos obtenidos y almacenarlos en un arreglo de eventos.
 	// Luego, ordena el arreglo de eventos por nombre y actualiza el estado con los eventos obtenidos.
 	const fetchEventos = async () => {
-		const eventosFirebase = await getDocs(collection(db, "Eventos"));
+		const mail = localStorage.getItem("email")
+		console.log(mail)
+		const eventosFirebase = await getDocs(query(collection(db, "Eventos"), where("organizador", "==", mail)));
+		//const eventosFirebase = await getDocs(collection(db, "Eventos"));
 		//console.log(eventosFirebase);
 		const eventosArray = await Promise.all (eventosFirebase.docs.map(async (evento, index) => {
 			const invitadosFirebase = await getDocs(collection(db, "Eventos/" + evento.id + "/Invitados"))
@@ -585,274 +591,288 @@ function EventosPage() {
 		)
 	}
 
-	// El hook useEffect se utiliza para hacer la peticion a Cloud Firestore y mostrar
-	// los datos de los eventos cuando se realiza la renderización del componente
+	const [isUserLogged, setIsUserLogged] = useState(false)
+	const [cargado, setCargado] = useState(false)
+
 	useEffect(() => {
+		const prueba = async () => {
+			setIsUserLogged(await isLogged())
+			setCargado(true)
+		}
+		prueba()
+		
 		fetchEventos();
 	}, []);
 
-	return (
-		<div>
-			<Layout>
-				{/* Contenido de la página */}
-				<div className="container mt-4">
-					<div className="mx-4 mx-md-5">
-						<div className="d-flex flex-column flex-lg-row justify-content-between">
-							<h1 className="fw-bold text-center m-2">
-								Mis Eventos
-							</h1>
-							<form
-								className="d-flex mx-0 py-2 mx-lg-5 p-lg-2 flex-grow-1 text-center"
-								role="search"
-								id="form"
-							>
-								<input
-									value={busqueda}
-									id="searchBar"
-									onChange={(e) =>
-										setBusqueda(e.target.value)
-									}
-									className="form-control border-2"
-									type="search"
-									placeholder="Buscar un evento..."
-									aria-label="Search"
-								/>
-							</form>
-							<button
-								className="btn btn-dark my-2"
-								onClick={handleShow}
-							>
-								Crear Evento
-							</button>
-						</div>
-
-						{/* Modal de confirmación borrado múltiple de eventos */}
-						<ModalGenerico
-							id="modalConfirmacionEliminarEventoMultiple"
-							show={showConfirmBorradoMultiple}
-							titulo="Borrar los eventos seleccionados"
-							cuerpo = {
-								<div>¿Estás seguro de que desea eliminar los eventos seleccionados?
-									<br/>
-									{filtroEventosFuturos ? "Se enviarán correos electrónicos a todos los asistendes a los eventos que vas a eliminar." : ""}
-								</div>}
-							onHide={() => setShowConfirmBorradoMultiple(false)}
-							onEliminar={() => handleEliminarEventoMultiple()}
-							showSpinner={showSpinner}
-						/>
-						{/* ------------------------------------------------------- */}
-
-						{/* Modal de modificar eventos */}
-						<ModalGenerico
-							id="modalModificar"
-							show={showModalModificar}
-							titulo="Modificar un evento"
-							cuerpo={
-								<BodyModal
-									nombreEvento={eventoCambiar.nombre}
-									onChangeNombre={(e) =>
-										setEventoCambiar({
-											...eventoCambiar,
-											nombre: e.target.value,
-										})}
-									fechaEvento={eventoCambiar.fechaOriginal}
-									onChangeFecha={(e) =>{
-										setEventoCambiar({
-											...eventoCambiar,
-											fecha: e.target.value,
-										})}}
-									horaEvento={eventoCambiar.hora}
-									onChangeHora={(e) =>
-										setEventoCambiar({
-											...eventoCambiar,
-											hora: e.target.value,
-										})
-									}
-									ubicacionEvento={eventoCambiar.ubicacion}
-									onChangeUbicacion={(e) =>
-										setEventoCambiar({
-											...eventoCambiar,
-											ubicacion: e.target.value,
-										})
-									}
-									error={error}
-									onClickEvento={handleModificarEvento}
-									errorFecha={errorFecha}
-									buttonName="Modificar Evento"
-								/>
-							}
-							onHide={() => {
-								setShowModalModificar(false);
-								setErrorFecha("");
-								setError(null);
-							}}
-							showSpinner={showSpinner}
-						/>
-						{/* ----------------------------------------------- */}
-
-						{/* Modal de confirmación de eliminación de evento simple */}
-						<ModalGenerico
-							id="modalConfirmarEliminarEventoSimple"
-							show={showConfirmModal}
-							titulo="Confirmar eliminación"
-							cuerpo={
-								<div>¿Estás seguro de que desea eliminar el evento "{eventToDeleteNombre}"?
-									<br/>
-									{filtroEventosFuturos ? "Se enviarán correos electrónicos a todos los invitados avisando de la cancelación del evento." : ""}
-								</div>}
-							onHide={() => handleHideConfirmacionModal()}
-							onEliminar={confirmarEliminacionEvento}
-							showSpinner={showSpinner}
-						/>
-						{/* ----------------------------------------------- */}
-
-						{/* Modal de crear evento */}
-						<ModalGenerico
-							id="modalCrearEvento"
-							show={showModalCrear}
-							titulo="Crear un nuevo evento"
-							cuerpo={
-								<BodyModal
-									nombreEvento={nuevoEvento.nombre}
-									onChangeNombre={(e) =>
-										setNuevoEvento({
-											...nuevoEvento,
-											nombre: e.target.value,
-										})
-									}
-									fechaEvento={nuevoEvento.fecha}
-									onChangeFecha={(e) =>
-										setNuevoEvento({
-											...nuevoEvento,
-											fecha: e.target.value,
-										})
-									}
-									horaEvento={nuevoEvento.hora}
-									onChangeHora={(e) =>
-										setNuevoEvento({
-											...nuevoEvento,
-											hora: e.target.value,
-										})
-									}
-									ubicacionEvento={nuevoEvento.ubicacion}
-									onChangeUbicacion={(e) =>
-										setNuevoEvento({
-											...nuevoEvento,
-											ubicacion: e.target.value,
-										})
-									}
-									error={error}
-									onClickEvento={handleCrearEvento}
-									errorFecha={errorFecha}
-									buttonName="Crear Evento"
-								/>
-							}
-							onHide={handleCloseCrear}
-							showSpinner={showSpinner}
-						/>
-						
-						{/* Carrusel donde aparecen todos los eventos */}
-						<div className="p-3 d-flex flex-column p-md-5 mt-3 rounded bg-light gap-2">
-							{/* Botones para filtrado por estado eventos [pasado, futuro] */}
-                            <div className="btn-group" role="group" aria-label="Basic radio toggle button group">
-                                <input type="radio" className="btn-check" name="filtroEventos" id="futuros" onClick={()=>{setFiltroEventosFuturos(true)}} autoComplete="off" defaultChecked/>
-                                <label className="btn btn-outline-primary" htmlFor="futuros">Eventos futuros</label>
-
-                                <input type="radio" className="btn-check" name="filtroEventos" id="pasados" onClick={()=>{setFiltroEventosFuturos(false)}} autoComplete="off"/>
-                                <label className="btn btn-outline-primary" htmlFor="pasados">Eventos pasados</label>
-                            </div>
-							<hr/>
-                            {/* Botones para ordenacion de eventos [nombre, fecha] */}
-							<h5 className="fw-bold text-center">Ordenar por: </h5>
-                            <div className="btn-group mb-4" role="group" aria-label="Basic radio toggle button group">
-                                <input type="radio" className="btn-check" name="ordenarEventos" id="ordenarNombre" onChange={()=>{setOrdenarPorFecha(false);setOrdenarPorNombre(true);}} autoComplete="off" checked={ordenarPorNombre}/>
-                                <label className="btn btn-outline-dark" htmlFor="ordenarNombre">Nombre</label>
-
-                                <input type="radio" className="btn-check" name="ordenarEventos" id="ordenarFecha" onChange={()=>{setOrdenarPorNombre(false);setOrdenarPorFecha(true)}} autoComplete="off" checked={ordenarPorFecha}/>
-                                <label className="btn btn-outline-dark" htmlFor="ordenarFecha">Fecha</label>
-                            </div>
-                            {/* Boton de eliminacion multiple */}
-							{showBotonMultiple ? (
-								<Button
-									id="boton-borrado-multiple"
-									className="mx-auto d-block mb-3"
-									variant="danger"
-									size="lg"
-									onClick={() =>
-										setShowConfirmBorradoMultiple(true)
-									}
-								>
-									Eliminar los eventos seleccionados
-								</Button>
-							) : null }
-              {/* Carrusel de eventos */}
-							<ul className="list-group">
-								{
-									eventosOdenadosFiltrados().length == 0
-									?
-									<h3 className="fw-bold text-center">No hay eventos {filtroEventosFuturos? "futuros" : "pasados"}</h3>
-									:
-									eventosOdenadosFiltrados().map((evento, index) => (
-										<Evento
-											key={evento.id}
-											{...evento}
-											onCambio={() => {
-												setEventToUpdateIndex(index);
-												setEventoCambiar({
-													id: evento.id,
-													nombre: evento.nombre,
-													fecha: evento.fecha,
-                                                    fechaOriginal: evento.fechaOriginal,
-													hora: evento.hora,
-													ubicacion: evento.ubicacion,
-												});
-												setShowModalModificar(true);
-											}}
-											onEliminar={() => handleEliminarEvento(evento.id, evento.nombre)}
-											onEstadisticas={() =>
-												router.push("/estadisticas/" + evento.id)
+	if (cargado){
+		if (!isUserLogged) router.push("/login");
+		else {
+			return (
+				<div>
+					<Layout>
+						{/* Contenido de la página */}
+						<div className="container mt-4">
+							<div className="mx-4 mx-md-5">
+								<div className="d-flex flex-column flex-lg-row justify-content-between">
+									<h1 className="fw-bold text-center m-2">
+										Mis Eventos
+									</h1>
+									<form
+										className="d-flex mx-0 py-2 mx-lg-5 p-lg-2 flex-grow-1 text-center"
+										role="search"
+										id="form"
+									>
+										<input
+											value={busqueda}
+											id="searchBar"
+											onChange={(e) =>
+												setBusqueda(e.target.value)
 											}
-											showBoton = {showBotonMultiple} 
-											onSelectEvento={ () => handleSelectEvento(evento.id)}
-											Seleccionado = { eventosSeleccionados.includes(evento.id) ? true : false}
-											setUsuariosPendientesCorreo={establecerPropiedadesCorreo}
-											quitarUsuariosPendientesCorreo={eliminarCorreosLista}
-											futuro={filtroEventosFuturos}
+											className="form-control border-2"
+											type="search"
+											placeholder="Buscar un evento..."
+											aria-label="Search"
 										/>
-									))
+									</form>
+									<button
+										className="btn btn-dark my-2"
+										onClick={handleShow}
+									>
+										Crear Evento
+									</button>
+								</div>
+		
+								{/* Modal de confirmación borrado múltiple de eventos */}
+								<ModalGenerico
+									id="modalConfirmacionEliminarEventoMultiple"
+									show={showConfirmBorradoMultiple}
+									titulo="Borrar los eventos seleccionados"
+									cuerpo = {
+										<div>¿Estás seguro de que desea eliminar los eventos seleccionados?
+											<br/>
+											{filtroEventosFuturos ? "Se enviarán correos electrónicos a todos los asistendes a los eventos que vas a eliminar." : ""}
+										</div>}
+									onHide={() => setShowConfirmBorradoMultiple(false)}
+									onEliminar={() => handleEliminarEventoMultiple()}
+									showSpinner={showSpinner}
+								/>
+								{/* ------------------------------------------------------- */}
+		
+								{/* Modal de modificar eventos */}
+								<ModalGenerico
+									id="modalModificar"
+									show={showModalModificar}
+									titulo="Modificar un evento"
+									cuerpo={
+										<BodyModal
+											nombreEvento={eventoCambiar.nombre}
+											onChangeNombre={(e) =>
+												setEventoCambiar({
+													...eventoCambiar,
+													nombre: e.target.value,
+												})}
+											fechaEvento={eventoCambiar.fechaOriginal}
+											onChangeFecha={(e) =>{
+												setEventoCambiar({
+													...eventoCambiar,
+													fecha: e.target.value,
+												})}}
+											horaEvento={eventoCambiar.hora}
+											onChangeHora={(e) =>
+												setEventoCambiar({
+													...eventoCambiar,
+													hora: e.target.value,
+												})
+											}
+											ubicacionEvento={eventoCambiar.ubicacion}
+											onChangeUbicacion={(e) =>
+												setEventoCambiar({
+													...eventoCambiar,
+													ubicacion: e.target.value,
+												})
+											}
+											error={error}
+											onClickEvento={handleModificarEvento}
+											errorFecha={errorFecha}
+											buttonName="Modificar Evento"
+										/>
 									}
-							</ul>
+									onHide={() => {
+										setShowModalModificar(false);
+										setErrorFecha("");
+										setError(null);
+									}}
+									showSpinner={showSpinner}
+								/>
+								{/* ----------------------------------------------- */}
+		
+								{/* Modal de confirmación de eliminación de evento simple */}
+								<ModalGenerico
+									id="modalConfirmarEliminarEventoSimple"
+									show={showConfirmModal}
+									titulo="Confirmar eliminación"
+									cuerpo={
+										<div>¿Estás seguro de que desea eliminar el evento "{eventToDeleteNombre}"?
+											<br/>
+											{filtroEventosFuturos ? "Se enviarán correos electrónicos a todos los invitados avisando de la cancelación del evento." : ""}
+										</div>}
+									onHide={() => handleHideConfirmacionModal()}
+									onEliminar={confirmarEliminacionEvento}
+									showSpinner={showSpinner}
+								/>
+								{/* ----------------------------------------------- */}
+		
+								{/* Modal de crear evento */}
+								<ModalGenerico
+									id="modalCrearEvento"
+									show={showModalCrear}
+									titulo="Crear un nuevo evento"
+									cuerpo={
+										<BodyModal
+											nombreEvento={nuevoEvento.nombre}
+											onChangeNombre={(e) =>
+												setNuevoEvento({
+													...nuevoEvento,
+													nombre: e.target.value,
+												})
+											}
+											fechaEvento={nuevoEvento.fecha}
+											onChangeFecha={(e) =>
+												setNuevoEvento({
+													...nuevoEvento,
+													fecha: e.target.value,
+												})
+											}
+											horaEvento={nuevoEvento.hora}
+											onChangeHora={(e) =>
+												setNuevoEvento({
+													...nuevoEvento,
+													hora: e.target.value,
+												})
+											}
+											ubicacionEvento={nuevoEvento.ubicacion}
+											onChangeUbicacion={(e) =>
+												setNuevoEvento({
+													...nuevoEvento,
+													ubicacion: e.target.value,
+												})
+											}
+											error={error}
+											onClickEvento={handleCrearEvento}
+											errorFecha={errorFecha}
+											buttonName="Crear Evento"
+										/>
+									}
+									onHide={handleCloseCrear}
+									showSpinner={showSpinner}
+								/>
+								
+								{/* Carrusel donde aparecen todos los eventos */}
+								<div className="p-3 d-flex flex-column p-md-5 mt-3 rounded bg-light gap-2">
+									{/* Botones para filtrado por estado eventos [pasado, futuro] */}
+									<div className="btn-group" role="group" aria-label="Basic radio toggle button group">
+										<input type="radio" className="btn-check" name="filtroEventos" id="futuros" onClick={()=>{setFiltroEventosFuturos(true)}} autoComplete="off" defaultChecked/>
+										<label className="btn btn-outline-primary" htmlFor="futuros">Eventos futuros</label>
+		
+										<input type="radio" className="btn-check" name="filtroEventos" id="pasados" onClick={()=>{setFiltroEventosFuturos(false)}} autoComplete="off"/>
+										<label className="btn btn-outline-primary" htmlFor="pasados">Eventos pasados</label>
+									</div>
+									<hr/>
+									{/* Botones para ordenacion de eventos [nombre, fecha] */}
+									<h5 className="fw-bold text-center">Ordenar por: </h5>
+									<div className="btn-group mb-4" role="group" aria-label="Basic radio toggle button group">
+										<input type="radio" className="btn-check" name="ordenarEventos" id="ordenarNombre" onChange={()=>{setOrdenarPorFecha(false);setOrdenarPorNombre(true);}} autoComplete="off" checked={ordenarPorNombre}/>
+										<label className="btn btn-outline-dark" htmlFor="ordenarNombre">Nombre</label>
+		
+										<input type="radio" className="btn-check" name="ordenarEventos" id="ordenarFecha" onChange={()=>{setOrdenarPorNombre(false);setOrdenarPorFecha(true)}} autoComplete="off" checked={ordenarPorFecha}/>
+										<label className="btn btn-outline-dark" htmlFor="ordenarFecha">Fecha</label>
+									</div>
+									{/* Boton de eliminacion multiple */}
+									{showBotonMultiple ? (
+										<Button
+											id="boton-borrado-multiple"
+											className="mx-auto d-block mb-3"
+											variant="danger"
+											size="lg"
+											onClick={() =>
+												setShowConfirmBorradoMultiple(true)
+											}
+										>
+											Eliminar los eventos seleccionados
+										</Button>
+									) : null }
+					  {/* Carrusel de eventos */}
+									<ul className="list-group">
+										{
+											eventosOdenadosFiltrados().length == 0
+											?
+											<h3 className="fw-bold text-center">No hay eventos {filtroEventosFuturos? "futuros" : "pasados"}</h3>
+											:
+											eventosOdenadosFiltrados().map((evento, index) => (
+												<Evento
+													key={evento.id}
+													{...evento}
+													onCambio={() => {
+														setEventToUpdateIndex(index);
+														setEventoCambiar({
+															id: evento.id,
+															nombre: evento.nombre,
+															fecha: evento.fecha,
+															fechaOriginal: evento.fechaOriginal,
+															hora: evento.hora,
+															ubicacion: evento.ubicacion,
+														});
+														setShowModalModificar(true);
+													}}
+													onEliminar={() => handleEliminarEvento(evento.id, evento.nombre)}
+													onEstadisticas={() =>
+														router.push("/estadisticas/" + evento.id)
+													}
+													showBoton = {showBotonMultiple} 
+													onSelectEvento={ () => handleSelectEvento(evento.id)}
+													Seleccionado = { eventosSeleccionados.includes(evento.id) ? true : false}
+													setUsuariosPendientesCorreo={establecerPropiedadesCorreo}
+													quitarUsuariosPendientesCorreo={eliminarCorreosLista}
+													futuro={filtroEventosFuturos}
+												/>
+											))
+											}
+									</ul>
+								</div>
+		
+								{/* Modal de mensaje de exito al crear, modificar y eliminar varios eventos */}
+								<Toast className='position-fixed bottom-0 end-0 p-3 m-2' show={showToast} onClose={() => {
+									setMensajeToast({
+										headerToast: '',
+										bodyToast: ''
+									})
+									setShowToast(false)
+									
+								}} delay={3000} autohide>
+									<Toast.Header>
+										<strong className="me-auto">{mensajeToast.headerToast}</strong>
+									</Toast.Header>
+									<Toast.Body>{mensajeToast.bodyToast}</Toast.Body>
+						
+								</Toast>
+		
+								{/* Modal de mensaje de exito al eliminar varios eventos */}
+								<Toast className='position-fixed bottom-0 end-0 p-3 m-2' show={showExitoBorradoEventos} onClose={() => setShowExitoBorradoEventos(false)} delay={3000} autohide>
+									<Toast.Header>
+									<strong className="me-auto">Eventos eliminados</strong>
+									</Toast.Header>
+									<Toast.Body>Los eventos se han eliminado correctamente</Toast.Body>
+								</Toast>
+		
+							</div>
 						</div>
-
-						{/* Modal de mensaje de exito al crear, modificar y eliminar varios eventos */}
-						<Toast className='position-fixed bottom-0 end-0 p-3 m-2' show={showToast} onClose={() => {
-							setMensajeToast({
-								headerToast: '',
-								bodyToast: ''
-							})
-							setShowToast(false)
-							
-						}} delay={3000} autohide>
-							<Toast.Header>
-								<strong className="me-auto">{mensajeToast.headerToast}</strong>
-							</Toast.Header>
-							<Toast.Body>{mensajeToast.bodyToast}</Toast.Body>
-				
-						</Toast>
-
-						{/* Modal de mensaje de exito al eliminar varios eventos */}
-						<Toast className='position-fixed bottom-0 end-0 p-3 m-2' show={showExitoBorradoEventos} onClose={() => setShowExitoBorradoEventos(false)} delay={3000} autohide>
-							<Toast.Header>
-							<strong className="me-auto">Eventos eliminados</strong>
-							</Toast.Header>
-							<Toast.Body>Los eventos se han eliminado correctamente</Toast.Body>
-						</Toast>
-
-					</div>
+					</Layout>
 				</div>
-			</Layout>
-		</div>
-	);
+			);
+		}
+	}
+
+	
 }
 
 export default EventosPage;

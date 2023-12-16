@@ -1,4 +1,3 @@
-'use server'
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { auth } from "@/firebase";
@@ -6,21 +5,13 @@ import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useRouter } from "next/router";
 import { cookies } from 'next/headers';
 
+
 function Login() {
 	// Uso del provider de autentificación de Google
 	const provider = new GoogleAuthProvider();
 
 	// Uso del componente router para redirección entre páginas
 	const router = useRouter();
-
-	// Server Action
-	async function addCookieAuth() {
-		'use server'
-	 
-
-		cookies().set('authenticated', true)
-		// ...
-	}
 
 	// Función para gestionar el inicio de sesión con Google
 	const signInWithGoogle = () => {
@@ -45,7 +36,6 @@ function Login() {
 				localStorage.setItem("foto", foto);
 				localStorage.setItem("idToken", token);
 
-				addCookieAuth()
 
 				// Redireccionamos a eventos tras un inicio de sesión válido
 				router.push("/eventos");
