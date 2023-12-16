@@ -20,8 +20,23 @@ import moment from "moment";
 import { useRouter } from "next/router";
 import { isLogged } from "@/functions/isLogged";
 
+
 // Componente que se corresponde con la página que se muestra de inicio, donde aparece la lista de los eventos
 function EventosPage() {
+	const [isLoading, setLoading] = useState(true);
+	// Función para simular la carga de datos
+	useEffect(() => {
+		function simularCarga() {
+			return new Promise((resolve) => setTimeout(resolve, 1000));
+		}
+
+		if (isLoading) {
+			simularCarga().then(() => {
+				setLoading(false);
+			});
+		}
+	}, [isLoading]);
+
 	// Modal que aparece al crear un evento
 	const [showModalCrear, setShowModalCrear] = useState(false);
 	
@@ -656,46 +671,64 @@ function EventosPage() {
 									onEliminar={() => handleEliminarEventoMultiple()}
 									showSpinner={showSpinner}
 								/>
-								{/* ------------------------------------------------------- */}
-		
-								{/* Modal de modificar eventos */}
-								<ModalGenerico
-									id="modalModificar"
-									show={showModalModificar}
-									titulo="Modificar un evento"
-									cuerpo={
-										<BodyModal
-											nombreEvento={eventoCambiar.nombre}
-											onChangeNombre={(e) =>
-												setEventoCambiar({
-													...eventoCambiar,
-													nombre: e.target.value,
-												})}
-											fechaEvento={eventoCambiar.fechaOriginal}
-											onChangeFecha={(e) =>{
-												setEventoCambiar({
-													...eventoCambiar,
-													fecha: e.target.value,
-												})}}
-											horaEvento={eventoCambiar.hora}
-											onChangeHora={(e) =>
-												setEventoCambiar({
-													...eventoCambiar,
-													hora: e.target.value,
-												})
-											}
-											ubicacionEvento={eventoCambiar.ubicacion}
-											onChangeUbicacion={(e) =>
-												setEventoCambiar({
-													...eventoCambiar,
-													ubicacion: e.target.value,
-												})
-											}
-											error={error}
-											onClickEvento={handleModificarEvento}
-											errorFecha={errorFecha}
-											buttonName="Modificar Evento"
-										/>
+                    
+							</form>
+							<button
+								className="btn btn-dark my-2"
+								onClick={handleShow}
+							>
+								Crear Evento
+							</button>
+						</div>
+
+						{/* Modal de confirmación borrado múltiple de eventos */}
+						<ModalGenerico
+							id="modalConfirmacionEliminarEventoMultiple"
+							show={showConfirmBorradoMultiple}
+							titulo="Eliminar los eventos seleccionados"
+							cuerpo = {
+								<div>¿Estás seguro de que desea eliminar los eventos seleccionados?
+									<br/>
+									{filtroEventosFuturos ? "Se enviarán correos electrónicos a todos los asistentes a los eventos que vas a eliminar." : ""}
+								</div>}
+							onHide={() => setShowConfirmBorradoMultiple(false)}
+							onEliminar={() => handleEliminarEventoMultiple()}
+							showSpinner={showSpinner}
+						/>
+						{/* ------------------------------------------------------- */}
+
+						{/* Modal de modificar eventos */}
+						<ModalGenerico
+							id="modalModificar"
+							show={showModalModificar}
+							titulo="Modificar un evento"
+							cuerpo={
+								<BodyModal
+									nombreEvento={eventoCambiar.nombre}
+									onChangeNombre={(e) =>
+										setEventoCambiar({
+											...eventoCambiar,
+											nombre: e.target.value,
+										})}
+									fechaEvento={eventoCambiar.fechaOriginal}
+									onChangeFecha={(e) =>{
+										setEventoCambiar({
+											...eventoCambiar,
+											fecha: e.target.value,
+										})}}
+									horaEvento={eventoCambiar.hora}
+									onChangeHora={(e) =>
+										setEventoCambiar({
+											...eventoCambiar,
+											hora: e.target.value,
+										})
+									}
+									ubicacionEvento={eventoCambiar.ubicacion}
+									onChangeUbicacion={(e) =>
+										setEventoCambiar({
+											...eventoCambiar,
+											ubicacion: e.target.value,
+										})
 									}
 									onHide={() => {
 										setShowModalModificar(false);
@@ -720,6 +753,7 @@ function EventosPage() {
 									onEliminar={confirmarEliminacionEvento}
 									showSpinner={showSpinner}
 								/>
+
 								{/* ----------------------------------------------- */}
 		
 								{/* Modal de crear evento */}
@@ -755,13 +789,100 @@ function EventosPage() {
 												setNuevoEvento({
 													...nuevoEvento,
 													ubicacion: e.target.value,
-												})
+												}
+							}
+							onHide={handleCloseCrear}
+							showSpinner={showSpinner}
+						/>
+	
+						{/* Carrusel donde aparecen todos los eventos */}
+						<div className="p-3 d-flex flex-column p-md-5 mt-3 rounded bg-light gap-2">
+							{/* Botones para filtrado por estado eventos [pasado, futuro] */}
+                            <div className="btn-group" role="group" aria-label="Basic radio toggle button group">
+                                <input type="radio" className="btn-check" name="filtroEventos" id="futuros" onClick={()=>{setFiltroEventosFuturos(true)}} autoComplete="off" defaultChecked/>
+                                <label className="btn btn-outline-primary" htmlFor="futuros">Eventos futuros</label>
+
+                                <input type="radio" className="btn-check" name="filtroEventos" id="pasados" onClick={()=>{setFiltroEventosFuturos(false)}} autoComplete="off"/>
+                                <label className="btn btn-outline-primary" htmlFor="pasados">Eventos pasados</label>
+                            </div>
+							<hr/>
+                            {/* Botones para ordenacion de eventos [nombre, fecha] */}
+							<h5 className="fw-bold text-center">Ordenar por: </h5>
+                            <div className="btn-group mb-4" role="group" aria-label="Basic radio toggle button group">
+                                <input type="radio" className="btn-check" name="ordenarEventos" id="ordenarNombre" onChange={()=>{setOrdenarPorFecha(false);setOrdenarPorNombre(true);}} autoComplete="off" checked={ordenarPorNombre}/>
+                                <label className="btn btn-outline-dark" htmlFor="ordenarNombre">Nombre</label>
+
+                                <input type="radio" className="btn-check" name="ordenarEventos" id="ordenarFecha" onChange={()=>{setOrdenarPorNombre(false);setOrdenarPorFecha(true)}} autoComplete="off" checked={ordenarPorFecha}/>
+                                <label className="btn btn-outline-dark" htmlFor="ordenarFecha">Fecha</label>
+                            </div>
+                            {/* Boton de eliminacion multiple */}
+							<Button
+								id="boton-borrado-multiple"
+								disabled={eventosSeleccionados.length == 0}
+								className="mx-auto d-block mb-3"
+								variant="danger"
+								size="lg"
+								onClick={() =>
+									setShowConfirmBorradoMultiple(true)
+								}
+							>
+									Eliminar los eventos seleccionados
+							</Button>
+							{/*
+							{showBotonMultiple ? (
+								<Button
+									id="boton-borrado-multiple"
+									className="mx-auto d-block mb-3"
+									variant="danger"
+									size="lg"
+									onClick={() =>
+										setShowConfirmBorradoMultiple(true)
+									}
+								>
+									Eliminar los eventos seleccionados
+								</Button>
+							) : null }
+							*/}
+              {/* Carrusel de eventos */}
+
+							<ul className="list-group">
+								{
+									!isLoading ? 
+									eventosOdenadosFiltrados().length == 0
+									?
+									<h3 className="fw-bold text-center">No hay eventos {filtroEventosFuturos? "futuros" : "pasados"}</h3>
+									:
+									eventosOdenadosFiltrados().map((evento, index) => (
+										<Evento
+											key={evento.id}
+											{...evento}
+											onCambio={() => {
+												setEventToUpdateIndex(index);
+												setEventoCambiar({
+													id: evento.id,
+													nombre: evento.nombre,
+													fecha: evento.fecha,
+                                                    fechaOriginal: evento.fechaOriginal,
+													hora: evento.hora,
+													ubicacion: evento.ubicacion,
+												});
+												setShowModalModificar(true);
+											}}
+											onEliminar={() => handleEliminarEvento(evento.id, evento.nombre)}
+											onEstadisticas={() =>
+												router.push("/estadisticas/" + evento.id)
 											}
 											error={error}
 											onClickEvento={handleCrearEvento}
 											errorFecha={errorFecha}
 											buttonName="Crear Evento"
 										/>
+									))
+									:
+									<div className="d-flex justify-content-center py-4">
+										<Spinner size="xl"></Spinner>
+									</div>
+
 									}
 									onHide={handleCloseCrear}
 									showSpinner={showSpinner}
