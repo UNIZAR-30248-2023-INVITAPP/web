@@ -193,6 +193,8 @@ function Evento({
 	};
 
 	const handleModificarInvitado = (index) => {
+		const section = document.querySelector(`#modalListaInvitados-${id}`);
+  		section.scrollIntoView( { behavior: 'smooth', block: 'start' } );
 		setIndexInvitadoModificar(index)
 		setModificandoInvitado(true)
 	}
@@ -462,7 +464,7 @@ function Evento({
 									<Form.Label>Género</Form.Label>
 									<Form.Select id="formGenero">
 									<option value={modificandoInvitado ? invitadosArray?.at(indexInvitadoModificar)?.genero : "Otro"}>
-											{modificandoInvitado ? "Género introducido: " + invitadosArray?.at(indexInvitadoModificar)?.genero : "Introduzca género(Por defeto: Otro)"}
+											{modificandoInvitado ? "Género introducido: " + invitadosArray?.at(indexInvitadoModificar)?.genero : "Introduzca género (Defecto: Otro)"}
 										</option>
 										<option value={"Masculino"}>Masculino</option>
 										<option value="Femenino">Femenino</option>
@@ -695,7 +697,7 @@ function Evento({
                               className="btn btn-block btn-info" // Estilo de botón de estadísticas
                               onClick={onEstadisticas} // Manejador para abrir el modal correspondiente a las estadísticas
                             >
-                              Estadisticas
+                              Estadísticas
                             </button>
                         </div>
 					</div>
