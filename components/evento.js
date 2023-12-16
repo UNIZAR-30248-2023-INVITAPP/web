@@ -40,6 +40,7 @@ function Evento({
 	const [invitadoExistente, setInvitadoExistente] = useState(false);
 	const [showInvitados, setShowInvitados] = useState(false);
 	const [showSorteo, setShowSorteo] = useState(false);
+	const [showConfirmacionCerrarSorteo, setShowConfirmacionCerrarSorteo] = useState(false);
 	const [showConfirmacionEliminar, setShowConfirmacionEliminar] =
 		useState(false);
 	const [indexInvitadoEliminar, setIndexInvitadoEliminar] = useState(null);
@@ -353,6 +354,43 @@ function Evento({
 
 	return (
 		<>
+			{/* Modal de confirmación de cerrar sorteo */}
+			<Modal
+				id="modalConfirmarCerrarSorteo"
+				show={showConfirmacionCerrarSorteo}
+				centered
+			>
+				<Modal.Header>
+					<Modal.Title>Confirmar cerrar sorteo</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					¿Estás seguro de que quieres cerrar sorteo?
+					<br/>
+					Si lo cierras, no podrás recuperar los datos de ganadores y premios sorteados. 
+					<br/>
+					Asegúrate de enviar un correo electrónico a los ganadores antes de cerrar esta pestaña.
+				</Modal.Body>
+				<Modal.Footer>
+					<Button
+						variant="secondary"
+						onClick={() => {
+							setShowSorteo(true);
+							setShowConfirmacionCerrarSorteo(false);
+						}}
+					>
+						Cancelar
+					</Button>
+					<Button
+						variant="danger"
+						onClick={() => {
+							setShowConfirmacionCerrarSorteo(false);
+							setShowSorteo(false);
+						}}
+					>
+						Cerrar
+					</Button>
+				</Modal.Footer>
+			</Modal>
 			{/* Modal de listado de invitados */}
 			<Modal
 				id={`modalListaInvitados-${id}`}
@@ -538,6 +576,7 @@ function Evento({
 				className="pt-2 px-2 pt-md-0 px-md-0"
 				show={showSorteo}
 				onHide={() => {
+					setShowConfirmacionCerrarSorteo(true);
 					setShowSorteo(false);
 				}}
 				centered
@@ -595,7 +634,7 @@ function Evento({
 			<ModalGenerico
 							id="modalConfirmacionEliminarInvitadoMultiple"
 							show={showConfirmBorradoMultiple}
-							titulo="Borrar los invitados seleccionados"
+							titulo="Eliminar los invitados seleccionados"
 							cuerpo="¿Está seguro de que desea eliminar los invitados seleccionados?"
 							onHide={() => {setShowInvitados(true);setShowConfirmBorradoMultiple(false)}}
 							onEliminar={() => handleEliminarInvitadoMultiple()}

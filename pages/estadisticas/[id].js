@@ -28,14 +28,6 @@ function Estadisticas() {
 	const [nombreEvento, setNombreEvento] = useState("");
 	const [fechaEvento, setFechaEvento] = useState("");
 
-	// TEMPORAL
-	const [num, setNum] = useState(0);
-
-	const randomNumberInRange = (min, max) => { 
-        return Math.floor(Math.random()  
-                * (max - min + 1)) + min; 
-    }; 
-
 	// Función para simular la carga de datos
 	useEffect(() => {
 		function simularCarga() {
@@ -49,7 +41,7 @@ function Estadisticas() {
 		}
 	}, [isLoading]);
 
-	
+	// Función para extraer el nombre y fecha de los eventos y el nombre, DNI, email, genero, edad, asistencia y hora de llegada de los invitados
 	const fetchData = async() => {
 		const evento = await getDoc(doc(db, "Eventos/" + router.query.id));
 		const nombre = evento._document.data.value.mapValue.fields.nombre.stringValue;
@@ -57,7 +49,6 @@ function Estadisticas() {
 		const fecha = fechaDate.toLocaleDateString("es-ES", { year: "numeric", month: "long", day: "numeric" });
 		setNombreEvento(nombre);
 		setFechaEvento(fecha);
-		//...
 		const invitadosFirebase = await getDocs(collection(db, "Eventos/" + router.query.id + "/Invitados"))
 		const invitadosEventoPrueba = invitadosFirebase.docs.map((i) => {
 			if(i._document.data.value.mapValue.fields.asistido.booleanValue){
@@ -66,7 +57,7 @@ function Estadisticas() {
 					DNI: i._document.data.value.mapValue.fields.DNI.stringValue,
 					email: i._document.data.value.mapValue.fields.email.stringValue,
 					genero: i._document.data.value.mapValue.fields.genero.stringValue,
-					edad: randomNumberInRange(18, 24), // ACABARÁ SIENDO -> i._document.data.value.mapValue.fields.loquesea.timestampValue, 
+					edad: i._document.data.value.mapValue.fields.edad.stringValue, 
 					asistencia: i._document.data.value.mapValue.fields.asistido.booleanValue,
 					horaLlegada: i._document.data.value.mapValue.fields.hora_asistido.timestampValue
 				}
@@ -77,7 +68,6 @@ function Estadisticas() {
 					DNI: i._document.data.value.mapValue.fields.DNI.stringValue,
 					email: i._document.data.value.mapValue.fields.email.stringValue,
 					genero: i._document.data.value.mapValue.fields.genero.stringValue,
-					edad: randomNumberInRange(18, 24),
 					asistencia: i._document.data.value.mapValue.fields.asistido.booleanValue,
 				}
 			}
