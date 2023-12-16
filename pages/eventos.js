@@ -17,8 +17,23 @@ import BodyModal from "@/components/bodyModal";
 import moment from "moment";
 import { useRouter } from "next/router";
 
+
 // Componente que se corresponde con la página que se muestra de inicio, donde aparece la lista de los eventos
 function EventosPage() {
+	const [isLoading, setLoading] = useState(true);
+	// Función para simular la carga de datos
+	useEffect(() => {
+		function simularCarga() {
+			return new Promise((resolve) => setTimeout(resolve, 1000));
+		}
+
+		if (isLoading) {
+			simularCarga().then(() => {
+				setLoading(false);
+			});
+		}
+	}, [isLoading]);
+
 	// Modal que aparece al crear un evento
 	const [showModalCrear, setShowModalCrear] = useState(false);
 	
@@ -630,11 +645,11 @@ function EventosPage() {
 						<ModalGenerico
 							id="modalConfirmacionEliminarEventoMultiple"
 							show={showConfirmBorradoMultiple}
-							titulo="Borrar los eventos seleccionados"
+							titulo="Eliminar los eventos seleccionados"
 							cuerpo = {
 								<div>¿Estás seguro de que desea eliminar los eventos seleccionados?
 									<br/>
-									{filtroEventosFuturos ? "Se enviarán correos electrónicos a todos los asistendes a los eventos que vas a eliminar." : ""}
+									{filtroEventosFuturos ? "Se enviarán correos electrónicos a todos los asistentes a los eventos que vas a eliminar." : ""}
 								</div>}
 							onHide={() => setShowConfirmBorradoMultiple(false)}
 							onEliminar={() => handleEliminarEventoMultiple()}
@@ -750,7 +765,7 @@ function EventosPage() {
 							onHide={handleCloseCrear}
 							showSpinner={showSpinner}
 						/>
-						
+	
 						{/* Carrusel donde aparecen todos los eventos */}
 						<div className="p-3 d-flex flex-column p-md-5 mt-3 rounded bg-light gap-2">
 							{/* Botones para filtrado por estado eventos [pasado, futuro] */}
@@ -772,6 +787,19 @@ function EventosPage() {
                                 <label className="btn btn-outline-dark" htmlFor="ordenarFecha">Fecha</label>
                             </div>
                             {/* Boton de eliminacion multiple */}
+							<Button
+								id="boton-borrado-multiple"
+								disabled={eventosSeleccionados.length == 0}
+								className="mx-auto d-block mb-3"
+								variant="danger"
+								size="lg"
+								onClick={() =>
+									setShowConfirmBorradoMultiple(true)
+								}
+							>
+									Eliminar los eventos seleccionados
+							</Button>
+							{/*
 							{showBotonMultiple ? (
 								<Button
 									id="boton-borrado-multiple"
@@ -785,9 +813,12 @@ function EventosPage() {
 									Eliminar los eventos seleccionados
 								</Button>
 							) : null }
+							*/}
               {/* Carrusel de eventos */}
+
 							<ul className="list-group">
 								{
+									!isLoading ? 
 									eventosOdenadosFiltrados().length == 0
 									?
 									<h3 className="fw-bold text-center">No hay eventos {filtroEventosFuturos? "futuros" : "pasados"}</h3>
@@ -820,6 +851,10 @@ function EventosPage() {
 											futuro={filtroEventosFuturos}
 										/>
 									))
+									:
+									<div className="d-flex justify-content-center py-4">
+										<Spinner size="xl"></Spinner>
+									</div>
 									}
 							</ul>
 						</div>

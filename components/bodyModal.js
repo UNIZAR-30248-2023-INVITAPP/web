@@ -31,7 +31,7 @@ const BodyModal = ({
 						className="form-control"
 						id="nombre"
 						value={nombreEvento}
-						placeholder="Ingrese el nombre del evento"
+						placeholder="Introduzca el nombre del evento"
 						onChange={onChangeNombre}
 					/>
 				</div>

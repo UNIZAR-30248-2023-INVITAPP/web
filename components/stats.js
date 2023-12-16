@@ -17,14 +17,6 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 		return counter;
 	}
 
-	// Función para dado una fecha, calcular la edad del invitado
-	function calcularEdad(fecha){
-		var month_diff = Date.now() - fecha;
-		var age_dt = new Date(month_diff);
-		var year = age_dt.getUTCFullYear();
-		return Math.abs(year - 1970);
-	}
-
 	// Funcion para redondear horas de llegada
 	function redondearHora(minutos){
 		console.log(minutos);
@@ -49,7 +41,6 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 
 	// Arrays de asistencias segun edad
 	const hanAsistidoEdad = []
-	const noHanAsistidoEdad = []
 
 	// Arrays de horas segun genero
 	const horaLlegadaMasculino = []
@@ -74,22 +65,16 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 
 	// Recorro el conjunto de invitados
 	invitados.forEach(i => {
+
 		// Creamos una variable para ver si la edad del invitado está incluida en el vector totalEdades
 		var edadEncontrada = false;
+
 		// Creamos una variable para ver si la hora de llegada del invitado está incluida en el vector totalHoras
 		var horaLlegadaEncontrada = false;
+
 		// ACABARÁ SIENDO -> var cambioTimestampEdad = new Date(i.edad);
 		// ACABARÁ SIENDO -> var edad = calcularEdad(cambioTimestampEdad);
-		// Si la edad del invitado ya está incluida cambiamos la variable a true
-		totalEdades.forEach(j => {
-			if(j==i.edad){ // ACABARÁ SIENDO -> edad
-				edadEncontrada = true;
-			}
-		})
-		// Si no está incluida, la añadimos al vector totalEdades
-		if(!edadEncontrada){
-			totalEdades.push(i.edad); // ACABARÁ SIENDO -> edad
-		}
+
 		// Verificamos si el invitado ha asistido
 		// en caso afirmativo, transformamos su timestamp a fecha
 		if(i.asistencia){
@@ -100,63 +85,65 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 					horaLlegadaEncontrada = true;
 				}
 			})
+
+			// Si la edad del invitado ya está incluida cambiamos la variable a true
+			totalEdades.forEach(j => {
+				if(j==i.edad){ // ACABARÁ SIENDO -> edad
+					edadEncontrada = true;
+				}
+			})
 		}
-		// Si no está incluida, la añadimos al vector totalHoras
+		
+		// Si la hora de llegada no está incluida, la añadimos al vector totalHoras
 		if(i.asistencia && !horaLlegadaEncontrada){
 			totalHoras.push(cambioTimestampHoraLlegada.getUTCHours()+":"+redondearHora(cambioTimestampHoraLlegada.getMinutes()));
 		}
+
+		// Si la edad del invitado no está incluida, la añadimos al vector totalEdades
+		if(i.asistencia && !edadEncontrada){
+			totalEdades.push(i.edad); // ACABARÁ SIENDO -> edad
+		}
+
 		// Si el invitado es de genero masculino
 		if(i.genero == "Masculino"){
 			// Se aumenta el contador de invitados masculino
 			counterMasculino++;
-			// Añade su edad al vector edadesMasculino
-			edadesMasculino.push(i.edad); // ACABARÁ SIENDO -> edad
 			// Si ha asistido se incrementa el contador de asistencia masculino
 			// y se añade al vector hanAsistidoEdad
 			if(i.asistencia){
+				// Añade su edad al vector edadesMasculino
+				edadesMasculino.push(i.edad); // ACABARÁ SIENDO -> edad
 				counterAsistenciaMasculino++;
 				hanAsistidoEdad.push(i.edad); // ACABARÁ SIENDO -> edad
 				horaLlegadaMasculino.push(cambioTimestampHoraLlegada.getUTCHours() + ":" + redondearHora(cambioTimestampHoraLlegada.getMinutes()));
-			}
-			// Si no ha asistido se añade al vector noHanAsistidoEdad
-			else{
-				noHanAsistidoEdad.push(i.edad); // ACABARÁ SIENDO -> edad
 			}
 		}
 		// Si el invitado es de genero femenino
 		else if(i.genero == "Femenino"){
 			// Se aumenta el contador de invitados femenino
 			counterFemenino++;
-			// Añade su edad al vector edadesFemenino
-			edadesFemenino.push(i.edad); // ACABARÁ SIENDO -> edad
 			// Si ha asistido se incrementa el contador de asistencia femenino
 			// y se añade al vector hanAsistidoEdad
 			if(i.asistencia){
+				// Añade su edad al vector edadesFemenino
+				edadesFemenino.push(i.edad); // ACABARÁ SIENDO -> edad
 				counterAsistenciaFemenino++;
 				hanAsistidoEdad.push(i.edad); // ACABARÁ SIENDO -> edad
 				console.log(cambioTimestampHoraLlegada.getMinutes());
 				horaLlegadaFemenino.push(cambioTimestampHoraLlegada.getUTCHours() + ":" + redondearHora(cambioTimestampHoraLlegada.getMinutes()));
 			}
-			// Si no ha asistido se añade al vector noHanAsistidoEdad
-			else{
-				noHanAsistidoEdad.push(i.edad); // ACABARÁ SIENDO -> edad
-			}
 		}
 		else{
 			// Se aumenta el contador de invitados otro
 			counterOtro++;
-			// Añade su edad al vector edadesOtro
-			edadesOtro.push(i.edad); // ACABARÁ SIENDO -> edad
 			// Si ha asistido se incrementa el contador de asistencia otro
 			// y se añade al vector hanAsistidoEdad
 			if(i.asistencia){
+				// Añade su edad al vector edadesOtro
+				edadesOtro.push(i.edad); // ACABARÁ SIENDO -> edad
 				counterAsistenciaOtro++;
 				hanAsistidoEdad.push(i.edad); // ACABARÁ SIENDO -> edad
 				horaLlegadaOtro.push(cambioTimestampHoraLlegada.getUTCHours() + ":" + redondearHora(cambioTimestampHoraLlegada.getMinutes()));
-			}
-			// Si no ha asistido se añade al vector noHanAsistidoEdad
-			else{
-				noHanAsistidoEdad.push(i.edad); // ACABARÁ SIENDO -> edad
 			}
 		}
 	})
@@ -344,12 +331,12 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 			if (asistenciaChecked) {
 				// Datos para las variables conjuntas edad y asistencia
 				const data = [
-					["Edad", "Han asistido", "No han asistido"],
+					["Edad", "Han asistido"],
 				];
 
 				// Se contabilizan los invitados segun edad y asistencia
 				totalEdades.forEach(i =>{
-					data.push([i, contabilizarElemento(i, hanAsistidoEdad), contabilizarElemento(i, noHanAsistidoEdad)])
+					data.push([i, contabilizarElemento(i, hanAsistidoEdad)])
 				})
 				// Opciones para los graficos
 				const options = {
