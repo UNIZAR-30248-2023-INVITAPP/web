@@ -32,7 +32,7 @@ const MostrarGrafica = ({
 	// Control de la pulsación del botón vertical
 	const handleClickOnVertical = () => {
 		if (!verticalChecked) {
-			setLoading(true);
+			//setLoading(true);
 			setHorizontalChecked(false);
 			setVerticalChecked(!verticalChecked);
 			options=options;
@@ -43,7 +43,7 @@ const MostrarGrafica = ({
 	// Control de la pulsación del botón horizontal
 	const handleClickOnHorizontal = () => {
 		if (!horizontalChecked) {
-			setLoading(true);
+			//setLoading(true);
 			setHorizontalChecked(!horizontalChecked);
 			setVerticalChecked(false);
 			options=options_horizontal;
