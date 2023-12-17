@@ -560,7 +560,7 @@ function EventosPage() {
 		}
 	};
 
-	const eventosOdenadosFiltrados = () => {
+	const eventosOrdenadosFiltrados = () => {
 		const eventosFiltrados = (eventos
 			.filter((evento) => {
 				if (filtroEventosFuturos){
@@ -793,18 +793,20 @@ function EventosPage() {
 									<label className="btn btn-outline-dark" htmlFor="ordenarFecha">Fecha</label>
 								</div>
 								{/* Boton de eliminacion multiple */}
-								<Button
-									id="boton-borrado-multiple"
-									disabled={eventosSeleccionados.length == 0}
-									className="mx-auto d-block mb-3"
-									variant="danger"
-									size="md"
-									onClick={() =>
-										setShowConfirmBorradoMultiple(true)
-									}
-								>
-										Eliminar los eventos seleccionados
-								</Button>
+								{eventosOrdenadosFiltrados().length != 0 &&
+									<Button
+										id="boton-borrado-multiple"
+										disabled={eventosSeleccionados.length == 0}
+										className="mx-auto d-block mb-3"
+										variant="danger"
+										size="md"
+										onClick={() =>
+											setShowConfirmBorradoMultiple(true)
+										}
+									>
+											Eliminar los eventos seleccionados
+									</Button>
+								}
 								{/*
 								{showBotonMultiple ? (
 									<Button
@@ -825,11 +827,11 @@ function EventosPage() {
 								<ul className="list-group">
 									{
 										!isLoading ? 
-										eventosOdenadosFiltrados().length == 0
+										eventosOrdenadosFiltrados().length == 0
 										?
 										<h3 className="fw-bold text-center">No hay eventos {filtroEventosFuturos? "futuros" : "pasados"}</h3>
 										:
-										eventosOdenadosFiltrados().map((evento, index) => (
+										eventosOrdenadosFiltrados().map((evento, index) => (
 											<Evento
 												key={evento.id}
 												{...evento}
