@@ -3,6 +3,7 @@ import Form from "react-bootstrap/Form";
 import { auth } from "@/firebase";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useRouter } from "next/router";
+import Logo from "./../imgs/logo_blanco.png"
 
 function Login() {
 	// Uso del provider de autentificación de Google
@@ -59,11 +60,11 @@ function Login() {
 			style={sectionStyle}
 		>
 			{/* Tal vez aumentar anchura del div */}
-			<div className="form_container w-70 p-5 rounded border border-dark bg-white">
+			<div className="form_container w-70 p-5 rounded border border-dark bg-white text-center">
 				<Form>
-					<h1> InvitApp </h1>
+					<img id="img" src={Logo.src} width={265} heigth={265}/>
 					<hr />
-					<h3>Iniciar sesión</h3>
+					
 					{/* --------DESCOMENTAR PARA SPRINT 3---------}
                     <div className="mb-2">
                         <Form.Label>Correo electrónico</Form.Label>
