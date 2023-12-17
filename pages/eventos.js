@@ -638,12 +638,13 @@ function EventosPage() {
 										aria-label="Search"
 									/>
 								</form>
-								<button
+								<Button
 									className="btn btn-dark my-2"
 									onClick={handleShow}
+									size="lg"
 								>
 									Crear Evento
-								</button>
+								</Button>
 							</div>
 	
 							{/* Modal de confirmación borrado múltiple de eventos */}
@@ -797,7 +798,7 @@ function EventosPage() {
 									disabled={eventosSeleccionados.length == 0}
 									className="mx-auto d-block mb-3"
 									variant="danger"
-									size="lg"
+									size="md"
 									onClick={() =>
 										setShowConfirmBorradoMultiple(true)
 									}

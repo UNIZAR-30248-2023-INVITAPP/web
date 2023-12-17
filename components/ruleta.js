@@ -278,7 +278,7 @@ function Ruleta({ listaInvitados, nombreEvento }) {
                 {!spinnerCorreo && !mensajeCorreoEnviado && (
                     <Button
                     disabled={ganadores.length == 0}
-                    className="btn btn-dark"
+                    variant="secondary"
                     onClick={handleClickBotonCorreo}
                     >
                         {`Enviar correo ${ganadores.length === 1 ? 'al ganador' : 'a los ganadores'}`}
