@@ -44,7 +44,7 @@ function Estadisticas() {
 		setFechaEvento(fecha);
 		const invitadosFirebase = await getDocs(collection(db, "Eventos/" + router.query.id + "/Invitados"))
 		const invitadosEventoPrueba = invitadosFirebase.docs.map((i) => {
-			if(i._document.data.value.mapValue.fields.asistido.booleanValue){
+			//if(i._document.data.value.mapValue.fields.asistido.booleanValue){
 				return {
 					nombre: i._document.data.value.mapValue.fields.nombre.stringValue,
 					DNI: i._document.data.value.mapValue.fields.DNI.stringValue,
@@ -54,16 +54,18 @@ function Estadisticas() {
 					asistencia: i._document.data.value.mapValue.fields.asistido.booleanValue,
 					horaLlegada: i._document.data.value.mapValue.fields.hora_asistido?.timestampValue || "Desconocida"
 				}
-			}
+			//}
+			/*
 			else{
 				return {
 					nombre: i._document.data.value.mapValue.fields.nombre.stringValue,
 					DNI: i._document.data.value.mapValue.fields.DNI.stringValue,
 					email: i._document.data.value.mapValue.fields.email.stringValue,
-					genero: i._document.data.value.mapValue.fields.genero.stringValue,
+					genero: i._document.data.value.mapValue.fields.genero.stringValue || "Desconocida",
 					asistencia: i._document.data.value.mapValue.fields.asistido.booleanValue,
 				}
 			}
+			*/
 		})
 		setLoading(false);
 		setInvitados([...invitadosEventoPrueba]);

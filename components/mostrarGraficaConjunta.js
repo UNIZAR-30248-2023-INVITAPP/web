@@ -7,6 +7,10 @@ const MostrarGraficaConjunta = ({
 	options,
 	options_horizontal,
 	options_stacked,
+	horaLlegadaChecked,
+	edadChecked,
+	noHayDatosEdad,
+	noHayDatosHoraLlegada
 }) => {
 	const [isLoading, setLoading] = useState(false);
 
@@ -111,7 +115,18 @@ const MostrarGraficaConjunta = ({
 		</div>
 		{isLoading ? <div className="d-flex justify-content-center py-3">
 									<Spinner></Spinner>
-								</div> : algoSeleccionado ?
+								</div> : !algoSeleccionado 
+								?
+								<div className="d-flex justify-content-center py-2">
+									<h3>Debes seleccionar una de las variables</h3>
+								</div>
+								:
+								((horaLlegadaChecked || edadChecked) && (noHayDatosHoraLlegada || noHayDatosEdad))
+								?
+								<div className="d-flex justify-content-center py-3">
+									<h3>Todavía no hay datos</h3>
+								</div>
+								:
 								<div className="d-flex justify-content-center py-1">
 									<Chart
 									chartType= {apiladasChecked ? "BarChart" : "Bar"}
@@ -121,11 +136,6 @@ const MostrarGraficaConjunta = ({
 									options={verticalChecked ? options : horizontalChecked ? options_horizontal : apiladasChecked ? options_stacked : null}
 									/>
 								</div>
-								:
-								<div className="d-flex justify-content-center py-2">
-									<h3>Debes seleccionar una de las variables</h3>
-								</div>
-
 		}
 		</>
 	);

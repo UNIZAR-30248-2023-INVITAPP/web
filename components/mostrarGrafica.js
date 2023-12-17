@@ -8,13 +8,18 @@ const MostrarGrafica = ({
 	options_horizontal,
 	options_stacked,
 	edadChecked,
-	horaLlegadaChecked
+	horaLlegadaChecked,
+	noHayDatosEdad,
+	noHayDatosHoraLlegada
 }) => {
 	const [isLoading, setLoading] = useState(false);
 
 	// Variables para controlar los botones que han sido pulsados
 	const [verticalChecked, setVerticalChecked] = useState(true);
 	const [horizontalChecked, setHorizontalChecked] = useState(false);
+
+	console.log(noHayDatosHoraLlegada);
+	console.log(noHayDatosEdad);
 
 	// Función para simular la carga de datos
 	useEffect(() => {
@@ -86,7 +91,12 @@ const MostrarGrafica = ({
 		:
 		isLoading ? <div className="d-flex justify-content-center py-3">
 									<Spinner></Spinner>
-								</div> : 
+								</div> : ((horaLlegadaChecked || edadChecked) && (noHayDatosHoraLlegada || noHayDatosEdad))
+								?
+								<div className="d-flex justify-content-center py-3">
+									<h3>Todavía no hay datos</h3>
+								</div>
+								:
 								<div className="d-flex justify-content-center py-1">
 									<Chart
 									chartType= {horizontalChecked ? "BarChart" : "Bar"}
@@ -114,8 +124,6 @@ const MostrarGrafica = ({
 		</>
 		}
 		</>
-		// INCLUIR DIAGRAMAS CON LA MEDIA?? (!!)
-		// ...
 	);
 };
 

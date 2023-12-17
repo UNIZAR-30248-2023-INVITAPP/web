@@ -63,6 +63,9 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 	// Array que contiene las diferentes horas de llegada
 	const totalHoras = []
 
+	var noHayDatosHoraLlegada = false;
+	var noHayDatosEdad = false;
+
 	// Recorro el conjunto de invitados
 	invitados.forEach(i => {
 
@@ -148,6 +151,16 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 		}
 	})
 
+	console.log(totalHoras.length);
+
+	if(totalHoras.length==0){
+		noHayDatosHoraLlegada = true;
+	}
+
+	if(totalEdades.length==0){
+		noHayDatosEdad = true;
+	}
+
 	console.log(totalEdades);
 	console.log(edadesMasculino);
 	console.log(edadesFemenino);
@@ -217,6 +230,10 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 							options={options}
 							options_horizontal={options_horizontal}
 							options_stacked={options_stacked}
+							edadChecked={edadChecked}
+							horaLlegadaChecked={horaLlegadaChecked}
+							noHayDatosEdad={noHayDatosEdad}
+							noHayDatosHoraLlegada={noHayDatosHoraLlegada}
 						/>
 					</>
 				);
@@ -259,6 +276,10 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 							options={options}
 							options_horizontal={options_horizontal}
 							options_stacked={options_stacked}
+							edadChecked={edadChecked}
+							horaLlegadaChecked={horaLlegadaChecked}
+							noHayDatosEdad={noHayDatosEdad}
+							noHayDatosHoraLlegada={noHayDatosHoraLlegada}
 						/>
 					</>
 				);
@@ -301,6 +322,10 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 							options={options}
 							options_horizontal={options_horizontal}
 							options_stacked={options_stacked}
+							edadChecked={edadChecked}
+							horaLlegadaChecked={horaLlegadaChecked}
+							noHayDatosEdad={noHayDatosEdad}
+							noHayDatosHoraLlegada={noHayDatosHoraLlegada}
 						/>
 					</>
 				);
@@ -324,6 +349,8 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 						options={options}
 						edadChecked={edadChecked}
 						horaLlegadaChecked={horaLlegadaChecked}
+						noHayDatosEdad={noHayDatosEdad} 
+						noHayDatosHoraLlegada={noHayDatosHoraLlegada}
 					></MostrarGrafica>
 				);
 			}
@@ -366,52 +393,10 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 						options={options}
 						options_horizontal={options_horizontal}
 						options_stacked={options_stacked}
-					/>
-				);
-			} else if (horaLlegadaChecked) {
-				// Datos para las variables conjuntas edad y hora de llegada
-				const data = [
-					["Edad", "Masculino", "Femenino"],
-					["18", 19, 16],
-					["19", 32, 26],
-					["20", 20, 15],
-					["21", 21, 17],
-					["22", 4, 10],
-					["23", 4, 6],
-					["24", 8, 14],
-					["25", 11, 5],
-					["32", 6, 3],
-					["41", 1, 0],
-					["52", 3, 2],
-				];
-				// Opciones para los gráficos
-				const options = {
-					chartArea: { width: "100%" },
-				};
-				// Opciones para el gráfico de barras horizontal
-				const options_horizontal = {
-					chartArea: { width: "100%" },
-					hAxis: {
-						title: "Edad",
-						minValue: 0,
-					},
-					bars: "horizontal",
-				};
-				// Opciones para el gráfico de barras apiladas
-				const options_stacked = {
-					chartArea: { width: "100%" },
-					isStacked: true,
-					hAxis: {
-						title: "Total invitados",
-						minValue: 0,
-					},
-				};
-				return (
-					<MostrarGraficaConjunta
-						data={data}
-						options={options}
-						options_horizontal={options_horizontal}
-						options_stacked={options_stacked}
+						edadChecked={edadChecked}
+						horaLlegadaChecked={horaLlegadaChecked}
+						noHayDatosEdad={noHayDatosEdad}
+						noHayDatosHoraLlegada={noHayDatosHoraLlegada}
 					/>
 				);
 			} else {
@@ -433,6 +418,8 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 						options={options}
 						edadChecked={edadChecked}
 						horaLlegadaChecked={horaLlegadaChecked}
+						noHayDatosEdad={noHayDatosEdad} 
+						noHayDatosHoraLlegada={noHayDatosHoraLlegada}
 					></MostrarGrafica>
 				);
 			}
@@ -452,9 +439,17 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 			};
 
 			return (
-				<MostrarGrafica data={data} options={options} edadChecked={edadChecked} horaLlegadaChecked={horaLlegadaChecked}></MostrarGrafica>
+				<MostrarGrafica 
+					data={data} 
+					options={options} 
+					edadChecked={edadChecked} 
+					horaLlegadaChecked={horaLlegadaChecked}
+					noHayDatosEdad={noHayDatosEdad} 
+					noHayDatosHoraLlegada={noHayDatosHoraLlegada}>
+				</MostrarGrafica>
 			);
-			} else {
+			} 
+			else {
 				// Si sólo se ha seleccionado la variable asistencia
 				const data = [
 					["Asistencia", "Invitados"],
@@ -471,6 +466,8 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 						options={options}
 						edadChecked={edadChecked}
 						horaLlegadaChecked={horaLlegadaChecked}
+						noHayDatosEdad={noHayDatosEdad} 
+						noHayDatosHoraLlegada={noHayDatosHoraLlegada}
 					></MostrarGrafica>
 				);
 			}
@@ -489,7 +486,14 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 			};
 
 			return (
-				<MostrarGrafica data={data} options={options} edadChecked={edadChecked} horaLlegadaChecked={horaLlegadaChecked}></MostrarGrafica>
+				<MostrarGrafica 
+					data={data} 
+					options={options} 
+					edadChecked={edadChecked} 
+					horaLlegadaChecked={horaLlegadaChecked} 
+					noHayDatosEdad={noHayDatosEdad} 
+					noHayDatosHoraLlegada={noHayDatosHoraLlegada}>
+				</MostrarGrafica>
 			);
 		}
 	}
