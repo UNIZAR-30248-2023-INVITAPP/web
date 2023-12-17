@@ -5,6 +5,8 @@ import { ToggleButton, ButtonGroup, Spinner } from "react-bootstrap";
 import { useRouter } from "next/router";
 import { doc, getDoc, getDocs, collection } from "firebase/firestore";
 import db from "../../firebase";
+import { isLogged } from "@/functions/isLogged";
+import { Button } from "react-bootstrap";
 
 function Estadisticas() {
 	// Variable redirección por Router
@@ -27,26 +29,17 @@ function Estadisticas() {
 	// Variables para recuperar el nombre y fecha del evento pulsado
 	const [nombreEvento, setNombreEvento] = useState("");
 	const [fechaEvento, setFechaEvento] = useState("");
-
-	// Función para simular la carga de datos
-	useEffect(() => {
-		function simularCarga() {
-			return new Promise((resolve) => setTimeout(resolve, 1000));
-		}
-
-		if (isLoading) {
-			simularCarga().then(() => {
-				setLoading(false);
-			});
-		}
-	}, [isLoading]);
+	const [organizador, setOrganizador] = useState("");
 
 	// Función para extraer el nombre y fecha de los eventos y el nombre, DNI, email, genero, edad, asistencia y hora de llegada de los invitados
 	const fetchData = async() => {
+		setLoading(true)
 		const evento = await getDoc(doc(db, "Eventos/" + router.query.id));
-		const nombre = evento._document.data.value.mapValue.fields.nombre.stringValue;
-		const fechaDate = new Date(evento._document.data.value.mapValue.fields.fecha.stringValue);
+		const organizador = evento._document?.data.value.mapValue.fields.organizador.stringValue;
+		const nombre = evento._document?.data.value.mapValue.fields.nombre.stringValue;
+		const fechaDate = new Date(evento._document?.data.value.mapValue.fields.fecha.stringValue);
 		const fecha = fechaDate.toLocaleDateString("es-ES", { year: "numeric", month: "long", day: "numeric" });
+		setOrganizador(organizador)
 		setNombreEvento(nombre);
 		setFechaEvento(fecha);
 		const invitadosFirebase = await getDocs(collection(db, "Eventos/" + router.query.id + "/Invitados"))
@@ -57,9 +50,9 @@ function Estadisticas() {
 					DNI: i._document.data.value.mapValue.fields.DNI.stringValue,
 					email: i._document.data.value.mapValue.fields.email.stringValue,
 					genero: i._document.data.value.mapValue.fields.genero.stringValue,
-					edad: i._document.data.value.mapValue.fields.edad.stringValue, 
+					edad: i._document.data.value.mapValue.fields.edad?.stringValue || "Desconocida", 
 					asistencia: i._document.data.value.mapValue.fields.asistido.booleanValue,
-					horaLlegada: i._document.data.value.mapValue.fields.hora_asistido.timestampValue
+					horaLlegada: i._document.data.value.mapValue.fields.hora_asistido?.timestampValue || "Desconocida"
 				}
 			}
 			else{
@@ -72,17 +65,27 @@ function Estadisticas() {
 				}
 			}
 		})
+		setLoading(false);
 		setInvitados([...invitadosEventoPrueba]);
 	}
 
+		
+	const [isUserLogged, setIsUserLogged] = useState(false)
+	const [cargado, setCargado] = useState(false)
+
 	useEffect(() => {
+		const actualizarLogged = async () => {
+			setIsUserLogged(await isLogged())
+			setCargado(true)
+		}
+		actualizarLogged()
 		fetchData();
 	}, [])
 
 	// Control de la pulsación de botones
 	const handleClickOnGenero = () => {
 		if (!generoChecked) {
-			setLoading(true);
+			// setLoading(true);
 			setGeneroChecked(!generoChecked);
 			setCounter(counter+1);
 		} else {
@@ -93,7 +96,7 @@ function Estadisticas() {
 
 	const handleClickOnEdad = () => {
 		if (!edadChecked) {
-			setLoading(true);
+			// setLoading(true);
 			setEdadChecked(!edadChecked);
 			setCounter(counter+1);
 		} else {
@@ -104,7 +107,7 @@ function Estadisticas() {
 
 	const handleClickOnAsistencia = () => {
 		if (!asistenciaChecked) {
-			setLoading(true);
+			// setLoading(true);
 			setAsistenciaChecked(!asistenciaChecked);
 			setCounter(counter+1);
 		} else {
@@ -115,7 +118,7 @@ function Estadisticas() {
 
 	const handleClickOnHoraLlegada = () => {
 		if (!horaLlegadaChecked) {
-			setLoading(true);
+			// setLoading(true);
 			setHoraLlegadaChecked(!horaLlegadaChecked);
 			setCounter(counter+1);
 		} else {
@@ -126,74 +129,101 @@ function Estadisticas() {
 
 	
 
-	return (
-		<Layout>
-			<h1 className="fw-bold text-center py-4">Estadísticas de {nombreEvento} del {fechaEvento}</h1>
-			<div className="d-flex justify-content-center">
-				<button
-					className="my-2 btn btn-outline-dark btn-lg" 
-					variant="outline-primary"
-					onClick={() => fetchData()}
-				>Actualizar</button>
-			</div>
-			<div className="d-flex justify-content-center">
-				<ButtonGroup horizontal="true" size="lg">
-					<ToggleButton
-						id="toggle-check"
-						type="checkbox"
-						variant="outline-primary"
-						checked={generoChecked ? true : false}
-						disabled={isLoading}
-						onClick={!isLoading ? handleClickOnGenero : null}
-					>
-						Genero
-					</ToggleButton>
-					<ToggleButton
-						id="toggle-check"
-						type="checkbox"
-						variant="outline-primary"
-						checked={edadChecked ? true : false}
-						disabled={isLoading || horaLlegadaChecked}
-						onClick={!isLoading ? handleClickOnEdad : null}
-					>
-						Edad
-					</ToggleButton>
-					<ToggleButton
-						id="toggle-check"
-						type="checkbox"
-						variant="outline-primary"
-						checked={asistenciaChecked ? true : false}
-						disabled={isLoading}
-						onClick={!isLoading ? handleClickOnAsistencia : null}
-					>
-						Asistencia
-					</ToggleButton>
-					<ToggleButton
-						id="toggle-check"
-						type="checkbox"
-						variant="outline-primary"
-						checked={horaLlegadaChecked ? true : false}
-						disabled={isLoading || edadChecked}
-						onClick={!isLoading ? handleClickOnHoraLlegada : null}
-					>
-						Hora de llegada
-					</ToggleButton>
-				</ButtonGroup>
-			</div>
-				{!isLoading ? <Stats generoChecked={generoChecked}
-								edadChecked={edadChecked}
-								asistenciaChecked={asistenciaChecked}
-								horaLlegadaChecked={horaLlegadaChecked}
-								counter={counter}
-								invitados={invitados}
-								></Stats> : 
-								<div className="d-flex justify-content-center py-4">
-									<Spinner></Spinner>
-								</div>
-				}
-								
-		</Layout>
-	);
+	if  (cargado){
+		if (isUserLogged){
+			if (organizador == localStorage.getItem("email")){
+				return (
+					<Layout>
+						<div className="container mt-4">
+							<h1 className="fw-bold text-center py-4">Estadísticas de {nombreEvento} del {fechaEvento}</h1>
+							<div className="d-flex justify-content-center">
+								<button
+									className="my-2 btn btn-outline-dark btn-lg" 
+									variant="outline-primary"
+									onClick={() => fetchData()}
+								>Actualizar</button>
+							</div>
+							<div className="d-flex justify-content-center">
+								<ButtonGroup horizontal="true" size="lg">
+									<ToggleButton
+										id="toggle-check"
+										type="checkbox"
+										variant="outline-primary"
+										checked={generoChecked ? true : false}
+										disabled={isLoading}
+										onClick={!isLoading ? handleClickOnGenero : null}
+									>
+										Genero
+									</ToggleButton>
+									<ToggleButton
+										id="toggle-check"
+										type="checkbox"
+										variant="outline-primary"
+										checked={edadChecked ? true : false}
+										disabled={isLoading || horaLlegadaChecked}
+										onClick={!isLoading ? handleClickOnEdad : null}
+									>
+										Edad
+									</ToggleButton>
+									<ToggleButton
+										id="toggle-check"
+										type="checkbox"
+										variant="outline-primary"
+										checked={asistenciaChecked ? true : false}
+										disabled={isLoading}
+										onClick={!isLoading ? handleClickOnAsistencia : null}
+									>
+										Asistencia
+									</ToggleButton>
+									<ToggleButton
+										id="toggle-check"
+										type="checkbox"
+										variant="outline-primary"
+										checked={horaLlegadaChecked ? true : false}
+										disabled={isLoading || edadChecked}
+										onClick={!isLoading ? handleClickOnHoraLlegada : null}
+									>
+										Hora de llegada
+									</ToggleButton>
+								</ButtonGroup>
+							</div>
+								{!isLoading ? <Stats generoChecked={generoChecked}
+												edadChecked={edadChecked}
+												asistenciaChecked={asistenciaChecked}
+												horaLlegadaChecked={horaLlegadaChecked}
+												counter={counter}
+												invitados={invitados}
+												></Stats> : 
+												<div className="d-flex justify-content-center py-4">
+													<Spinner></Spinner>
+												</div>
+								}
+						</div>				
+					</Layout>
+				);
+			}
+			else {
+				return (
+					<Layout>
+						<div className="container mt-4">
+							<h1 className="fw-bold text-center py-4">No tienes permisos para visualizar este evento</h1>
+							<Button
+									className="mx-auto d-block mb-3"
+									variant="primary"
+									size="lg"
+									onClick={() =>
+										router.push("/eventos")
+									}
+								>
+									Volver a mis eventos
+							</Button>
+						</div>
+					</Layout>
+				)
+			}
+		}
+		else router.push("/login")
+	}
 }
 
 export default Estadisticas;

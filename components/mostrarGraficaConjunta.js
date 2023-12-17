@@ -34,7 +34,7 @@ const MostrarGraficaConjunta = ({
 	// Control de la pulsación de botones
 	const handleClickOnVertical = () => {
 		if (!verticalChecked) {
-			setLoading(true);
+			//setLoading(true);
 			setHorizontalChecked(false);
 			setApiladasChecked(false);
 			setVerticalChecked(!verticalChecked);
@@ -47,7 +47,7 @@ const MostrarGraficaConjunta = ({
 
 	const handleClickOnHorizontal = () => {
 		if (!horizontalChecked) {
-			setLoading(true);
+			//setLoading(true);
 			setHorizontalChecked(!horizontalChecked);
 			setVerticalChecked(false);
 			setApiladasChecked(false);
@@ -60,7 +60,7 @@ const MostrarGraficaConjunta = ({
 
 	const handleClickOnApiladas = () => {
 		if (!apiladasChecked) {
-			setLoading(true);
+			//setLoading(true);
 			setApiladasChecked(!apiladasChecked);
 			setHorizontalChecked(false);
 			setVerticalChecked(false);
