@@ -1,32 +1,28 @@
-import { anadirEventoPrueba, eliminarEvento } from "../aux-funciones";
+import { anadirEventoPrueba, eliminarEvento, eliminarEventoDom, anadirEventoPruebaDom } from "../aux-funciones";
 
 describe("Añadir un invitado", () => {
     var docReference;
     const nombreEvento = "Test - Añadir un invitado";
 
     beforeEach(() => {
-        docReference = anadirEventoPrueba(nombreEvento).then(
-            (result) => (docReference = result)
-        );
+        cy.visit("http://localhost:3000/eventos");
 
         cy.wait(1000);
-
-        cy.visit("http://localhost:3000/eventos");
-    });
-
-    afterEach(() => {
-        eliminarEvento(docReference.id);
     });
 
     it("Añadir un invitado", () => {
+        anadirEventoPruebaDom(nombreEvento)
         const nombreInvitado = "Nombre invitado";
-        const DNIInvitado = "11111111A";
+        const DNIInvitado = "12345678Z";
         const emailInvitado = "prueba@correo.es";
+        const genero = "Femenino";
         // Comprobar que no hay invitados
         const ultimoEvento = cy
             .get(".list-group")
             .children()
             .contains(nombreEvento)
+            .parent()
+            .parent()
             .parent()
             .parent();
         ultimoEvento.contains("button", "Invitados").click();
@@ -40,6 +36,8 @@ describe("Añadir un invitado", () => {
         cy.get("#formDNI").type(DNIInvitado);
         // Rellenar el email
         cy.get("#formEmail").type(emailInvitado);
+        // Rellenar el genero
+        cy.get("#formGenero").select(genero)
         // Pulsar el boton
         cy.contains("button", "Añadir").click();
         // cy.intercept("*").as("fetch");
@@ -56,5 +54,9 @@ describe("Añadir un invitado", () => {
         cy.contains(DNIInvitado).should("exist");
         // Comprobar que aparece el Email
         cy.contains(emailInvitado).should("exist");
+    });
+
+    it("Añadir un invitado", () => {
+        eliminarEventoDom(nombreEvento)
     });
 });

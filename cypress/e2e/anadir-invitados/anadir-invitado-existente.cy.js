@@ -1,25 +1,16 @@
-import { anadirEventoPrueba, eliminarEvento } from "../aux-funciones";
+import { anadirEventoPruebaDom, eliminarEventoDom } from "../aux-funciones";
 
 describe("Añadir dos invitados con el mismo DNI", () => {
-    var docReference;
     const nombreEvento = "Test - Añadir dos invitado con el mismo DNI";
 
     beforeEach(() => {
-        docReference = anadirEventoPrueba(nombreEvento).then(
-            (result) => (docReference = result)
-        );
-        cy.wait(1000);
-
         cy.visit("http://localhost:3000/eventos");
     });
 
-    afterEach(() => {
-        eliminarEvento(docReference.id);
-    });
-
     it("Añadir dos invitados con el mismo DNI", () => {
+        anadirEventoPruebaDom(nombreEvento)
         const nombreInvitado = "Nombre invitado";
-        const DNIInvitado = "11111111A";
+        const DNIInvitado = "12345678Z";
         const emailInvitado = "prueba@correo.es";
         // Comprobar que no hay invitados
         const ultimoEvento = cy
@@ -27,7 +18,9 @@ describe("Añadir dos invitados con el mismo DNI", () => {
             .children()
             .contains(nombreEvento)
             .parent()
-            .parent();
+            .parent()
+            .parent()
+            .next();
         ultimoEvento.contains("button", "Invitados").click();
         // Comprobar que no hay invitados
         cy.contains("Aun no hay invitados para este evento");
@@ -41,6 +34,11 @@ describe("Añadir dos invitados con el mismo DNI", () => {
         cy.get("#formEmail").type(emailInvitado);
         // Pulsar el boton
         cy.contains("button", "Añadir").click();
+
+
+        cy.wait(500)
+
+        cy.get('.btn-close').eq(0).click()
 
         // Comprobar que se ha añadido
         cy.contains("Aun no hay invitados para este evento").should(
@@ -65,5 +63,11 @@ describe("Añadir dos invitados con el mismo DNI", () => {
 
         // Comprobar que existe el mensaje de error
         cy.contains("Ya existe un invitado con ese DNI").should("exist");
+
+        cy.wait(500)
+
+        cy.get('.btn-close').eq(0).click()
+
+        eliminarEventoDom(nombreEvento)
     });
 });

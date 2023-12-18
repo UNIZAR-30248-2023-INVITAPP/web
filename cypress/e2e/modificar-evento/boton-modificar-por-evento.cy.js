@@ -1,4 +1,4 @@
-import { anadirEventoPrueba, eliminarEventoDom } from "../aux-funciones"
+import { anadirEventoPruebaDom, eliminarEventoDom } from "../aux-funciones"
 describe('Comprobar que aparece un boton de modificar evento en cada evento', () => {
     
     const nombreEvento1 = "Test 1 - Boton modificar por evento"
@@ -14,10 +14,10 @@ describe('Comprobar que aparece un boton de modificar evento en cada evento', ()
         cy.get('h1').should('have.text', 'Mis Eventos')
     })
 
-    it('Prueba 2: Crear 3 eventos', async () => {
-      await anadirEventoPrueba(nombreEvento1)
-      await anadirEventoPrueba(nombreEvento2)
-      await anadirEventoPrueba(nombreEvento3)
+    it('Prueba 2: Crear 3 eventos', () => {
+      anadirEventoPruebaDom(nombreEvento1)
+      anadirEventoPruebaDom(nombreEvento2)
+      anadirEventoPruebaDom(nombreEvento3)
     })
 
 

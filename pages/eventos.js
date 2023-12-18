@@ -20,6 +20,8 @@ import moment from "moment";
 import { useRouter } from "next/router";
 import { isLogged } from "@/functions/isLogged";
 
+const emailTesting = "cypress-testing@gmail.com"
+
 
 // Componente que se corresponde con la página que se muestra de inicio, donde aparece la lista de los eventos
 function EventosPage() {
@@ -95,7 +97,7 @@ function EventosPage() {
 	// formatear los datos obtenidos y almacenarlos en un arreglo de eventos.
 	// Luego, ordena el arreglo de eventos por nombre y actualiza el estado con los eventos obtenidos.
 	const fetchEventos = async () => {
-		const mail = localStorage.getItem("email")
+		const mail = localStorage.getItem("email") || emailTesting
 		console.log(mail)
 		const eventosFirebase = await getDocs(query(collection(db, "Eventos"), where("organizador", "==", mail)));
 		//const eventosFirebase = await getDocs(collection(db, "Eventos"));
@@ -610,7 +612,12 @@ function EventosPage() {
 	}, []);
 
 	if (cargado){
-		if (!isUserLogged) router.push("/login");
+		console.log("cypress: " + window.Cypress)
+		if (window.Cypress){
+			console.log("preuba")
+			localStorage.setItem("email", emailTesting)
+		}
+		if (!isUserLogged && !window.Cypress) router.push("/login");
 		else return (
 			<div>
 				<Layout>

@@ -1,4 +1,4 @@
-const { eliminarEventoDom, anadirEventoPrueba } = require("../aux-funciones")
+const { eliminarEventoDom, anadirEventoPruebaDom } = require("../aux-funciones")
 
 describe('En esta prueba se modifican las propiedades con las mismas que otro ya existente', () => {
 
@@ -12,12 +12,12 @@ describe('En esta prueba se modifican las propiedades con las mismas que otro ya
     })
 
 
-    it('Prueba 1: Crear un evento "Evento de Prueba 1" ', async () => {
-        await anadirEventoPrueba(nombreEvento1)
+    it('Prueba 1: Crear un evento "Evento de Prueba 1" ', () => {
+        anadirEventoPruebaDom(nombreEvento1)
     })
 
-    it('Prueba 2: Crear un evento "Evento de Prueba 2" ', async () => {
-        await anadirEventoPrueba(nombreEvento2)
+    it('Prueba 2: Crear un evento "Evento de Prueba 2" ', () => {
+        anadirEventoPruebaDom(nombreEvento2)
     })
 
     it('Prueba 3: Seleccionar el segundo evento creado y ponerle el nombre del primero y comprobar el mensaje de error', () => {
@@ -25,6 +25,7 @@ describe('En esta prueba se modifican las propiedades con las mismas que otro ya
         cy.get('li') // Selecciona todos los elementos <li> que representan eventos
         .contains('h5', nombreEvento2) // Busca el elemento <h5> con el texto "Evento de Prueba 2"
         .parent() // Selecciona el padre del elemento h5
+        .parent()
         .parent()
         .next() // Selecciona el siguiente elemento (que sería el div hermano del padre del h5)
         .within(() => {
@@ -45,9 +46,10 @@ describe('En esta prueba se modifican las propiedades con las mismas que otro ya
             2,
             "0"
         )}`;
-        cy.get('#fecha').type(fechaUnDiaDespuesFormateada);
+        const fecha = "2025-12-31"
+        cy.get('#fecha').type(fecha);
         // Rellenar la hora
-        cy.get('#hora').type('00:00');
+        cy.get('#hora').type('21:30');
         // Rellenar hora
         // Pinchar el botón de modificar evento
         cy.get('button.btn-dark').contains('Modificar Evento').click()

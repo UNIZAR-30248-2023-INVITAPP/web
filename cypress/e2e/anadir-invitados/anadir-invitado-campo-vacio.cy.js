@@ -1,21 +1,16 @@
-import { anadirEventoPrueba, eliminarEvento } from "../aux-funciones";
+import { anadirEventoPruebaDom, eliminarEventoDom } from "../aux-funciones";
 
 describe("Añadir un invitado con campo vacio", () => {
     var docReference;
     const nombreEvento = "Test - Añadir un invitado con campo vacio";
 
     beforeEach(() => {
-        docReference = anadirEventoPrueba(nombreEvento).then(
-            (result) => (docReference = result)
-        );
-        cy.wait(1000);
-
         cy.visit("http://localhost:3000/eventos");
     });
 
-    afterEach(() => {
-        eliminarEvento(docReference.id);
-    });
+    it("Añadir un evento", () => {
+        anadirEventoPruebaDom(nombreEvento)
+    })
 
     it("Añadir un invitado sin nombre", () => {
         const DNIInvitado = "11111111A";
@@ -25,6 +20,8 @@ describe("Añadir un invitado con campo vacio", () => {
             .get(".list-group")
             .children()
             .contains(nombreEvento)
+            .parent()
+            .parent()
             .parent()
             .parent();
         ultimoEvento.contains("button", "Invitados").click();
@@ -52,6 +49,8 @@ describe("Añadir un invitado con campo vacio", () => {
             .children()
             .contains(nombreEvento)
             .parent()
+            .parent()
+            .parent()
             .parent();
         ultimoEvento.contains("button", "Invitados").click();
         // Comprobar que no hay invitados
@@ -78,6 +77,8 @@ describe("Añadir un invitado con campo vacio", () => {
             .children()
             .contains(nombreEvento)
             .parent()
+            .parent()
+            .parent()
             .parent();
         ultimoEvento.contains("button", "Invitados").click();
         // Comprobar que no hay invitados
@@ -94,4 +95,8 @@ describe("Añadir un invitado con campo vacio", () => {
         // Comprobar que no se ha añadido
         cy.contains("Aun no hay invitados para este evento").should("exist");
     });
+
+    it("Eliminer un evento", () => {
+        eliminarEventoDom(nombreEvento)
+    })
 });

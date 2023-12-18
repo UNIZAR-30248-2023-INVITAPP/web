@@ -1,4 +1,4 @@
-import { anadirEventoPrueba, eliminarEventoDom } from "../aux-funciones";
+import { anadirEventoPrueba, anadirEventoPruebaDom, eliminarEventoDom } from "../aux-funciones";
 
 
 describe('Crear un evento con las mismas propiedades que otro existente', () => {
@@ -10,7 +10,7 @@ describe('Crear un evento con las mismas propiedades que otro existente', () => 
 
 
   it('Prueba 1: Crear un evento', () => {
-    anadirEventoPrueba('Test - Crear Evento existente')
+    anadirEventoPruebaDom(nombre)
   })
 
   it('Prueba 2: Crear un evento con las mismas propiedades que uno creado', () => {
@@ -29,8 +29,9 @@ describe('Crear un evento con las mismas propiedades que otro existente', () => 
         "0"
     )}`;
 
-    const hora = '00:00'
-    const ubicacion = 'Ubicacion de prueba'
+    const fecha = "2025-12-31"
+    const hora = '21:30'
+    const ubicacion = 'Calle León XII'
     // Pinchar en el modal para crear Evento
     cy.contains('button', 'Crear Evento').click();
     // Rellenar el nombre del evento
@@ -38,7 +39,7 @@ describe('Crear un evento con las mismas propiedades que otro existente', () => 
 
 
     // Rellenar la fecha
-    cy.get('#fecha').type(fechaUnDiaDespuesFormateada)
+    cy.get('#fecha').type(fecha)
     // Rellenar la hora
     cy.get('#hora').type(hora);
     //Rellenar la ubicacion

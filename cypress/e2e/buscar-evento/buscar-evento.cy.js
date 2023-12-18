@@ -1,4 +1,4 @@
-import { anadirEventoPrueba, eliminarEventoDom } from "../aux-funciones";
+import { anadirEventoPrueba, anadirEventoPruebaDom, eliminarEventoDom } from "../aux-funciones";
 
 describe("Buscar un evento en la barra de búsqueda", () => {
     beforeEach(() => {
@@ -16,11 +16,12 @@ describe("Buscar un evento en la barra de búsqueda", () => {
         );
     });
 
-    it("Prueba 2: Crear un evento", async  () => {
-        await anadirEventoPrueba("Test - Buscar Evento");
+    it("Prueba 2: Crear un evento",  () => {
+        anadirEventoPruebaDom("Test - Buscar Evento");
     });
 
     it("Prueba 3: Buscar el evento en la barra de búsqueda y comprobar que aparece", () => {
+        
         // Buscar el evento creado previamente
         cy.get("#searchBar").clear().type("Buscar Evento");
 
