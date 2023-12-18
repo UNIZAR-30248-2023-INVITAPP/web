@@ -55,6 +55,23 @@ export const eliminarEvento = async (docId) => {
     await deleteDoc(doc(db, "Eventos", docId));
 };
 
+export const anadirEventoPruebaDom = (nombre) => {
+    // Pinchar en el modal para crear Evento
+    cy.contains('button', 'Crear Evento').click();
+    // Rellenar el nombre del evento
+    cy.get('#nombre').type(nombre);
+    // Rellenar la fecha
+    cy.get('#fecha').type('2025-12-31');
+    // Rellenar la hora
+    cy.get('#hora').type('21:30');
+    //Rellenar la ubicacion
+    cy.get('#ubicacion').type('Calle León XII');
+    // Crear Evento
+    cy.get('#boton-crear-evento').click()
+
+    cy.wait(2500)
+}
+
 export const eliminarEventoDom = (evento) => {
     // Eliminar el evento
     const etiqueta = cy.get('h5').contains(evento)
@@ -64,6 +81,8 @@ export const eliminarEventoDom = (evento) => {
     .find('Button')  // Encuentra todos los elementos tipo botón dentro del modal
     .last()  // Selecciona el último botón (asumiendo que "Eliminar" es el último)
     .click();  // Realiza clic en el botón
+
+    cy.wait(1000)
 }
 
 /**

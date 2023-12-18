@@ -1,4 +1,4 @@
-import { anadirEventoPrueba, eliminarEventoDom } from "../aux-funciones"
+import { anadirEventoPruebaDom, eliminarEventoDom } from "../aux-funciones"
 describe('Comprobar que aparece un boton de "Estadisticas" en cada evento', () => {
     
     const nombreEvento1 = "Test 1 - Botón estadistícas por evento"
@@ -13,9 +13,9 @@ describe('Comprobar que aparece un boton de "Estadisticas" en cada evento', () =
         cy.get('h1').should('have.text', 'Mis Eventos')
     })
 
-    it('Prueba 2: Crear 2 eventos', async () => {
-      await anadirEventoPrueba(nombreEvento1)
-      await anadirEventoPrueba(nombreEvento2)
+    it('Prueba 2: Crear 2 eventos', () => {
+      anadirEventoPruebaDom(nombreEvento1)
+      anadirEventoPruebaDom(nombreEvento2)
     })
 
 
@@ -30,10 +30,11 @@ describe('Comprobar que aparece un boton de "Estadisticas" en cada evento', () =
     it('Prueba 4: Comprobar que el botón lleva a la página de estadísticas y las muestra', () => {
       // Obtén todos los elementos <li> que representan eventos
       cy.get('li.list-group-item').first().find('button.btn-info').click()
+      cy.wait(2500)
       // Comprobar que se abre la pagina de estadísticas mirando la primera cabecera
       const etiqueta = cy.get('h1').should('contain', 'Estadísticas de ')
 
-      const botones = etiqueta.siblings().contains("Sexo")
+      const botones = etiqueta.siblings().contains("Genero")
       //Mostramos estadísticas de "sexo"
       botones.click()
 
