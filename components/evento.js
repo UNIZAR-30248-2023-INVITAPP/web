@@ -429,6 +429,7 @@ function Evento({
 							onReset={(e) =>{
 								setModificandoInvitado(false)
 								setIndexInvitadoModificar(null)
+								setShowErrorAgnadirInvitado(false)
 								e.target.formNombre.value =  "";
 								e.target.formDNI.value = "";
 								e.target.formEmail.value = "";
