@@ -84,7 +84,7 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 			var cambioTimestampHoraLlegada = new Date(i.horaLlegada);
 			// Si la hora de llegada del invitado ya está incluida cambiamos la variable a true
 			totalHoras.forEach(j => {
-				if(j==cambioTimestampHoraLlegada.getUTCHours()+":"+redondearHora(cambioTimestampHoraLlegada.getMinutes)){
+				if(j==cambioTimestampHoraLlegada.getUTCHours()+":"+redondearHora(cambioTimestampHoraLlegada.getMinutes())){
 					horaLlegadaEncontrada = true;
 				}
 			})
