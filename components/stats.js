@@ -19,18 +19,20 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 
 	// Funcion para redondear horas de llegada
 	function redondearHora(minutos){
-		console.log(minutos);
-		if((minutos>=0 && minutos<=7) || (minutos>=52 && minutos<=59)){
-			return 0;
+		if(minutos>=0 && minutos<=7){
+			return "00";
 		}
 		else if(minutos>=8 && minutos<=22){
-			return 15;
+			return "15";
 		}
 		else if(minutos>=23 && minutos<=37){
-			return 30;
+			return "30";
+		}
+		else if(minutos>=52 && minutos<=59){
+			return "nueva_hora"
 		}
 		else {
-			return 45;
+			return "45";
 		}
 	}
 	
@@ -82,9 +84,24 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 		// en caso afirmativo, transformamos su timestamp a fecha
 		if(i.asistencia){
 			var cambioTimestampHoraLlegada = new Date(i.horaLlegada);
+			// Ajusto la hora a un formato de 24 horas
+			//if(cambioTimestampHoraLlegada.getHours()>11){
+				//console.log(cambioTimestampHoraLlegada.getHours());
+				cambioTimestampHoraLlegada.setHours(cambioTimestampHoraLlegada.getHours()+1, cambioTimestampHoraLlegada.getMinutes(), cambioTimestampHoraLlegada.getSeconds(), cambioTimestampHoraLlegada.getMilliseconds());
+				//console.log(cambioTimestampHoraLlegada.getHours());
+			//}
+			//else{
+				//cambioTimestampHoraLlegada.setHours(cambioTimestampHoraLlegada.getHours()+1, cambioTimestampHoraLlegada.getMinutes(), cambioTimestampHoraLlegada.getSeconds(), cambioTimestampHoraLlegada.getMilliseconds());
+			//}
 			// Si la hora de llegada del invitado ya está incluida cambiamos la variable a true
 			totalHoras.forEach(j => {
-				if(j==cambioTimestampHoraLlegada.getUTCHours()+":"+redondearHora(cambioTimestampHoraLlegada.getMinutes())){
+				var minutos = redondearHora(cambioTimestampHoraLlegada.getMinutes());
+				console.log(minutos);
+				if(minutos=="nueva_hora"){
+					cambioTimestampHoraLlegada.setHours(cambioTimestampHoraLlegada.getHours()+1, cambioTimestampHoraLlegada.getMinutes(), cambioTimestampHoraLlegada.getSeconds(), cambioTimestampHoraLlegada.getMilliseconds());
+					minutos="00";
+				}
+				if(j==cambioTimestampHoraLlegada.getUTCHours()+":"+minutos){
 					horaLlegadaEncontrada = true;
 				}
 			})
@@ -99,7 +116,12 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 		
 		// Si la hora de llegada no está incluida, la añadimos al vector totalHoras
 		if(i.asistencia && !horaLlegadaEncontrada){
-			totalHoras.push(cambioTimestampHoraLlegada.getUTCHours()+":"+redondearHora(cambioTimestampHoraLlegada.getMinutes()));
+			var minutos = redondearHora(cambioTimestampHoraLlegada.getMinutes());
+			if(minutos=="nueva_hora"){
+				cambioTimestampHoraLlegada.setHours(cambioTimestampHoraLlegada.getHours()+1, cambioTimestampHoraLlegada.getMinutes(), cambioTimestampHoraLlegada.getSeconds(), cambioTimestampHoraLlegada.getMilliseconds());
+				minutos="00";
+			}
+			totalHoras.push(cambioTimestampHoraLlegada.getUTCHours() + ":" + minutos);
 		}
 
 		// Si la edad del invitado no está incluida, la añadimos al vector totalEdades
@@ -118,7 +140,12 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 				edadesMasculino.push(i.edad); // ACABARÁ SIENDO -> edad
 				counterAsistenciaMasculino++;
 				hanAsistidoEdad.push(i.edad); // ACABARÁ SIENDO -> edad
-				horaLlegadaMasculino.push(cambioTimestampHoraLlegada.getUTCHours() + ":" + redondearHora(cambioTimestampHoraLlegada.getMinutes()));
+				var minutos = redondearHora(cambioTimestampHoraLlegada.getMinutes());
+				if(minutos=="nueva_hora"){
+					//cambioTimestampHoraLlegada.setHours(cambioTimestampHoraLlegada.getHours()+1, cambioTimestampHoraLlegada.getMinutes(), cambioTimestampHoraLlegada.getSeconds(), cambioTimestampHoraLlegada.getMilliseconds());
+					minutos="00";
+				}
+				horaLlegadaMasculino.push(cambioTimestampHoraLlegada.getUTCHours() + ":" + minutos);
 			}
 		}
 		// Si el invitado es de genero femenino
@@ -132,8 +159,12 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 				edadesFemenino.push(i.edad); // ACABARÁ SIENDO -> edad
 				counterAsistenciaFemenino++;
 				hanAsistidoEdad.push(i.edad); // ACABARÁ SIENDO -> edad
-				console.log(cambioTimestampHoraLlegada.getMinutes());
-				horaLlegadaFemenino.push(cambioTimestampHoraLlegada.getUTCHours() + ":" + redondearHora(cambioTimestampHoraLlegada.getMinutes()));
+				var minutos = redondearHora(cambioTimestampHoraLlegada.getMinutes());
+				if(minutos=="nueva_hora"){
+					//cambioTimestampHoraLlegada.setHours(cambioTimestampHoraLlegada.getHours()+1, cambioTimestampHoraLlegada.getMinutes(), cambioTimestampHoraLlegada.getSeconds(), cambioTimestampHoraLlegada.getMilliseconds());
+					minutos="00";
+				}
+				horaLlegadaFemenino.push(cambioTimestampHoraLlegada.getUTCHours() + ":" + minutos);
 			}
 		}
 		else{
@@ -146,7 +177,12 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 				edadesOtro.push(i.edad); // ACABARÁ SIENDO -> edad
 				counterAsistenciaOtro++;
 				hanAsistidoEdad.push(i.edad); // ACABARÁ SIENDO -> edad
-				horaLlegadaOtro.push(cambioTimestampHoraLlegada.getUTCHours() + ":" + redondearHora(cambioTimestampHoraLlegada.getMinutes()));
+				var minutos = redondearHora(cambioTimestampHoraLlegada.getMinutes());
+				if(minutos=="nueva_hora"){
+					//cambioTimestampHoraLlegada.setHours(cambioTimestampHoraLlegada.getHours()+1, cambioTimestampHoraLlegada.getMinutes(), cambioTimestampHoraLlegada.getSeconds(), cambioTimestampHoraLlegada.getMilliseconds());
+					minutos="00";
+				}
+				horaLlegadaOtro.push(cambioTimestampHoraLlegada.getUTCHours() + ":" + minutos);
 			}
 		}
 	})
@@ -161,11 +197,11 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 		noHayDatosEdad = true;
 	}
 
-	console.log(totalEdades);
-	console.log(edadesMasculino);
-	console.log(edadesFemenino);
-	console.log(edadesOtro);
 	console.log(totalHoras);
+	console.log(horaLlegadaMasculino);
+	console.log(horaLlegadaFemenino);
+	console.log(horaLlegadaOtro
+		);
 
 	// Si no ha seleccionado ninguna de las variables
 	if (counter==0) {
