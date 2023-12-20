@@ -36,32 +36,28 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 		}
 	}
 
-	function ordenar(vector, hora, minutos){
-		var partes = [];
-		var counter = 0;
-		if(vector.length == 0){
-			vector.push(hora + ":" + minutos);
-			return;
+	// función que compara dos horas
+	function comparar(hora1, hora2){
+		var partes1 = [];
+		var partes2 = [];
+		partes1 = hora1.split(":");
+		partes2 = hora2.split(":");
+		if(partes2[0]>partes1[0]){
+			return -1;
 		}
-		else {
-			vector.forEach(i => {
-				counter++;
-				partes = i.split(":");
-				if(hora==partes[0]){
-					if(minutos<partes[1]){
-						vector.splice(counter, 0, hora+":"+minutos);
-						return;
-					}
-				}
-				else if(hora<partes[0]){
-					vector.splice(counter,0,hora+":"+minutos);
-					return;
-				}
-				else if(counter==vector.length){
-					vector.push(hora + ":" + minutos);
-					return;
-				}
-			})
+		else if(partes2[0]<partes1[0]){
+			return 1;
+		}
+		else if(partes1[0]==partes2[0]){
+			if(partes2[1]>partes1[1]){
+				return -1;
+			}
+			else if(partes2[1]<partes1[1]){
+				return 1;
+			}
+			else{
+				return 0;
+			}
 		}
 	}
 	
@@ -218,12 +214,12 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 	if(totalEdades.length==0){
 		noHayDatosEdad = true;
 	}
-
+	
+	totalHoras.sort(comparar);
 	console.log(totalHoras);
 	console.log(horaLlegadaMasculino);
 	console.log(horaLlegadaFemenino);
-	console.log(horaLlegadaOtro
-		);
+	console.log(horaLlegadaOtro);
 
 	// Si no ha seleccionado ninguna de las variables
 	if (counter==0) {
