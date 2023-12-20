@@ -104,7 +104,7 @@ function Evento({
 		const genero = event.target.formGenero.value;
 		// Valido el dni
 		if (validarDNI(DNI) === true) {
-			console.log({ nombre, DNI, email, genero});
+			//console.log({ nombre, DNI, email, genero});
 		} else {
 			setDNIInvalido(true);
 			return;
@@ -256,11 +256,11 @@ function Evento({
 												className="form-check-input border-2"
 												onChange={() => {
 													if (invitadosAEliminar.includes(invitado.DNI)) {
-														console.log("eliminando")
+														//console.log("eliminando")
 														setInvitadosAEliminar(invitadosAEliminar.filter((i)=>i != invitado.DNI))
 													}
 													else {
-														console.log("añadiendo")
+														//console.log("añadiendo")
 														setInvitadosAEliminar([...invitadosAEliminar, invitado.DNI])
 													}
 												}} // Manejador para marcar/desmarcar invitado
@@ -336,8 +336,8 @@ function Evento({
 		if (invitadosAEliminar.length == 0) return;
 		const nuevosInvitados = [...invitadosArray].filter((i) => !invitadosAEliminar.includes(i.DNI))
 		const docsRefsEliminar = [...invitadosArray].filter((i) => invitadosAEliminar.includes(i.DNI)).map((i) => i.docId)
-		console.log(docsRefsEliminar)
-		console.log(nuevosInvitados)
+		//console.log(docsRefsEliminar)
+		//console.log(nuevosInvitados)
 		try {
 			await (docsRefsEliminar.forEach(async (docId) => {
 				await deleteDoc(doc(db, "Eventos/" + id + "/Invitados/" + docId))

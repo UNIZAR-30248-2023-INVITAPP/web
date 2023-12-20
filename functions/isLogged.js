@@ -3,7 +3,7 @@ import { auth } from "@/firebase";
 
 export async function isLogged (){
     var id = localStorage.getItem("idToken")
-    console.log(id)
+    //console.log(id)
     if (!id) return false
     const credential = GoogleAuthProvider.credential(id);
     // Comprobar que la sesion es valida

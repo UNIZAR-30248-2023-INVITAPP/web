@@ -18,8 +18,8 @@ const MostrarGrafica = ({
 	const [verticalChecked, setVerticalChecked] = useState(true);
 	const [horizontalChecked, setHorizontalChecked] = useState(false);
 
-	console.log(noHayDatosHoraLlegada);
-	console.log(noHayDatosEdad);
+	//console.log(noHayDatosHoraLlegada);
+	//console.log(noHayDatosEdad);
 
 	// Función para simular la carga de datos
 	useEffect(() => {

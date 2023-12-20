@@ -38,7 +38,7 @@ function Ruleta({ listaInvitados, nombreEvento }) {
                 nombreEvento: nombreEvento, // Nombre del evento
                 email: ganador.email // Email del ganador
             }));
-            console.log(dataToSend)
+            //console.log(dataToSend)
             const response = await fetch('/api/sendMail', {
                 method: 'PUT',
                 headers: {
@@ -80,11 +80,11 @@ function Ruleta({ listaInvitados, nombreEvento }) {
             const premio = event.target.formPremio.value;
             setPremios(premios.add(premio));
             getInvitadoRandom();
-            console.log(premios);
+            //console.log(premios);
 
             // Añadimos un ganador aleatorio a la lista de ganadores
             setGanadores([...ganadores, { ...invitadoRandom, premio: premio }]);
-            console.log(ganadores);
+            //console.log(ganadores);
 
             // Actualizamos la lista de invitados extrayendo el ganador. SEGURAMENTE NO SE HAGA ASÍ (!!)
             const actualizarLista = invitados.filter(

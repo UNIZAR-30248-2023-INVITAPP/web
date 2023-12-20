@@ -14,11 +14,11 @@ const Layout = ({ children }) => {
 				// Redirecciona al usuario a la pantalla inicial
 				localStorage.clear();
 				router.push("/");
-				console.log("Signed out successfully");
+				//console.log("Signed out successfully");
 			})
 			.catch((error) => {
 				// Hacemos log del error en caso de que haya ocurrido algún problema
-				console.log(error);
+				//console.log(error);
 			});
 	};
 	return (

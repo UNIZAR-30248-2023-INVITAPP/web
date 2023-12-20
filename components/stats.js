@@ -3,7 +3,7 @@ import MostrarGrafica from "./mostrarGrafica";
 
 const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaChecked, counter, invitados }) => {
 
-	console.log(invitados);
+	//console.log(invitados);
 
 	// Función para contabilizar elementos en un vector
 	function contabilizarElemento(elemento, array) {
@@ -112,9 +112,9 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 			totalHoras.forEach(j => {
 				var minutos = redondearHora(cambioTimestampHoraLlegada.getMinutes());
 				if(minutos=="nueva_hora"){
-					console.log("soy " + i.nombre + ": antes -> " + cambioTimestampHoraLlegada.getHours() + ":" + cambioTimestampHoraLlegada.getMinutes());
+					//console.log("soy " + i.nombre + ": antes -> " + cambioTimestampHoraLlegada.getHours() + ":" + cambioTimestampHoraLlegada.getMinutes());
 					cambioTimestampHoraLlegada.setHours(cambioTimestampHoraLlegada.getHours()+1, "00", cambioTimestampHoraLlegada.getSeconds(), cambioTimestampHoraLlegada.getMilliseconds());
-					console.log("soy " + i.nombre + ": despues -> " + cambioTimestampHoraLlegada.getHours() + ":" + cambioTimestampHoraLlegada.getMinutes());
+					//console.log("soy " + i.nombre + ": despues -> " + cambioTimestampHoraLlegada.getHours() + ":" + cambioTimestampHoraLlegada.getMinutes());
 					minutos="00";
 				}
 				if(j==cambioTimestampHoraLlegada.getHours()+":"+minutos){
@@ -205,7 +205,7 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 		}
 	})
 
-	console.log(totalHoras.length);
+	//console.log(totalHoras.length);
 
 	if(totalHoras.length==0){
 		noHayDatosHoraLlegada = true;
@@ -216,10 +216,10 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 	}
 	
 	totalHoras.sort(comparar);
-	console.log(totalHoras);
-	console.log(horaLlegadaMasculino);
-	console.log(horaLlegadaFemenino);
-	console.log(horaLlegadaOtro);
+	//console.log(totalHoras);
+	//console.log(horaLlegadaMasculino);
+	//console.log(horaLlegadaFemenino);
+	//console.log(horaLlegadaOtro);
 
 	// Si no ha seleccionado ninguna de las variables
 	if (counter==0) {
