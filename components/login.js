@@ -40,7 +40,7 @@ function Login() {
 			})
 			.catch((error) => {
 				// Hacemos log del error en caso de que haya ocurrido algún problema
-				console.log(error);
+				//console.log(error);
 			});
 	};
 

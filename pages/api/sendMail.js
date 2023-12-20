@@ -23,7 +23,7 @@ export default async function handler(req, res) {
           html: `El evento "${evento.nombre}" programado para el día ${evento.fecha} ha sido cancelado.`
         };
         const info = await transporter.sendMail(mailOptions);
-        console.log('Correo enviado:', info.response);
+        //console.log('Correo enviado:', info.response);
       }
       res.status(200).json({ message: 'Correo/s enviado/s exitosamente' });
       } catch(error) {
@@ -51,7 +51,7 @@ export default async function handler(req, res) {
             html: `Enhorabuena! Has ganado "${ganador.premio}" para el evento ${ganador.nombreEvento}. Que lo disfrutes!`
           };
           const info = await transporter.sendMail(mailOptions);
-          console.log('Correo enviado:', info.response);
+          //console.log('Correo enviado:', info.response);
         }
         res.status(200).json({ message: 'Correo/s enviado/s exitosamente' });
         } catch(error) {

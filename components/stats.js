@@ -3,7 +3,7 @@ import MostrarGrafica from "./mostrarGrafica";
 
 const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaChecked, counter, invitados }) => {
 
-	console.log(invitados);
+	//console.log(invitados);
 
 	// Función para contabilizar elementos en un vector
 	function contabilizarElemento(elemento, array) {
@@ -33,6 +33,31 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 		}
 		else {
 			return "45";
+		}
+	}
+
+	// función que compara dos horas
+	function comparar(hora1, hora2){
+		var partes1 = [];
+		var partes2 = [];
+		partes1 = hora1.split(":");
+		partes2 = hora2.split(":");
+		if(partes2[0]>partes1[0]){
+			return -1;
+		}
+		else if(partes2[0]<partes1[0]){
+			return 1;
+		}
+		else if(partes1[0]==partes2[0]){
+			if(partes2[1]>partes1[1]){
+				return -1;
+			}
+			else if(partes2[1]<partes1[1]){
+				return 1;
+			}
+			else{
+				return 0;
+			}
 		}
 	}
 	
@@ -84,24 +109,15 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 		// en caso afirmativo, transformamos su timestamp a fecha
 		if(i.asistencia){
 			var cambioTimestampHoraLlegada = new Date(i.horaLlegada);
-			// Ajusto la hora a un formato de 24 horas
-			//if(cambioTimestampHoraLlegada.getHours()>11){
-				//console.log(cambioTimestampHoraLlegada.getHours());
-				cambioTimestampHoraLlegada.setHours(cambioTimestampHoraLlegada.getHours()+1, cambioTimestampHoraLlegada.getMinutes(), cambioTimestampHoraLlegada.getSeconds(), cambioTimestampHoraLlegada.getMilliseconds());
-				//console.log(cambioTimestampHoraLlegada.getHours());
-			//}
-			//else{
-				//cambioTimestampHoraLlegada.setHours(cambioTimestampHoraLlegada.getHours()+1, cambioTimestampHoraLlegada.getMinutes(), cambioTimestampHoraLlegada.getSeconds(), cambioTimestampHoraLlegada.getMilliseconds());
-			//}
-			// Si la hora de llegada del invitado ya está incluida cambiamos la variable a true
 			totalHoras.forEach(j => {
 				var minutos = redondearHora(cambioTimestampHoraLlegada.getMinutes());
-				console.log(minutos);
 				if(minutos=="nueva_hora"){
-					cambioTimestampHoraLlegada.setHours(cambioTimestampHoraLlegada.getHours()+1, cambioTimestampHoraLlegada.getMinutes(), cambioTimestampHoraLlegada.getSeconds(), cambioTimestampHoraLlegada.getMilliseconds());
+					//console.log("soy " + i.nombre + ": antes -> " + cambioTimestampHoraLlegada.getHours() + ":" + cambioTimestampHoraLlegada.getMinutes());
+					cambioTimestampHoraLlegada.setHours(cambioTimestampHoraLlegada.getHours()+1, "00", cambioTimestampHoraLlegada.getSeconds(), cambioTimestampHoraLlegada.getMilliseconds());
+					//console.log("soy " + i.nombre + ": despues -> " + cambioTimestampHoraLlegada.getHours() + ":" + cambioTimestampHoraLlegada.getMinutes());
 					minutos="00";
 				}
-				if(j==cambioTimestampHoraLlegada.getUTCHours()+":"+minutos){
+				if(j==cambioTimestampHoraLlegada.getHours()+":"+minutos){
 					horaLlegadaEncontrada = true;
 				}
 			})
@@ -121,7 +137,8 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 				cambioTimestampHoraLlegada.setHours(cambioTimestampHoraLlegada.getHours()+1, cambioTimestampHoraLlegada.getMinutes(), cambioTimestampHoraLlegada.getSeconds(), cambioTimestampHoraLlegada.getMilliseconds());
 				minutos="00";
 			}
-			totalHoras.push(cambioTimestampHoraLlegada.getUTCHours() + ":" + minutos);
+			//ordenar(totalHoras, cambioTimestampHoraLlegada.getHours(), minutos);
+			totalHoras.push(cambioTimestampHoraLlegada.getHours() + ":" + minutos);
 		}
 
 		// Si la edad del invitado no está incluida, la añadimos al vector totalEdades
@@ -142,10 +159,10 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 				hanAsistidoEdad.push(i.edad); // ACABARÁ SIENDO -> edad
 				var minutos = redondearHora(cambioTimestampHoraLlegada.getMinutes());
 				if(minutos=="nueva_hora"){
-					//cambioTimestampHoraLlegada.setHours(cambioTimestampHoraLlegada.getHours()+1, cambioTimestampHoraLlegada.getMinutes(), cambioTimestampHoraLlegada.getSeconds(), cambioTimestampHoraLlegada.getMilliseconds());
+					cambioTimestampHoraLlegada.setHours(cambioTimestampHoraLlegada.getHours()+1, cambioTimestampHoraLlegada.getMinutes(), cambioTimestampHoraLlegada.getSeconds(), cambioTimestampHoraLlegada.getMilliseconds());
 					minutos="00";
 				}
-				horaLlegadaMasculino.push(cambioTimestampHoraLlegada.getUTCHours() + ":" + minutos);
+				horaLlegadaMasculino.push(cambioTimestampHoraLlegada.getHours() + ":" + minutos);
 			}
 		}
 		// Si el invitado es de genero femenino
@@ -160,11 +177,12 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 				counterAsistenciaFemenino++;
 				hanAsistidoEdad.push(i.edad); // ACABARÁ SIENDO -> edad
 				var minutos = redondearHora(cambioTimestampHoraLlegada.getMinutes());
+				var minutos = redondearHora(cambioTimestampHoraLlegada.getMinutes());
 				if(minutos=="nueva_hora"){
-					//cambioTimestampHoraLlegada.setHours(cambioTimestampHoraLlegada.getHours()+1, cambioTimestampHoraLlegada.getMinutes(), cambioTimestampHoraLlegada.getSeconds(), cambioTimestampHoraLlegada.getMilliseconds());
+					cambioTimestampHoraLlegada.setHours(cambioTimestampHoraLlegada.getHours()+1, cambioTimestampHoraLlegada.getMinutes(), cambioTimestampHoraLlegada.getSeconds(), cambioTimestampHoraLlegada.getMilliseconds());
 					minutos="00";
 				}
-				horaLlegadaFemenino.push(cambioTimestampHoraLlegada.getUTCHours() + ":" + minutos);
+				horaLlegadaFemenino.push(cambioTimestampHoraLlegada.getHours() + ":" + minutos);
 			}
 		}
 		else{
@@ -179,15 +197,15 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 				hanAsistidoEdad.push(i.edad); // ACABARÁ SIENDO -> edad
 				var minutos = redondearHora(cambioTimestampHoraLlegada.getMinutes());
 				if(minutos=="nueva_hora"){
-					//cambioTimestampHoraLlegada.setHours(cambioTimestampHoraLlegada.getHours()+1, cambioTimestampHoraLlegada.getMinutes(), cambioTimestampHoraLlegada.getSeconds(), cambioTimestampHoraLlegada.getMilliseconds());
+					cambioTimestampHoraLlegada.setHours(cambioTimestampHoraLlegada.getHours()+1, cambioTimestampHoraLlegada.getMinutes(), cambioTimestampHoraLlegada.getSeconds(), cambioTimestampHoraLlegada.getMilliseconds());
 					minutos="00";
 				}
-				horaLlegadaOtro.push(cambioTimestampHoraLlegada.getUTCHours() + ":" + minutos);
+				horaLlegadaOtro.push(cambioTimestampHoraLlegada.getHours() + ":" + minutos);
 			}
 		}
 	})
 
-	console.log(totalHoras.length);
+	//console.log(totalHoras.length);
 
 	if(totalHoras.length==0){
 		noHayDatosHoraLlegada = true;
@@ -196,12 +214,12 @@ const Stats = ({ generoChecked, edadChecked, asistenciaChecked, horaLlegadaCheck
 	if(totalEdades.length==0){
 		noHayDatosEdad = true;
 	}
-
-	console.log(totalHoras);
-	console.log(horaLlegadaMasculino);
-	console.log(horaLlegadaFemenino);
-	console.log(horaLlegadaOtro
-		);
+	
+	totalHoras.sort(comparar);
+	//console.log(totalHoras);
+	//console.log(horaLlegadaMasculino);
+	//console.log(horaLlegadaFemenino);
+	//console.log(horaLlegadaOtro);
 
 	// Si no ha seleccionado ninguna de las variables
 	if (counter==0) {

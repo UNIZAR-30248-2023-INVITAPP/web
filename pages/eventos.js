@@ -99,7 +99,7 @@ function EventosPage() {
 	// Luego, ordena el arreglo de eventos por nombre y actualiza el estado con los eventos obtenidos.
 	const fetchEventos = async () => {
 		const mail = localStorage.getItem("email") || emailTesting
-		console.log(mail)
+		//console.log(mail)
 		const eventosFirebase = await getDocs(query(collection(db, "Eventos"), where("organizador", "==", mail)));
 		//const eventosFirebase = await getDocs(collection(db, "Eventos"));
 		//console.log(eventosFirebase);
@@ -142,7 +142,7 @@ function EventosPage() {
             eventoCopia.fechaOriginal = fechaDate;
 			return eventoCopia;
 		});
-		console.log(eventosFechaDate)
+		//console.log(eventosFechaDate)
 		setEventos(eventosFechaDate);
 		setLoading(false);
 	};
@@ -195,7 +195,7 @@ function EventosPage() {
 			}
 
 			const data = await response.json();
-			console.log(data.message); // Mensaje de confirmación del servidor
+			//console.log(data.message); // Mensaje de confirmación del servidor
 		} catch (error) {
 			console.error("Error al enviar los correos desde React:", error);
 			// Manejar el error de manera apropiada para tu aplicación
@@ -223,13 +223,13 @@ function EventosPage() {
 					
                     setEventos(nuevosEventos);
 
-                    console.log(usuariosPendientesCorreo)
+                    //console.log(usuariosPendientesCorreo)
                     if (usuariosPendientesCorreo.length > 0 && filtroEventosFuturos) { // Solo se manda peticion de correo si hay invitados en el evento
                         await sendPostRequestToMailService(usuariosPendientesCorreo);
                     }
                 }
             } catch(error){
-                console.log("Error: ", error)
+                //console.log("Error: ", error)
             } finally {
 				handleHideConfirmacionModal()
 				setShowToast(true)
@@ -260,7 +260,7 @@ function EventosPage() {
 			await Promise.all(
 				eventosSeleccionados.map(async (idFirebase) => {
 					const eventoEliminar = eventos.find((e) => e.id == idFirebase)
-					console.log(eventoEliminar)
+					//console.log(eventoEliminar)
 					// Eliminar todos los documentos de la subcoleccion invitados
 					const invitadosFirebase = await getDocs(collection(db, "Eventos/" + idFirebase + "/Invitados"))
 					const invitadosEventoEliminar = invitadosFirebase.docs.map((i) => i.id)
@@ -615,9 +615,9 @@ function EventosPage() {
 	}, []);
 
 	if (cargado){
-		console.log("cypress: " + window.Cypress)
+		//console.log("cypress: " + window.Cypress)
 		if (window.Cypress){
-			console.log("preuba")
+			//console.log("preuba")
 			localStorage.setItem("email", emailTesting)
 		}
 		if (!isUserLogged && !window.Cypress) router.push("/login");
