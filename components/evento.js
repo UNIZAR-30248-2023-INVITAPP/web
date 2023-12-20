@@ -577,7 +577,7 @@ function Evento({
 				className="pt-2 px-2 pt-md-0 px-md-0"
 				show={showSorteo}
 				onHide={() => {
-					setShowConfirmacionCerrarSorteo(true);
+					// setShowConfirmacionCerrarSorteo(true);
 					setShowSorteo(false);
 				}}
 				centered
